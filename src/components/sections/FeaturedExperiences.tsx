@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Heart, Star, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 const experiences = [
   {
     id: 1,
@@ -92,6 +92,8 @@ const cardVariants = {
 };
 
 export function FeaturedExperiences() {
+  const navigate = useNavigate();
+
   return (
     <section id="experiences" className="py-20 lg:py-28 bg-cream">
       <div className="container">
@@ -131,7 +133,8 @@ export function FeaturedExperiences() {
               key={exp.id}
               variants={cardVariants}
               whileHover={{ y: -8 }}
-              className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50"
+              onClick={() => navigate(`/experience/${exp.id}`)}
+              className="group bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50 cursor-pointer"
             >
               {/* Image */}
               <div className="relative h-52 overflow-hidden">
@@ -196,7 +199,13 @@ export function FeaturedExperiences() {
                       </span>
                     )}
                   </div>
-                  <Button size="sm">
+                  <Button 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/experience/${exp.id}`);
+                    }}
+                  >
                     Rezervă
                   </Button>
                 </div>
