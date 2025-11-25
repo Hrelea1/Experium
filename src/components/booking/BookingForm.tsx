@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, Users, Gift, CreditCard, ChevronDown } from "lucide-react";
+import { format } from "date-fns";
+import { ro } from "date-fns/locale";
+import { CalendarIcon, Users, Gift, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface BookingFormProps {
   experience: {
@@ -16,7 +25,7 @@ interface BookingFormProps {
 
 export function BookingForm({ experience }: BookingFormProps) {
   const { toast } = useToast();
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [participants, setParticipants] = useState(1);
   const [isGift, setIsGift] = useState(false);
   const [giftDetails, setGiftDetails] = useState({
@@ -25,11 +34,31 @@ export function BookingForm({ experience }: BookingFormProps) {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const totalPrice = experience.price * participants;
   const savings = experience.originalPrice 
     ? (experience.originalPrice - experience.price) * participants 
     : 0;
+
+  // Disable dates in the past and some random unavailable dates
+  const disabledDays = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Disable past dates
+    if (date < today) return true;
+    
+    // Disable dates within next 2 days (preparation time)
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + 2);
+    if (date < minDate) return true;
+    
+    // Simulate some unavailable dates (every Sunday and some random dates)
+    if (date.getDay() === 0) return true;
+    
+    return false;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,27 +79,11 @@ export function BookingForm({ experience }: BookingFormProps) {
     
     toast({
       title: "Rezervare confirmată! 🎉",
-      description: `Ai rezervat ${experience.title} pentru ${participants} ${participants === 1 ? "persoană" : "persoane"}.`,
+      description: `Ai rezervat ${experience.title} pentru ${participants} ${participants === 1 ? "persoană" : "persoane"} pe ${format(selectedDate, "d MMMM yyyy", { locale: ro })}.`,
     });
     
     setIsSubmitting(false);
   };
-
-  // Generate available dates (next 30 days, excluding some random dates)
-  const getAvailableDates = () => {
-    const dates = [];
-    const today = new Date();
-    for (let i = 3; i < 33; i++) {
-      if (i % 7 !== 0 && i % 5 !== 0) { // Skip some dates
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        dates.push(date);
-      }
-    }
-    return dates;
-  };
-
-  const availableDates = getAvailableDates();
 
   return (
     <motion.div
@@ -99,31 +112,50 @@ export function BookingForm({ experience }: BookingFormProps) {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="p-6 space-y-5">
-        {/* Date Selection */}
+        {/* Date Selection with Calendar */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
-            <Calendar className="w-4 h-4 text-primary" />
+            <CalendarIcon className="w-4 h-4 text-primary" />
             Data experienței
           </label>
-          <div className="relative">
-            <select
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full px-4 py-3 bg-muted rounded-xl text-foreground appearance-none cursor-pointer hover:bg-muted/80 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="">Selectează o dată</option>
-              {availableDates.map((date, index) => (
-                <option key={index} value={date.toISOString()}>
-                  {date.toLocaleDateString("ro-RO", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                  })}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-          </div>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal h-12 rounded-xl bg-muted border-0 hover:bg-muted/80",
+                  !selectedDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
+                {selectedDate ? (
+                  format(selectedDate, "EEEE, d MMMM yyyy", { locale: ro })
+                ) : (
+                  <span>Selectează o dată</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-card border border-border shadow-xl z-50" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  setSelectedDate(date);
+                  setCalendarOpen(false);
+                }}
+                disabled={disabledDays}
+                initialFocus
+                locale={ro}
+                className={cn("p-3 pointer-events-auto")}
+              />
+              <div className="px-4 pb-3 pt-0">
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
+                  <span className="w-3 h-3 rounded bg-muted"></span>
+                  Indisponibil
+                </p>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Participants */}

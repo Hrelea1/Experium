@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { 
   Mountain, 
   Sparkles, 
@@ -9,11 +10,11 @@ import {
   Heart,
   Plane
 } from "lucide-react";
-
 const categories = [
   {
     icon: Mountain,
     title: "Aventură",
+    slug: "aventura",
     description: "Rafting, paragliding, escaladă",
     count: 87,
     color: "from-orange-500 to-red-500",
@@ -21,6 +22,7 @@ const categories = [
   {
     icon: Sparkles,
     title: "Spa & Relaxare",
+    slug: "spa-relaxare",
     description: "Masaje, tratamente, wellness",
     count: 124,
     color: "from-cyan-500 to-blue-500",
@@ -28,6 +30,7 @@ const categories = [
   {
     icon: UtensilsCrossed,
     title: "Gastronomie",
+    slug: "gastronomie",
     description: "Degustări, cursuri de gătit",
     count: 93,
     color: "from-amber-500 to-orange-500",
@@ -35,6 +38,7 @@ const categories = [
   {
     icon: Palette,
     title: "Artă & Cultură",
+    slug: "arta-cultura",
     description: "Workshop-uri, tururi ghidate",
     count: 56,
     color: "from-purple-500 to-pink-500",
@@ -42,6 +46,7 @@ const categories = [
   {
     icon: Dumbbell,
     title: "Sport",
+    slug: "sport",
     description: "Golf, tenis, karting",
     count: 72,
     color: "from-green-500 to-emerald-500",
@@ -49,6 +54,7 @@ const categories = [
   {
     icon: TreePine,
     title: "Natură",
+    slug: "natura",
     description: "Safari, pescuit, camping",
     count: 68,
     color: "from-teal-500 to-green-500",
@@ -56,6 +62,7 @@ const categories = [
   {
     icon: Heart,
     title: "Romantic",
+    slug: "romantic",
     description: "Cină romantică, escapade",
     count: 45,
     color: "from-rose-500 to-pink-500",
@@ -63,6 +70,7 @@ const categories = [
   {
     icon: Plane,
     title: "Călătorii",
+    slug: "calatorii",
     description: "City break, excursii",
     count: 34,
     color: "from-indigo-500 to-purple-500",
@@ -91,6 +99,8 @@ const itemVariants = {
 };
 
 export function Categories() {
+  const navigate = useNavigate();
+
   return (
     <section id="categories" className="py-20 lg:py-28 bg-background">
       <div className="container">
@@ -121,9 +131,9 @@ export function Categories() {
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6"
         >
           {categories.map((category) => (
-            <motion.a
+            <motion.div
               key={category.title}
-              href={`#${category.title.toLowerCase()}`}
+              onClick={() => navigate(`/category/${category.slug}`)}
               variants={itemVariants}
               whileHover={{ scale: 1.02, y: -4 }}
               className="group relative bg-card rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer overflow-hidden border border-border/50"
@@ -148,7 +158,7 @@ export function Categories() {
               <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
                 {category.count} experiențe
               </span>
-            </motion.a>
+            </motion.div>
           ))}
         </motion.div>
       </div>
