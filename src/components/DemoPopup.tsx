@@ -73,7 +73,7 @@ export function DemoPopup() {
               </div>
 
               {/* Content */}
-              <div className="p-6 text-center">
+              <div className="p-6 pb-8 text-center">
                 <motion.p
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -86,24 +86,10 @@ export function DemoPopup() {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-muted-foreground mb-6"
+                  className="text-muted-foreground"
                 >
                   Vizionare plăcută!
                 </motion.p>
-
-                <motion.div
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Button 
-                    onClick={() => setIsOpen(false)}
-                    className="w-full"
-                    size="lg"
-                  >
-                    Explorează Experiențele
-                  </Button>
-                </motion.div>
               </div>
             </div>
           </motion.div>
