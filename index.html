@@ -4,6 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Experium - Cadouri Experiențiale Unice în România</title>
+    <!-- GitHub Pages SPA redirect handler -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
     <meta name="description" content="Descoperă cele mai frumoase experiențe cadou din România. De la aventuri în natură la relaxare la spa, găsește cadoul perfect pentru cei dragi. Peste 500+ experiențe în 42 de județe." />
     <meta name="keywords" content="experiențe cadou, cadouri experiențiale, România, aventură, spa, gastronomie, zbor cu balonul, rafting, cadou unic, Experium" />
     <meta name="author" content="Experium" />
