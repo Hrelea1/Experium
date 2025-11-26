@@ -3,12 +3,9 @@ import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { componentTagger } from 'lovable-tagger';
 
-export default defineConfig(({ mode }) => ({
-  base: process.env.GITHUB_PAGES ? '/Experium/' : '/',
-  server: {
-    host: "::",
-    port: 8080,
-  },
+export default defineConfig({
+  base: '/Experium/',
+});
   plugins: [
     react(),
     mode === 'development' && componentTagger()
