@@ -65,7 +65,7 @@ export function Footer() {
               </a>
               <div className="flex items-center gap-2 text-secondary-foreground/70">
                 <MapPin className="w-4 h-4" />
-                București, România
+                Craiova, România
               </div>
             </div>
 
@@ -142,7 +142,7 @@ export function Footer() {
       <div className="border-t border-secondary-foreground/10">
         <div className="container py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-secondary-foreground/60 text-sm">
-            © 2024 Experium. Toate drepturile rezervate.
+            © 2025 Experium. Toate drepturile rezervate.
           </p>
           <div className="flex items-center gap-6 text-sm">
             <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">

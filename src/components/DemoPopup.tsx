@@ -78,31 +78,23 @@ export function DemoPopup() {
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-lg text-foreground mb-2"
+                  className="text-lg text-foreground mb-4"
                 >
-                  Demo prezentat de
+                  Demo prezentat de <span className="font-bold text-primary">David Hrelea</span> pentru Experium
                 </motion.p>
-                <motion.h3
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-2xl font-bold text-primary mb-4"
-                >
-                  David Hrelea
-                </motion.h3>
                 <motion.p
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.4 }}
                   className="text-muted-foreground mb-6"
                 >
-                  pentru Experium
+                  Vizionare plăcută!
                 </motion.p>
 
                 <motion.div
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
+                  transition={{ delay: 0.5 }}
                 >
                   <Button 
                     onClick={() => setIsOpen(false)}
