@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Facebook, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
 
 const footerLinks = {
@@ -39,14 +40,14 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-3 lg:col-span-2">
-            <a href="/" className="flex items-center gap-2 mb-4">
+            <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-xl">E</span>
               </div>
               <span className="font-bold text-xl">
-                Experiențe<span className="text-primary">.ro</span>
+                Experium
               </span>
-            </a>
+            </Link>
             <p className="text-secondary-foreground/70 mb-6 max-w-xs">
               Oferim cele mai frumoase experiențe cadou din România. 
               Fă pe cineva fericit astăzi!
@@ -58,9 +59,9 @@ export function Footer() {
                 <Phone className="w-4 h-4" />
                 +40 721 234 567
               </a>
-              <a href="mailto:contact@experiente.ro" className="flex items-center gap-2 text-secondary-foreground/70 hover:text-primary transition-colors">
+              <a href="mailto:contact@experium.ro" className="flex items-center gap-2 text-secondary-foreground/70 hover:text-primary transition-colors">
                 <Mail className="w-4 h-4" />
-                contact@experiente.ro
+                contact@experium.ro
               </a>
               <div className="flex items-center gap-2 text-secondary-foreground/70">
                 <MapPin className="w-4 h-4" />
@@ -141,7 +142,7 @@ export function Footer() {
       <div className="border-t border-secondary-foreground/10">
         <div className="container py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-secondary-foreground/60 text-sm">
-            © 2024 Experiențe.ro. Toate drepturile rezervate.
+            © 2024 Experium. Toate drepturile rezervate.
           </p>
           <div className="flex items-center gap-6 text-sm">
             <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">
