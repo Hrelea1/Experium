@@ -8,10 +8,7 @@ export default defineConfig(({ mode }) => ({
   // Set the base path to '/Experium/' for GitHub Pages
   base: process.env.GITHUB_PAGES ? '/Experium/' : '/',
 base: '/Experium/' 
-  server: {
-    host: "::",
-    port: 8080,
-  },
+  
 
   plugins: [react(), mode === 'development' && componentTagger()].filter(Boolean),
 
