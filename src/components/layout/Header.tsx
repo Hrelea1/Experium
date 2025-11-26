@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Menu, X, Search, Heart, ShoppingBag, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,14 +20,18 @@ export function Header() {
       <div className="container">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+          <Link to="/" className="flex items-center gap-2 group">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transition-shadow group-hover:shadow-lg group-hover:shadow-primary/25"
+            >
               <span className="text-primary-foreground font-bold text-xl">E</span>
-            </div>
+            </motion.div>
             <span className="hidden sm:block font-bold text-xl text-foreground">
-              Experiențe<span className="text-primary">.ro</span>
+              Experium
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
