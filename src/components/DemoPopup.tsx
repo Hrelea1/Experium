@@ -7,7 +7,6 @@ export function DemoPopup() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Show popup after a short delay for smoother experience
     const timer = setTimeout(() => setIsOpen(true), 500);
     return () => clearTimeout(timer);
   }, []);
@@ -37,18 +36,27 @@ export function DemoPopup() {
               stiffness: 300,
               duration: 0.4 
             }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-[90%] max-w-md"
+            className="fixed inset-4 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-[101] flex items-center justify-center sm:block sm:w-full sm:max-w-md"
           >
-            <div className="bg-card rounded-3xl shadow-2xl border border-border overflow-hidden">
+            <div className="relative bg-card rounded-3xl shadow-2xl border border-border overflow-hidden w-full max-w-md">
+              {/* Close button - positioned outside gradient header */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-secondary/80 backdrop-blur-sm flex items-center justify-center text-secondary-foreground hover:bg-secondary transition-colors shadow-lg"
+                aria-label="Închide"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
               {/* Gradient Header */}
-              <div className="bg-gradient-to-r from-primary via-coral to-coral-dark p-6 text-center relative">
+              <div className="bg-gradient-to-r from-primary via-coral to-coral-dark p-6 pt-8 text-center relative">
                 <motion.div
                   initial={{ rotate: 0 }}
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="absolute top-4 right-4 opacity-20"
+                  className="absolute top-4 left-4 opacity-20"
                 >
-                  <Sparkles className="w-16 h-16 text-primary-foreground" />
+                  <Sparkles className="w-12 h-12 text-primary-foreground" />
                 </motion.div>
                 <motion.div
                   initial={{ y: -10, opacity: 0 }}
@@ -105,14 +113,6 @@ export function DemoPopup() {
                   </Button>
                 </motion.div>
               </div>
-
-              {/* Close button */}
-              <button
-                onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center text-primary-foreground hover:bg-primary-foreground/30 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
           </motion.div>
         </>
