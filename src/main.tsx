@@ -1,9 +1,5 @@
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
+import { createRoot } from "react-dom/client";
+import App from "./App.tsx";
+import "./index.css";
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <BrowserRouter basename="/Experium">
-    <App />
-  </BrowserRouter>
-);
+createRoot(document.getElementById("root")!).render(<App />);

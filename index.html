@@ -4,19 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Experium - Cadouri Experiențiale Unice în România</title>
-    <!-- GitHub Pages SPA redirect handler -->
-    <script type="text/javascript">
-      (function(l) {
-        if (l.search[1] === '/' ) {
-          var decoded = l.search.slice(1).split('&').map(function(s) { 
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
-      }(window.location))
-    </script>
     <meta name="description" content="Descoperă cele mai frumoase experiențe cadou din România. De la aventuri în natură la relaxare la spa, găsește cadoul perfect pentru cei dragi. Peste 500+ experiențe în 42 de județe." />
     <meta name="keywords" content="experiențe cadou, cadouri experiențiale, România, aventură, spa, gastronomie, zbor cu balonul, rafting, cadou unic, Experium" />
     <meta name="author" content="Experium" />
@@ -32,11 +19,11 @@
     <meta name="twitter:description" content="Descoperă cele mai frumoase experiențe cadou din România." />
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1574974915766-a4195c4f66e9?w=1200&h=630&fit=crop" />
 
-    <link rel="canonical" href="https://hrelea1.github.io/Experium/" />
+    <link rel="canonical" href="https://experium.ro" />
   </head>
 
   <body>
     <div id="root"></div>
-    <script type="module" src="./src/main.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
