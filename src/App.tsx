@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import ExperienceDetail from "./pages/ExperienceDetail";
 import CategorySearch from "./pages/CategorySearch";
 import Auth from "./pages/Auth";
+import MyVouchers from "./pages/MyVouchers";
+import CreateTestVoucher from "./pages/CreateTestVoucher";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { DemoPopup } from "./components/DemoPopup";
@@ -28,6 +30,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/category/:category" element={<CategorySearch />} />
+            <Route path="/my-vouchers" element={<MyVouchers />} />
+            <Route path="/create-test-voucher" element={<CreateTestVoucher />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

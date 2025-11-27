@@ -301,15 +301,83 @@ export type Database = {
         }
         Relationships: []
       }
+      vouchers: {
+        Row: {
+          code: string
+          created_at: string
+          experience_id: string | null
+          expiry_date: string
+          id: string
+          issue_date: string
+          notes: string | null
+          purchase_price: number
+          qr_code_data: string | null
+          redemption_date: string | null
+          status: Database["public"]["Enums"]["voucher_status"]
+          transferred_date: string | null
+          transferred_to: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          experience_id?: string | null
+          expiry_date: string
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          purchase_price: number
+          qr_code_data?: string | null
+          redemption_date?: string | null
+          status?: Database["public"]["Enums"]["voucher_status"]
+          transferred_date?: string | null
+          transferred_to?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          experience_id?: string | null
+          expiry_date?: string
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          purchase_price?: number
+          qr_code_data?: string | null
+          redemption_date?: string | null
+          status?: Database["public"]["Enums"]["voucher_status"]
+          transferred_date?: string | null
+          transferred_to?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vouchers_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_voucher_code: { Args: never; Returns: string }
+      update_expired_vouchers: { Args: never; Returns: undefined }
     }
     Enums: {
-      [_ in never]: never
+      voucher_status:
+        | "active"
+        | "used"
+        | "expired"
+        | "exchanged"
+        | "transferred"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -436,6 +504,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      voucher_status: ["active", "used", "expired", "exchanged", "transferred"],
+    },
   },
 } as const
