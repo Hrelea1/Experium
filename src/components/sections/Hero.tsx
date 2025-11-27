@@ -4,6 +4,7 @@ import { Search, MapPin, Sparkles, ChevronDown, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const regions = [
   "Toate Regiunile",
@@ -34,12 +35,28 @@ export function Hero() {
   const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
+  const { data: content } = useHomepageContent("hero");
+  
+  const heroContent = content?.content || {
+    title: "Oferă Momente",
+    titleHighlight: "Memorabile",
+    subtitle: "Descoperă cele mai frumoase experiențe din România. De la aventuri în natură la relaxare la spa, găsește cadoul perfect pentru cei dragi.",
+    badge: "Peste 500+ experiențe unice în România",
+    ctaPrimary: "Descoperă Experiențe",
+    ctaPrimaryLink: "/category/toate-categoriile",
+    ctaSecondary: "Ai un Voucher?",
+    ctaSecondaryLink: "/redeem-voucher",
+    backgroundImage: "",
+  };
+
+  const backgroundImage = heroContent.backgroundImage || heroBg;
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
-          src={heroBg}
+          src={backgroundImage}
           alt="Romanian landscape"
           className="w-full h-full object-cover"
         />
@@ -61,17 +78,16 @@ export function Hero() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/20 backdrop-blur-sm text-card text-sm font-medium mb-6"
           >
             <Sparkles className="w-4 h-4 text-accent" />
-            Peste 500+ experiențe unice în România
+            {heroContent.badge}
           </motion.span>
 
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-card mb-6 leading-tight">
-            Oferă Momente
-            <span className="block text-primary">Memorabile</span>
+            {heroContent.title}
+            <span className="block text-primary">{heroContent.titleHighlight}</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-card/90 mb-10 max-w-2xl mx-auto">
-            Descoperă cele mai frumoase experiențe din România. De la aventuri 
-            în natură la relaxare la spa, găsește cadoul perfect pentru cei dragi.
+            {heroContent.subtitle}
           </p>
 
           {/* CTA Buttons */}
@@ -82,15 +98,15 @@ export function Hero() {
             className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
           >
             <Button asChild size="lg" className="group">
-              <Link to="/category/toate-categoriile">
+              <Link to={heroContent.ctaPrimaryLink}>
                 <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                Descoperă Experiențe
+                {heroContent.ctaPrimary}
               </Link>
             </Button>
             <Button asChild size="lg" variant="secondary" className="group bg-card/20 backdrop-blur-sm border-2 border-card/30 hover:bg-card/30 text-card hover:text-card">
-              <Link to="/redeem-voucher">
+              <Link to={heroContent.ctaSecondaryLink}>
                 <Gift className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Ai un Voucher?
+                {heroContent.ctaSecondary}
               </Link>
             </Button>
           </motion.div>

@@ -5,7 +5,8 @@ import {
   ShoppingBag,
   Users,
   Settings,
-  Home
+  Home,
+  FileEdit
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -24,6 +25,7 @@ import {
 
 const mainItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+  { title: "Editor Conținut", url: "/admin/content", icon: FileEdit },
   { title: "Experiențe", url: "/admin/experiences", icon: Gift },
   { title: "Rezervări", url: "/admin/bookings", icon: Calendar },
   { title: "Vouchere", url: "/admin/orders", icon: ShoppingBag },
