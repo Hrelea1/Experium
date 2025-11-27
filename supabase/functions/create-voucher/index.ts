@@ -8,9 +8,11 @@ const corsHeaders = {
 };
 
 interface CreateVoucherRequest {
+  userId?: string;  // Optional: for admin-created vouchers
   experienceId: string;
   purchasePrice: number;
   notes?: string;
+  validityMonths?: number;  // Optional: custom validity period
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -45,7 +47,10 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { experienceId, purchasePrice, notes }: CreateVoucherRequest = await req.json();
+    const { userId, experienceId, purchasePrice, notes, validityMonths = 12 }: CreateVoucherRequest = await req.json();
+
+    // Determine target user ID (either specified or current user)
+    const targetUserId = userId || user.id;
 
     // Generate unique voucher code
     const { data: codeData, error: codeError } = await supabaseClient
@@ -58,15 +63,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     const voucherCode = codeData as string;
 
-    // Calculate expiry date (12 months from now)
+    // Calculate expiry date (custom months or default 12 months)
     const expiryDate = new Date();
-    expiryDate.setMonth(expiryDate.getMonth() + 12);
+    expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
 
     // Create voucher
     const { data: voucher, error: voucherError } = await supabaseClient
       .from('vouchers')
       .insert({
-        user_id: user.id,
+        user_id: targetUserId,
         experience_id: experienceId,
         code: voucherCode,
         purchase_price: purchasePrice,
