@@ -340,6 +340,44 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_content_audit: {
+        Row: {
+          changed_at: string | null
+          changed_by: string | null
+          content_id: string | null
+          id: string
+          new_content: Json | null
+          old_content: Json | null
+          section_key: string
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by?: string | null
+          content_id?: string | null
+          id?: string
+          new_content?: Json | null
+          old_content?: Json | null
+          section_key: string
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string | null
+          content_id?: string | null
+          id?: string
+          new_content?: Json | null
+          old_content?: Json | null
+          section_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homepage_content_audit_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "homepage_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
