@@ -138,7 +138,7 @@ export default function ContentEditor() {
           <div className="flex gap-2">
             <Input
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleImageUpload("hero", "backgroundImage", file);
@@ -147,6 +147,9 @@ export default function ContentEditor() {
             />
             {uploading === "hero-backgroundImage" && <Loader2 className="w-5 h-5 animate-spin" />}
           </div>
+          <p className="text-xs text-muted-foreground">
+            Max 5MB. Formate acceptate: JPG, PNG, WebP
+          </p>
           {content.backgroundImage && (
             <img src={content.backgroundImage} alt="Preview" className="w-full h-32 object-cover rounded-lg mt-2" />
           )}
@@ -215,12 +218,20 @@ export default function ContentEditor() {
             <h2 className="text-3xl font-bold">Editor Conținut Homepage</h2>
             <p className="text-muted-foreground">Editează text, imagini și linkuri pentru fiecare secțiune</p>
           </div>
-          <Button variant="outline" asChild>
-            <Link to="/">
-              <Eye className="w-4 h-4 mr-2" />
-              Previzualizează
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/admin/content/audit">
+                <Upload className="w-4 h-4 mr-2" />
+                Istoric
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/">
+                <Eye className="w-4 h-4 mr-2" />
+                Previzualizează
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="hero" className="space-y-6">

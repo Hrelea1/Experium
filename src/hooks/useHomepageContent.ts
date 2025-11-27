@@ -52,9 +52,42 @@ export function useUpdateHomepageContent() {
       sectionKey: string;
       content: Record<string, any>;
     }) => {
+      // Validate section key
+      if (!sectionKey || sectionKey.length > 50) {
+        throw new Error("Section key invalid");
+      }
+
+      // Validate content is an object
+      if (!content || typeof content !== "object" || Array.isArray(content)) {
+        throw new Error("Conținutul trebuie să fie un obiect valid");
+      }
+
+      // Sanitize string values (remove potentially dangerous characters)
+      const sanitizeString = (str: string): string => {
+        if (typeof str !== "string") return str;
+        // Remove any HTML/script tags
+        return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+                  .replace(/<[^>]*>/g, "")
+                  .trim();
+      };
+
+      // Recursively sanitize all string values in content
+      const sanitizeContent = (obj: any): any => {
+        if (typeof obj === "string") return sanitizeString(obj);
+        if (Array.isArray(obj)) return obj.map(sanitizeContent);
+        if (typeof obj === "object" && obj !== null) {
+          return Object.fromEntries(
+            Object.entries(obj).map(([k, v]) => [k, sanitizeContent(v)])
+          );
+        }
+        return obj;
+      };
+
+      const sanitizedContent = sanitizeContent(content);
+
       const { data, error } = await supabase
         .from("homepage_content")
-        .update({ content })
+        .update({ content: sanitizedContent })
         .eq("section_key", sectionKey)
         .select()
         .single();
@@ -84,19 +117,36 @@ export function useUploadHomepageImage() {
 
   return useMutation({
     mutationFn: async (file: File) => {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      // Security validations
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+      const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        throw new Error("Fișierul este prea mare. Mărimea maximă este 5MB.");
+      }
+
+      // Validate file type
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        throw new Error("Tip de fișier invalid. Folosește JPG, PNG sau WebP.");
+      }
+
+      // Sanitize filename
+      const fileExt = file.name.split(".").pop()?.toLowerCase();
+      const sanitizedFileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
       const { error: uploadError } = await supabase.storage
         .from("homepage-images")
-        .upload(filePath, file);
+        .upload(sanitizedFileName, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (uploadError) throw uploadError;
 
       const { data } = supabase.storage
         .from("homepage-images")
-        .getPublicUrl(filePath);
+        .getPublicUrl(sanitizedFileName);
 
       return data.publicUrl;
     },
