@@ -177,9 +177,8 @@ const Dashboard = () => {
       p_cancellation_reason: cancellationReason,
     });
 
-    setCancelling(false);
-
     if (error || !data || data.length === 0) {
+      setCancelling(false);
       toast({
         title: 'Eroare',
         description: error?.message || 'Nu s-a putut anula rezervarea',
@@ -191,6 +190,7 @@ const Dashboard = () => {
     const result = data[0];
     
     if (!result.success) {
+      setCancelling(false);
       toast({
         title: 'Eroare',
         description: result.error_message,
@@ -199,6 +199,19 @@ const Dashboard = () => {
       return;
     }
 
+    // Send cancellation confirmation email
+    try {
+      await supabase.functions.invoke('send-cancellation-confirmation', {
+        body: {
+          bookingId: selectedBookingId,
+          refundEligible: result.refund_eligible,
+        },
+      });
+    } catch (emailError) {
+      console.error('Failed to send cancellation email:', emailError);
+    }
+
+    setCancelling(false);
     toast({
       title: 'Rezervare anulată',
       description: result.refund_eligible 
