@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navLinks = [
   { label: "Experiențe", href: "#experiences" },
@@ -14,6 +23,7 @@ const navLinks = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border/50 pt-[env(safe-area-inset-top)]">
@@ -61,10 +71,46 @@ export function Header() {
                 0
               </span>
             </Button>
-            <Button variant="outline" size="sm" className="hidden lg:flex">
-              <User className="h-4 w-4 mr-2" />
-              Contul Meu
-            </Button>
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="hidden lg:flex">
+                    <User className="h-4 w-4 mr-2" />
+                    Contul Meu
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-bookings">Rezervările Mele</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-vouchers">Voucherele Mele</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Deconectare
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="outline" size="sm" className="hidden lg:flex" asChild>
+                <Link to="/auth">
+                  <User className="h-4 w-4 mr-2" />
+                  Autentificare
+                </Link>
+              </Button>
+            )}
 
             {/* Mobile Menu Toggle */}
             <Button
@@ -109,10 +155,24 @@ export function Header() {
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingBag className="h-5 w-5" />
                 </Button>
-                <Button variant="outline" size="sm" className="ml-auto">
-                  <User className="h-4 w-4 mr-2" />
-                  Contul Meu
-                </Button>
+                {user ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="ml-auto"
+                    onClick={signOut}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Deconectare
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" className="ml-auto" asChild>
+                    <Link to="/auth">
+                      <User className="h-4 w-4 mr-2" />
+                      Autentificare
+                    </Link>
+                  </Button>
+                )}
               </div>
             </nav>
           </motion.div>
