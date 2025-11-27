@@ -313,6 +313,33 @@ export type Database = {
           },
         ]
       }
+      homepage_content: {
+        Row: {
+          content: Json
+          created_at: string | null
+          id: string
+          section_key: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          content?: Json
+          created_at?: string | null
+          id?: string
+          section_key: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          id?: string
+          section_key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -21,6 +21,7 @@ import ManageOrders from "./pages/admin/ManageOrders";
 import ManageRoles from "./pages/admin/ManageRoles";
 import ExperienceBuilder from "./pages/admin/ExperienceBuilder";
 import VoucherBuilder from "./pages/admin/VoucherBuilder";
+import ContentEditor from "./pages/admin/ContentEditor";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { DemoPopup } from "./components/DemoPopup";
@@ -49,6 +50,7 @@ const App = () => (
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/content" element={<ContentEditor />} />
             <Route path="/admin/experiences" element={<ManageExperiences />} />
             <Route path="/admin/experiences/create" element={<ExperienceBuilder />} />
             <Route path="/admin/bookings" element={<ManageBookings />} />
