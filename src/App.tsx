@@ -12,6 +12,11 @@ import MyVouchers from "./pages/MyVouchers";
 import MyBookings from "./pages/MyBookings";
 import RedeemVoucher from "./pages/RedeemVoucher";
 import CreateTestVoucher from "./pages/CreateTestVoucher";
+import GrantAdminAccess from "./pages/GrantAdminAccess";
+import AdminDashboard from "./pages/admin/Dashboard";
+import ManageExperiences from "./pages/admin/ManageExperiences";
+import ManageBookings from "./pages/admin/ManageBookings";
+import ManageOrders from "./pages/admin/ManageOrders";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { DemoPopup } from "./components/DemoPopup";
@@ -36,6 +41,14 @@ const App = () => (
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/redeem-voucher" element={<RedeemVoucher />} />
             <Route path="/create-test-voucher" element={<CreateTestVoucher />} />
+            <Route path="/grant-admin-access" element={<GrantAdminAccess />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/experiences" element={<ManageExperiences />} />
+            <Route path="/admin/bookings" element={<ManageBookings />} />
+            <Route path="/admin/orders" element={<ManageOrders />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
