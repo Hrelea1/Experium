@@ -407,7 +407,7 @@ export type Database = {
           transferred_date: string | null
           transferred_to: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           code: string
@@ -424,7 +424,7 @@ export type Database = {
           transferred_date?: string | null
           transferred_to?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           code?: string
@@ -441,7 +441,7 @@ export type Database = {
           transferred_date?: string | null
           transferred_to?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

@@ -8,9 +8,7 @@ const corsHeaders = {
 };
 
 interface CreateVoucherRequest {
-  userId?: string;  // Optional: for admin-created vouchers
   experienceId: string;
-  purchasePrice: number;
   notes?: string;
   validityMonths?: number;  // Optional: custom validity period
 }
@@ -47,10 +45,25 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { userId, experienceId, purchasePrice, notes, validityMonths = 12 }: CreateVoucherRequest = await req.json();
+    const { experienceId, notes, validityMonths = 12 }: CreateVoucherRequest = await req.json();
 
-    // Determine target user ID (either specified or current user)
-    const targetUserId = userId || user.id;
+    // Get experience details to fetch the price
+    const { data: experience, error: experienceError } = await supabaseClient
+      .from('experiences')
+      .select('price')
+      .eq('id', experienceId)
+      .single();
+
+    if (experienceError || !experience) {
+      console.error("Error fetching experience:", experienceError);
+      return new Response(
+        JSON.stringify({ error: "Experiența nu a fost găsită" }),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
     // Generate unique voucher code
     const { data: codeData, error: codeError } = await supabaseClient
@@ -67,16 +80,16 @@ const handler = async (req: Request): Promise<Response> => {
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
 
-    // Create voucher
+    // Create voucher (user_id is NULL initially, assigned on redemption)
     const { data: voucher, error: voucherError } = await supabaseClient
       .from('vouchers')
       .insert({
-        user_id: targetUserId,
+        user_id: null,
         experience_id: experienceId,
         code: voucherCode,
-        purchase_price: purchasePrice,
+        purchase_price: experience.price,
         expiry_date: expiryDate.toISOString(),
-        qr_code_data: voucherCode, // Store code for QR generation
+        qr_code_data: voucherCode,
         notes: notes || null,
       })
       .select()
