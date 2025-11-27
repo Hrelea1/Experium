@@ -1,33 +1,38 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import transilvaniaImg from "@/assets/regions/transilvania.jpg";
+import bucovinaImg from "@/assets/regions/bucovina.jpg";
+import maramuresImg from "@/assets/regions/maramures.jpg";
+import dobrogeaImg from "@/assets/regions/dobrogea.jpg";
+import banatImg from "@/assets/regions/banat.jpg";
 
 const regions = [
   {
     name: "Transilvania",
     experiences: 156,
-    image: "https://images.unsplash.com/photo-1574974915766-a4195c4f66e9?w=600&h=400&fit=crop",
+    image: transilvaniaImg,
     featured: true,
   },
   {
     name: "Bucovina",
     experiences: 48,
-    image: "https://images.unsplash.com/photo-1604580864964-0462f5d5b1a8?w=600&h=300&fit=crop",
+    image: bucovinaImg,
   },
   {
     name: "Maramureș",
     experiences: 42,
-    image: "https://images.unsplash.com/photo-1596994838912-f4f8d7b8eef8?w=600&h=300&fit=crop",
+    image: maramuresImg,
   },
   {
     name: "Dobrogea",
     experiences: 67,
-    image: "https://images.unsplash.com/photo-1505881502353-a1986add3762?w=600&h=300&fit=crop",
+    image: dobrogeaImg,
   },
   {
     name: "Banat",
     experiences: 54,
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=300&fit=crop",
+    image: banatImg,
   },
 ];
 
