@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const regions = [
   {
@@ -31,6 +32,12 @@ const regions = [
 ];
 
 export function Regions() {
+  const navigate = useNavigate();
+
+  const handleRegionClick = (regionName: string) => {
+    navigate(`/category/all?region=${regionName}`);
+  };
+
   return (
     <section id="regions" className="py-20 lg:py-28 bg-background">
       <div className="container">
@@ -55,8 +62,8 @@ export function Regions() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Featured Region - Large */}
-          <motion.a
-            href="#transilvania"
+          <motion.div
+            onClick={() => handleRegionClick(regions[0].name)}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -85,13 +92,13 @@ export function Regions() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
               </div>
             </div>
-          </motion.a>
+          </motion.div>
 
           {/* Other Regions */}
           {regions.slice(1).map((region, index) => (
-            <motion.a
+            <motion.div
               key={region.name}
-              href={`#${region.name.toLowerCase()}`}
+              onClick={() => handleRegionClick(region.name)}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -113,7 +120,7 @@ export function Regions() {
                   {region.experiences} experiențe
                 </p>
               </div>
-            </motion.a>
+            </motion.div>
           ))}
         </div>
       </div>
