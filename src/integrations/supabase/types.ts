@@ -465,6 +465,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_primary_admin: { Args: { _user_id: string }; Returns: boolean }
       redeem_voucher: {
         Args: {
           p_booking_date: string

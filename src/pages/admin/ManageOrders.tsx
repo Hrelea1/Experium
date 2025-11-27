@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Gift, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Gift, Calendar, CheckCircle, XCircle, Clock, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   Table,
@@ -36,6 +38,7 @@ interface UserProfile {
 }
 
 const ManageOrders = () => {
+  const navigate = useNavigate();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [userProfiles, setUserProfiles] = useState<Record<string, UserProfile>>({});
   const [loading, setLoading] = useState(true);
@@ -159,11 +162,17 @@ const ManageOrders = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h2 className="text-3xl font-bold">Vouchere & Comenzi</h2>
-          <p className="text-muted-foreground">
-            Gestionează toate voucherele și comenzile
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold">Vouchere & Comenzi</h2>
+            <p className="text-muted-foreground">
+              Gestionează toate voucherele și comenzile
+            </p>
+          </div>
+          <Button onClick={() => navigate('/admin/orders/create')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Creează Voucher
+          </Button>
         </div>
 
         <Card>

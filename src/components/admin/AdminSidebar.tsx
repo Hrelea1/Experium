@@ -27,10 +27,10 @@ const mainItems = [
   { title: "Experiențe", url: "/admin/experiences", icon: Gift },
   { title: "Rezervări", url: "/admin/bookings", icon: Calendar },
   { title: "Vouchere", url: "/admin/orders", icon: ShoppingBag },
+  { title: "Roluri", url: "/admin/roles", icon: Users },
 ];
 
 const otherItems = [
-  { title: "Utilizatori", url: "/admin/users", icon: Users },
   { title: "Setări", url: "/admin/settings", icon: Settings },
   { title: "Înapoi la Site", url: "/", icon: Home },
 ];

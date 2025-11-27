@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +31,7 @@ interface Experience {
 }
 
 const ManageExperiences = () => {
+  const navigate = useNavigate();
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -122,7 +124,7 @@ const ManageExperiences = () => {
               Gestionează toate experiențele disponibile
             </p>
           </div>
-          <Button>
+          <Button onClick={() => navigate('/admin/experiences/create')}>
             <Plus className="h-4 w-4 mr-2" />
             Adaugă Experiență
           </Button>
