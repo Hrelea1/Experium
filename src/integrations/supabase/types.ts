@@ -24,6 +24,7 @@ export type Database = {
           id: string
           participants: number
           payment_method: string | null
+          rescheduled_count: number
           special_requests: string | null
           status: Database["public"]["Enums"]["booking_status"]
           total_price: number
@@ -40,6 +41,7 @@ export type Database = {
           id?: string
           participants?: number
           payment_method?: string | null
+          rescheduled_count?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           total_price: number
@@ -56,6 +58,7 @@ export type Database = {
           id?: string
           participants?: number
           payment_method?: string | null
+          rescheduled_count?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           total_price?: number
@@ -455,6 +458,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_booking: {
+        Args: { p_booking_id: string; p_cancellation_reason: string }
+        Returns: {
+          error_message: string
+          refund_eligible: boolean
+          success: boolean
+        }[]
+      }
       generate_voucher_code: { Args: never; Returns: string }
       get_user_role: { Args: { _user_id: string }; Returns: string }
       has_role: {
@@ -475,6 +486,13 @@ export type Database = {
         }
         Returns: {
           booking_id: string
+          error_message: string
+          success: boolean
+        }[]
+      }
+      reschedule_booking: {
+        Args: { p_booking_id: string; p_new_booking_date: string }
+        Returns: {
           error_message: string
           success: boolean
         }[]
