@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, MapPin, Sparkles, ChevronDown } from "lucide-react";
+import { Search, MapPin, Sparkles, ChevronDown, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const regions = [
@@ -72,6 +73,27 @@ export function Hero() {
             Descoperă cele mai frumoase experiențe din România. De la aventuri 
             în natură la relaxare la spa, găsește cadoul perfect pentru cei dragi.
           </p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+          >
+            <Button asChild size="lg" className="group">
+              <Link to="/category/toate-categoriile">
+                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                Descoperă Experiențe
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="secondary" className="group bg-card/20 backdrop-blur-sm border-2 border-card/30 hover:bg-card/30 text-card hover:text-card">
+              <Link to="/redeem-voucher">
+                <Gift className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                Ai un Voucher?
+              </Link>
+            </Button>
+          </motion.div>
 
           {/* Search Box */}
           <motion.div
