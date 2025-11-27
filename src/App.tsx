@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import ExperienceDetail from "./pages/ExperienceDetail";
 import CategorySearch from "./pages/CategorySearch";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import MyVouchers from "./pages/MyVouchers";
 import MyBookings from "./pages/MyBookings";
 import RedeemVoucher from "./pages/RedeemVoucher";
@@ -38,6 +39,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/category/:category" element={<CategorySearch />} />
             <Route path="/my-vouchers" element={<MyVouchers />} />
