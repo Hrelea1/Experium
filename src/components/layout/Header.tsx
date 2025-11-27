@@ -91,10 +91,10 @@ export function Header() {
                     <Link to="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/my-bookings">Rezervările Mele</Link>
+                    <Link to="/my-vouchers">Voucherele Mele</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/my-vouchers">Voucherele Mele</Link>
+                    <Link to="/redeem-voucher">Folosește Voucher</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut}>

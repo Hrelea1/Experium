@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          booking_date: string
+          cancellation_date: string | null
+          cancellation_reason: string | null
+          created_at: string
+          experience_id: string
+          id: string
+          participants: number
+          payment_method: string | null
+          special_requests: string | null
+          status: Database["public"]["Enums"]["booking_status"]
+          total_price: number
+          updated_at: string
+          user_id: string
+          voucher_id: string | null
+        }
+        Insert: {
+          booking_date: string
+          cancellation_date?: string | null
+          cancellation_reason?: string | null
+          created_at?: string
+          experience_id: string
+          id?: string
+          participants?: number
+          payment_method?: string | null
+          special_requests?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_price: number
+          updated_at?: string
+          user_id: string
+          voucher_id?: string | null
+        }
+        Update: {
+          booking_date?: string
+          cancellation_date?: string | null
+          cancellation_reason?: string | null
+          created_at?: string
+          experience_id?: string
+          id?: string
+          participants?: number
+          payment_method?: string | null
+          special_requests?: string | null
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_price?: number
+          updated_at?: string
+          user_id?: string
+          voucher_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -369,9 +435,32 @@ export type Database = {
     }
     Functions: {
       generate_voucher_code: { Args: never; Returns: string }
+      redeem_voucher: {
+        Args: {
+          p_booking_date: string
+          p_participants?: number
+          p_special_requests?: string
+          p_voucher_id: string
+        }
+        Returns: {
+          booking_id: string
+          error_message: string
+          success: boolean
+        }[]
+      }
       update_expired_vouchers: { Args: never; Returns: undefined }
+      validate_voucher_code: {
+        Args: { voucher_code: string }
+        Returns: {
+          error_message: string
+          experience_id: string
+          is_valid: boolean
+          voucher_id: string
+        }[]
+      }
     }
     Enums: {
+      booking_status: "pending" | "confirmed" | "cancelled" | "completed"
       voucher_status:
         | "active"
         | "used"
@@ -505,6 +594,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      booking_status: ["pending", "confirmed", "cancelled", "completed"],
       voucher_status: ["active", "used", "expired", "exchanged", "transferred"],
     },
   },

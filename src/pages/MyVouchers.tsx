@@ -359,7 +359,11 @@ const VoucherGrid = ({ vouchers, onDownload, getStatusBadge }: VoucherGridProps)
                   PDF
                 </Button>
                 {voucher.status === 'active' && (
-                  <Button size="sm" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => window.location.href = `/#/redeem-voucher?code=${voucher.code}`}
+                  >
                     Rezervă
                   </Button>
                 )}
