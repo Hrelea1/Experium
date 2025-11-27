@@ -57,6 +57,16 @@ export function Header() {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group flex items-center gap-2"
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+              </Link>
+            )}
           </nav>
 
           {/* Actions */}
@@ -158,6 +168,16 @@ export function Header() {
                   {link.label}
                 </a>
               ))}
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin Panel
+                </Link>
+              )}
               <div className="flex items-center gap-4 px-4 pt-4 border-t border-border mt-2">
                 <Button variant="ghost" size="icon">
                   <Search className="h-5 w-5" />
