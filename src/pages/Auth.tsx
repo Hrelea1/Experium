@@ -22,7 +22,9 @@ const Auth = () => {
   // Signup form state
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [signupFullName, setSignupFullName] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   // Reset password state
   const [resetEmail, setResetEmail] = useState('');
@@ -54,11 +56,34 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setPasswordError('');
+    
+    // Validate password match
+    if (signupPassword !== signupConfirmPassword) {
+      setPasswordError('Parolele nu se potrivesc');
+      return;
+    }
+    
+    // Validate password length
+    if (signupPassword.length < 6) {
+      setPasswordError('Parola trebuie să aibă cel puțin 6 caractere');
+      return;
+    }
+    
     setLoading(true);
     const { error } = await signUp(signupEmail, signupPassword, signupFullName);
     setLoading(false);
     if (!error) {
-      // User will receive email confirmation
+      alert('Cont creat cu succes! Verifică-ți emailul pentru confirmarea contului.');
+      // Reset form
+      setSignupEmail('');
+      setSignupPassword('');
+      setSignupConfirmPassword('');
+      setSignupFullName('');
+    } else {
+      if (error.message.includes('already registered')) {
+        setPasswordError('Acest email este deja înregistrat');
+      }
     }
   };
 
@@ -206,7 +231,23 @@ const Auth = () => {
                       required
                       minLength={6}
                     />
+                    <p className="text-xs text-muted-foreground">Minim 6 caractere</p>
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm-password">Confirmă parola</Label>
+                    <Input
+                      id="signup-confirm-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={signupConfirmPassword}
+                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                  {passwordError && (
+                    <p className="text-sm text-destructive">{passwordError}</p>
+                  )}
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? 'Se creează contul...' : 'Creează cont'}
                   </Button>
