@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -38,10 +38,10 @@ const ExperienceBuilder = () => {
   const [minAge, setMinAge] = useState('');
   const [images, setImages] = useState<string[]>(['']);
 
-  useState(() => {
+  useEffect(() => {
     fetchCategories();
     fetchRegions();
-  });
+  }, []);
 
   const fetchCategories = async () => {
     const { data } = await supabase.from('categories').select('id, name').order('name');
