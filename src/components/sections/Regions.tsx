@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 import transilvaniaImg from "@/assets/regions/transilvania.jpg";
 import bucovinaImg from "@/assets/regions/bucovina.jpg";
@@ -39,12 +40,13 @@ const regions = [
 
 export function Regions() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: content } = useHomepageContent("regions");
   
   const sectionContent = content?.content || {
     badge: "Regiuni",
-    title: "Descoperă România",
-    subtitle: "Explorează experiențe unice în cele mai frumoase regiuni ale țării, de la munții Carpați la litoralul Mării Negre."
+    title: t('regions.title'),
+    subtitle: t('regions.subtitle')
   };
 
   const handleRegionClick = (regionName: string) => {

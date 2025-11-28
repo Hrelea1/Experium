@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Search, MapPin, Sparkles, ChevronDown, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
@@ -30,6 +31,7 @@ const categories = [
 ];
 
 export function Hero() {
+  const { t } = useTranslation();
   const [selectedRegion, setSelectedRegion] = useState("Toate Regiunile");
   const [selectedCategory, setSelectedCategory] = useState("Toate Categoriile");
   const [isRegionOpen, setIsRegionOpen] = useState(false);
@@ -38,13 +40,13 @@ export function Hero() {
   const { data: content } = useHomepageContent("hero");
   
   const heroContent = content?.content || {
-    title: "Oferă Momente",
-    titleHighlight: "Memorabile",
-    subtitle: "Descoperă cele mai frumoase experiențe din România. De la aventuri în natură la relaxare la spa, găsește cadoul perfect pentru cei dragi.",
-    badge: "Peste 500+ experiențe unice în România",
-    ctaPrimary: "Descoperă Experiențe",
+    title: t('hero.title'),
+    titleHighlight: "",
+    subtitle: t('hero.subtitle'),
+    badge: "500+",
+    ctaPrimary: t('hero.discover'),
     ctaPrimaryLink: "/category/toate-categoriile",
-    ctaSecondary: "Ai un Voucher?",
+    ctaSecondary: t('hero.hasVoucher'),
     ctaSecondaryLink: "/redeem-voucher",
     backgroundImage: "",
   };

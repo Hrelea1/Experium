@@ -5,6 +5,7 @@ import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield } from "lucid
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,18 +15,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const navLinks = [
-  { label: "Experiențe", href: "#experiences" },
-  { label: "Categorii", href: "#categories" },
-  { label: "Regiuni", href: "#regions" },
-  { label: "Cadouri", href: "#gifts" },
-  { label: "Despre Noi", href: "#about" },
-];
-
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminCheck();
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { label: t('nav.experiences'), href: "#experiences" },
+    { label: t('nav.regions'), href: "#regions" },
+    { label: t('nav.howItWorks'), href: "#how-it-works" },
+    { label: t('nav.contact'), href: "#contact" },
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border/50 pt-[env(safe-area-inset-top)]">
@@ -63,7 +64,7 @@ export function Header() {
                 className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group flex items-center gap-2"
               >
                 <Shield className="h-4 w-4" />
-                Admin
+                {t('nav.admin')}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
               </Link>
             )}
@@ -89,7 +90,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="hidden lg:flex">
                     <User className="h-4 w-4 mr-2" />
-                    Contul Meu
+                    {t('nav.login')}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -130,7 +131,7 @@ export function Header() {
               <Button variant="outline" size="sm" className="hidden lg:flex" asChild>
                 <Link to="/auth">
                   <User className="h-4 w-4 mr-2" />
-                  Autentificare
+                  {t('nav.login')}
                 </Link>
               </Button>
             )}
@@ -168,14 +169,14 @@ export function Header() {
                   {link.label}
                 </a>
               ))}
-              {isAdmin && (
+               {isAdmin && (
                 <Link
                   to="/admin"
                   className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Shield className="h-4 w-4" />
-                  Admin Panel
+                  {t('nav.admin')}
                 </Link>
               )}
               <div className="flex items-center gap-4 px-4 pt-4 border-t border-border mt-2">
@@ -202,7 +203,7 @@ export function Header() {
                   <Button variant="outline" size="sm" className="ml-auto" asChild>
                     <Link to="/auth">
                       <User className="h-4 w-4 mr-2" />
-                      Autentificare
+                      {t('nav.login')}
                     </Link>
                   </Button>
                 )}

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const footerLinks = {
   experiențe: [
@@ -33,6 +34,36 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const { t } = useTranslation();
+
+  const dynamicFooterLinks = {
+    experiențe: [
+      { label: t('footer.adventure'), href: "#" },
+      { label: t('footer.wellness'), href: "#" },
+      { label: t('footer.gastronomy'), href: "#" },
+      { label: t('footer.culture'), href: "#" },
+    ],
+    regiuni: [
+      { label: "Transilvania", href: "#" },
+      { label: "Bucovina", href: "#" },
+      { label: "Maramureș", href: "#" },
+      { label: "Dobrogea", href: "#" },
+      { label: "Banat", href: "#" },
+    ],
+    suport: [
+      { label: t('footer.faq'), href: "#" },
+      { label: t('footer.contact'), href: "#" },
+      { label: t('footer.howItWorks'), href: "#" },
+      { label: t('footer.termsConditions'), href: "#" },
+    ],
+    companie: [
+      { label: t('footer.about'), href: "#" },
+      { label: t('footer.careers'), href: "#" },
+      { label: t('footer.blog'), href: "#" },
+      { label: t('footer.partners'), href: "#" },
+    ],
+  };
+
   return (
     <footer className="bg-secondary text-secondary-foreground">
       {/* Main Footer */}
@@ -49,8 +80,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-secondary-foreground/70 mb-6 max-w-xs">
-              Oferim cele mai frumoase experiențe cadou din România. 
-              Fă pe cineva fericit astăzi!
+              {t('footer.description')}
             </p>
 
             {/* Contact Info */}
@@ -85,9 +115,9 @@ export function Footer() {
 
           {/* Links Columns */}
           <div>
-            <h4 className="font-semibold mb-4">Experiențe</h4>
+            <h4 className="font-semibold mb-4">{t('footer.experiences')}</h4>
             <ul className="space-y-2">
-              {footerLinks.experiențe.map((link) => (
+              {dynamicFooterLinks.experiențe.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
@@ -98,9 +128,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Regiuni</h4>
+            <h4 className="font-semibold mb-4">{t('footer.regions')}</h4>
             <ul className="space-y-2">
-              {footerLinks.regiuni.map((link) => (
+              {dynamicFooterLinks.regiuni.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
@@ -111,9 +141,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Suport</h4>
+            <h4 className="font-semibold mb-4">{t('footer.support')}</h4>
             <ul className="space-y-2">
-              {footerLinks.suport.map((link) => (
+              {dynamicFooterLinks.suport.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
@@ -124,9 +154,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Companie</h4>
+            <h4 className="font-semibold mb-4">{t('footer.company')}</h4>
             <ul className="space-y-2">
-              {footerLinks.companie.map((link) => (
+              {dynamicFooterLinks.companie.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
@@ -142,17 +172,17 @@ export function Footer() {
       <div className="border-t border-secondary-foreground/10">
         <div className="container py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-secondary-foreground/60 text-sm">
-            © 2025 Experium. Toate drepturile rezervate.
+            © 2025 Experium. {t('footer.rights')}
           </p>
           <div className="flex items-center gap-6 text-sm">
             <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">
-              Politica de Confidențialitate
+              {t('footer.privacy')}
             </a>
             <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">
-              Cookies
+              {t('footer.cookies')}
             </a>
             <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">
-              GDPR
+              {t('footer.gdpr')}
             </a>
           </div>
         </div>
