@@ -2,22 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, MapPin, Sparkles, ChevronDown, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
-
-const regions = [
-  "hero.allRegions",
-  "Transilvania",
-  "Moldova",
-  "Muntenia",
-  "Dobrogea",
-  "Oltenia",
-  "Banat",
-  "Maramureș",
-  "Bucovina",
-];
 
 const categories = [
   "hero.allCategories",
@@ -30,8 +18,21 @@ const categories = [
   "categories.romantic",
 ];
 
+// Map translation keys to URL slugs
+const categorySlugMap: Record<string, string> = {
+  "hero.allCategories": "toate-categoriile",
+  "categories.adventure": "aventura",
+  "categories.spa": "spa-relaxare",
+  "categories.gastronomy": "gastronomie",
+  "categories.culture": "arta-cultura",
+  "categories.sports": "sport",
+  "categories.nature": "natura",
+  "categories.romantic": "romantic",
+};
+
 export function Hero() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("hero.allCategories");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
@@ -50,6 +51,11 @@ export function Hero() {
   };
 
   const backgroundImage = heroContent.backgroundImage || heroBg;
+
+  const handleSearch = () => {
+    const slug = categorySlugMap[selectedCategory];
+    navigate(`/category/${slug}`);
+  };
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
@@ -150,7 +156,7 @@ export function Hero() {
               </div>
 
               {/* Search Button */}
-              <Button size="lg" className="md:w-auto">
+              <Button size="lg" className="md:w-auto" onClick={handleSearch}>
                 <Search className="w-5 h-5 mr-2" />
                 {t('hero.search')}
               </Button>
