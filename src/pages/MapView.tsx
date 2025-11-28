@@ -59,7 +59,7 @@ export default function MapView() {
           setIsLoadingLocation(false);
           
           // Filter experiences by proximity (within 50km)
-          const experiencesWithCoords = allExperiences.map(exp => {
+          const mappedExperiences = allExperiences.map(exp => {
             // Try to match location with known coordinates
             const cityMatch = Object.keys(cityCoordinates).find(city => 
               exp.location.toLowerCase().includes(city.toLowerCase())
@@ -71,9 +71,10 @@ export default function MapView() {
                 coordinates: cityCoordinates[cityMatch] as [number, number],
               };
             }
-            return exp;
-          }).filter(exp => {
-            if (!('coordinates' in exp) || !exp.coordinates) return false;
+            return null;
+          }).filter((exp): exp is NonNullable<typeof exp> => exp !== null);
+
+          const experiencesWithCoords = mappedExperiences.filter(exp => {
             const distance = calculateDistance(
               position.coords.latitude,
               position.coords.longitude,
@@ -81,7 +82,7 @@ export default function MapView() {
               exp.coordinates[0]
             );
             return distance <= 50; // Within 50km
-          }) as ExperienceWithCoords[];
+          });
 
           setNearbyExperiences(experiencesWithCoords);
         },
@@ -89,18 +90,20 @@ export default function MapView() {
           console.error('Error getting location:', error);
           setIsLoadingLocation(false);
           // Show all experiences if location access denied
-          const experiencesWithCoords = allExperiences.map(exp => {
-            const cityMatch = Object.keys(cityCoordinates).find(city => 
-              exp.location.toLowerCase().includes(city.toLowerCase())
-            );
-            if (cityMatch) {
-              return {
-                ...exp,
-                coordinates: cityCoordinates[cityMatch] as [number, number],
-              };
-            }
-            return exp;
-          }).filter(exp => 'coordinates' in exp && exp.coordinates) as ExperienceWithCoords[];
+          const experiencesWithCoords = allExperiences
+            .map(exp => {
+              const cityMatch = Object.keys(cityCoordinates).find(city => 
+                exp.location.toLowerCase().includes(city.toLowerCase())
+              );
+              if (cityMatch) {
+                return {
+                  ...exp,
+                  coordinates: cityCoordinates[cityMatch] as [number, number],
+                };
+              }
+              return null;
+            })
+            .filter((exp): exp is NonNullable<typeof exp> => exp !== null);
           
           setNearbyExperiences(experiencesWithCoords);
         }
