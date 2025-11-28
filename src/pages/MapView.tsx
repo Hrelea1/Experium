@@ -59,7 +59,7 @@ export default function MapView() {
           setIsLoadingLocation(false);
           
           // Filter experiences by proximity (within 50km)
-          const experiencesWithCoords: ExperienceWithCoords[] = allExperiences.map(exp => {
+          const experiencesWithCoords = allExperiences.map(exp => {
             // Try to match location with known coordinates
             const cityMatch = Object.keys(cityCoordinates).find(city => 
               exp.location.toLowerCase().includes(city.toLowerCase())
@@ -71,9 +71,9 @@ export default function MapView() {
                 coordinates: cityCoordinates[cityMatch] as [number, number],
               };
             }
-            return { ...exp, coordinates: undefined };
-          }).filter((exp): exp is ExperienceWithCoords => {
-            if (!exp.coordinates) return false;
+            return exp;
+          }).filter(exp => {
+            if (!('coordinates' in exp) || !exp.coordinates) return false;
             const distance = calculateDistance(
               position.coords.latitude,
               position.coords.longitude,
@@ -81,7 +81,7 @@ export default function MapView() {
               exp.coordinates[0]
             );
             return distance <= 50; // Within 50km
-          });
+          }) as ExperienceWithCoords[];
 
           setNearbyExperiences(experiencesWithCoords);
         },
@@ -89,7 +89,7 @@ export default function MapView() {
           console.error('Error getting location:', error);
           setIsLoadingLocation(false);
           // Show all experiences if location access denied
-          const experiencesWithCoords: ExperienceWithCoords[] = allExperiences.map(exp => {
+          const experiencesWithCoords = allExperiences.map(exp => {
             const cityMatch = Object.keys(cityCoordinates).find(city => 
               exp.location.toLowerCase().includes(city.toLowerCase())
             );
@@ -99,8 +99,8 @@ export default function MapView() {
                 coordinates: cityCoordinates[cityMatch] as [number, number],
               };
             }
-            return { ...exp, coordinates: undefined };
-          }).filter((exp): exp is ExperienceWithCoords => exp.coordinates !== undefined);
+            return exp;
+          }).filter(exp => 'coordinates' in exp && exp.coordinates) as ExperienceWithCoords[];
           
           setNearbyExperiences(experiencesWithCoords);
         }
