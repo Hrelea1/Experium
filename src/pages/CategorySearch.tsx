@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Heart, Star, MapPin, Clock, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,15 +15,26 @@ import { useState } from "react";
 export default function CategorySearch() {
   const { category } = useParams<{ category: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   
   const categoryKey = category?.toLowerCase() || "";
+  const regionParam = searchParams.get('region');
+  
   const categoryTitle = categoryTitles[categoryKey] || "Toate Experiențele";
   const categoryFilter = categoryMapping[categoryKey];
   
-  const categoryExperiences = categoryFilter 
+  // Filter by category first
+  let categoryExperiences = categoryFilter 
     ? allExperiences.filter(exp => exp.category === categoryFilter)
     : allExperiences;
+  
+  // Then filter by region if parameter exists
+  if (regionParam) {
+    categoryExperiences = categoryExperiences.filter(exp => 
+      exp.region.toLowerCase() === regionParam.toLowerCase()
+    );
+  }
 
   const { 
     filters, 
@@ -106,7 +117,7 @@ export default function CategorySearch() {
               animate={{ opacity: 1, y: 0 }}
               className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-2"
             >
-              {categoryTitle}
+              {regionParam ? `${categoryTitle} - ${regionParam}` : categoryTitle}
             </motion.h1>
             <p className="text-primary-foreground/80 text-lg">
               {categoryExperiences.length} experiențe disponibile
