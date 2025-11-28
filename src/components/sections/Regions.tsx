@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
 import transilvaniaImg from "@/assets/regions/transilvania.jpg";
 import bucovinaImg from "@/assets/regions/bucovina.jpg";
 import maramuresImg from "@/assets/regions/maramures.jpg";
@@ -38,6 +39,13 @@ const regions = [
 
 export function Regions() {
   const navigate = useNavigate();
+  const { data: content } = useHomepageContent("regions");
+  
+  const sectionContent = content?.content || {
+    badge: "Regiuni",
+    title: "Descoperă România",
+    subtitle: "Explorează experiențe unice în cele mai frumoase regiuni ale țării, de la munții Carpați la litoralul Mării Negre."
+  };
 
   const handleRegionClick = (regionName: string) => {
     navigate(`/category/all?region=${regionName}`);
@@ -54,14 +62,13 @@ export function Regions() {
           className="text-center mb-14"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
-            Regiuni
+            {sectionContent.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Descoperă România
+            {sectionContent.title}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Explorează experiențe unice în cele mai frumoase regiuni ale țării,
-            de la munții Carpați la litoralul Mării Negre.
+            {sectionContent.subtitle}
           </p>
         </motion.div>
 

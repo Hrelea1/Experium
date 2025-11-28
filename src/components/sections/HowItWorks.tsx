@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Search, Gift, Calendar, PartyPopper } from "lucide-react";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const steps = [
   {
@@ -25,6 +26,14 @@ const steps = [
 ];
 
 export function HowItWorks() {
+  const { data: content } = useHomepageContent("how-it-works");
+  
+  const sectionContent = content?.content || {
+    badge: "Cum funcționează",
+    title: "Simplu ca 1, 2, 3, 4",
+    subtitle: "Oferirea de experiențe cadou nu a fost niciodată mai simplă. Urmează acești pași și surprinde pe cei dragi."
+  };
+
   return (
     <section className="py-20 lg:py-28 bg-secondary text-secondary-foreground overflow-hidden">
       <div className="container">
@@ -36,14 +45,13 @@ export function HowItWorks() {
           className="text-center mb-14"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/20 text-primary text-sm font-semibold mb-4">
-            Cum funcționează
+            {sectionContent.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            Simplu ca 1, 2, 3, 4
+            {sectionContent.title}
           </h2>
           <p className="text-secondary-foreground/80 text-lg max-w-2xl mx-auto">
-            Oferirea de experiențe cadou nu a fost niciodată mai simplă. 
-            Urmează acești pași și surprinde pe cei dragi.
+            {sectionContent.subtitle}
           </p>
         </motion.div>
 

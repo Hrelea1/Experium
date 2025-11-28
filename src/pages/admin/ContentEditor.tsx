@@ -184,10 +184,10 @@ export default function ContentEditor() {
         </div>
 
         <div className="space-y-2">
-          <Label>Description</Label>
+          <Label>Subtitle</Label>
           <Textarea
-            value={content.description || ""}
-            onChange={(e) => handleContentChange(sectionKey, "description", e.target.value)}
+            value={content.subtitle || ""}
+            onChange={(e) => handleContentChange(sectionKey, "subtitle", e.target.value)}
             rows={3}
           />
         </div>
@@ -196,8 +196,8 @@ export default function ContentEditor() {
           <div className="space-y-2">
             <Label>Button Text</Label>
             <Input
-              value={content.buttonText || ""}
-              onChange={(e) => handleContentChange(sectionKey, "buttonText", e.target.value)}
+              value={content.ctaText || ""}
+              onChange={(e) => handleContentChange(sectionKey, "ctaText", e.target.value)}
             />
           </div>
         )}
@@ -240,7 +240,7 @@ export default function ContentEditor() {
             <TabsTrigger value="categories">Categorii</TabsTrigger>
             <TabsTrigger value="featured">Featured</TabsTrigger>
             <TabsTrigger value="regions">Regiuni</TabsTrigger>
-            <TabsTrigger value="how_it_works">Cum Funcționează</TabsTrigger>
+            <TabsTrigger value="how-it-works">Cum Funcționează</TabsTrigger>
             <TabsTrigger value="testimonials">Testimoniale</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
           </TabsList>
@@ -285,13 +285,13 @@ export default function ContentEditor() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="how_it_works">
+          <TabsContent value="how-it-works">
             <Card>
               <CardHeader>
                 <CardTitle>Secțiunea Cum Funcționează</CardTitle>
                 <CardDescription>Editează titlul și descrierea secțiunii despre procesul de utilizare</CardDescription>
               </CardHeader>
-              <CardContent>{renderSimpleSectionEditor("how_it_works", "Cum Funcționează")}</CardContent>
+              <CardContent>{renderSimpleSectionEditor("how-it-works", "Cum Funcționează")}</CardContent>
             </Card>
           </TabsContent>
 
@@ -322,19 +322,27 @@ export default function ContentEditor() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Description</Label>
+                    <Label>Subtitle</Label>
                     <Textarea
-                      value={getContent("newsletter").description || ""}
-                      onChange={(e) => handleContentChange("newsletter", "description", e.target.value)}
+                      value={getContent("newsletter").subtitle || ""}
+                      onChange={(e) => handleContentChange("newsletter", "subtitle", e.target.value)}
                       rows={3}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Email Placeholder</Label>
+                    <Input
+                      value={getContent("newsletter").placeholder || ""}
+                      onChange={(e) => handleContentChange("newsletter", "placeholder", e.target.value)}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label>Button Text</Label>
                     <Input
-                      value={getContent("newsletter").buttonText || ""}
-                      onChange={(e) => handleContentChange("newsletter", "buttonText", e.target.value)}
+                      value={getContent("newsletter").ctaText || ""}
+                      onChange={(e) => handleContentChange("newsletter", "ctaText", e.target.value)}
                     />
                   </div>
 

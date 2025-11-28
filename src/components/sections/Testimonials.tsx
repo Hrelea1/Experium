@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const testimonials = [
   {
@@ -29,6 +30,14 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+  const { data: content } = useHomepageContent("testimonials");
+  
+  const sectionContent = content?.content || {
+    badge: "Recenzii",
+    title: "Ce Spun Clienții Noștri",
+    subtitle: "Peste 50,000 de clienți fericiți au trăit experiențe memorabile prin platforma noastră."
+  };
+
   return (
     <section className="py-20 lg:py-28 bg-cream">
       <div className="container">
@@ -40,13 +49,13 @@ export function Testimonials() {
           className="text-center mb-14"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
-            Recenzii
+            {sectionContent.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Ce Spun Clienții Noștri
+            {sectionContent.title}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Peste 50,000 de clienți fericiți au trăit experiențe memorabile prin platforma noastră.
+            {sectionContent.subtitle}
           </p>
         </motion.div>
 
