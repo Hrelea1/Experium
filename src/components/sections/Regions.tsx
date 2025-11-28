@@ -99,10 +99,10 @@ export function Regions() {
                 {regions[0].name}
               </h3>
               <p className="text-card/80 mb-4">
-                {regions[0].experiences} experiențe disponibile
+                {regions[0].experiences} {t('regions.experiences')}
               </p>
               <div className="flex items-center gap-2 text-card font-medium group-hover:text-primary transition-colors">
-                Explorează
+                {t('regions.explore')}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
               </div>
             </div>

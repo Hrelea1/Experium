@@ -8,7 +8,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const regions = [
-  "Toate Regiunile",
+  "hero.allRegions",
   "Transilvania",
   "Moldova",
   "Muntenia",
@@ -20,20 +20,20 @@ const regions = [
 ];
 
 const categories = [
-  "Toate Categoriile",
-  "Aventură",
-  "Spa & Relaxare",
-  "Gastronomie",
-  "Artă & Cultură",
-  "Sport",
-  "Natură",
-  "Romantic",
+  "hero.allCategories",
+  "categories.adventure",
+  "categories.spa",
+  "categories.gastronomy",
+  "categories.culture",
+  "categories.sports",
+  "categories.nature",
+  "categories.romantic",
 ];
 
 export function Hero() {
   const { t } = useTranslation();
-  const [selectedRegion, setSelectedRegion] = useState("Toate Regiunile");
-  const [selectedCategory, setSelectedCategory] = useState("Toate Categoriile");
+  const [selectedRegion, setSelectedRegion] = useState("hero.allRegions");
+  const [selectedCategory, setSelectedCategory] = useState("hero.allCategories");
   const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
@@ -43,7 +43,7 @@ export function Hero() {
     title: t('hero.title'),
     titleHighlight: "",
     subtitle: t('hero.subtitle'),
-    badge: "500+",
+    badge: t('hero.badge'),
     ctaPrimary: t('hero.discover'),
     ctaPrimaryLink: "/category/toate-categoriile",
     ctaSecondary: t('hero.hasVoucher'),
@@ -132,7 +132,7 @@ export function Hero() {
                 >
                   <div className="flex items-center gap-2">
                     <MapPin className="w-5 h-5 text-primary" />
-                    <span className="text-foreground font-medium">{selectedRegion}</span>
+                    <span className="text-foreground font-medium">{t(selectedRegion)}</span>
                   </div>
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isRegionOpen ? "rotate-180" : ""}`} />
                 </button>
@@ -147,7 +147,7 @@ export function Hero() {
                         }}
                         className="w-full px-4 py-3 text-left hover:bg-muted transition-colors first:rounded-t-xl last:rounded-b-xl"
                       >
-                        {region}
+                        {t(region)}
                       </button>
                     ))}
                   </div>
@@ -165,7 +165,7 @@ export function Hero() {
                 >
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-primary" />
-                    <span className="text-foreground font-medium">{selectedCategory}</span>
+                    <span className="text-foreground font-medium">{t(selectedCategory)}</span>
                   </div>
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isCategoryOpen ? "rotate-180" : ""}`} />
                 </button>
@@ -180,7 +180,7 @@ export function Hero() {
                         }}
                         className="w-full px-4 py-3 text-left hover:bg-muted transition-colors first:rounded-t-xl last:rounded-b-xl"
                       >
-                        {category}
+                        {t(category)}
                       </button>
                     ))}
                   </div>
@@ -190,7 +190,7 @@ export function Hero() {
               {/* Search Button */}
               <Button size="lg" className="md:w-auto">
                 <Search className="w-5 h-5 mr-2" />
-                Caută
+                {t('hero.search')}
               </Button>
             </div>
           </motion.div>
@@ -203,10 +203,10 @@ export function Hero() {
             className="flex flex-wrap justify-center gap-8 mt-12"
           >
             {[
-              { value: "500+", label: "Experiențe" },
-              { value: "42", label: "Județe" },
-              { value: "50k+", label: "Clienți Fericiți" },
-              { value: "4.9★", label: "Rating" },
+              { value: "500+", label: t('hero.experiences') },
+              { value: "42", label: t('hero.counties') },
+              { value: "50k+", label: t('hero.happyClients') },
+              { value: "4.9★", label: t('hero.rating') },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-card">{stat.value}</div>

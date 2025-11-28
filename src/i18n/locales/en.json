@@ -11,35 +11,64 @@
     "title": "Gifts that create unforgettable memories",
     "subtitle": "Discover unique experiences across Romania - from adrenaline-filled adventures to spa relaxation",
     "discover": "Discover Experiences",
-    "hasVoucher": "Have a Voucher?"
+    "hasVoucher": "Have a Voucher?",
+    "badge": "Over 500+ unique experiences in Romania",
+    "search": "Search",
+    "allRegions": "All Regions",
+    "allCategories": "All Categories",
+    "experiences": "Experiences",
+    "counties": "Counties",
+    "happyClients": "Happy Clients",
+    "rating": "Rating"
   },
   "categories": {
     "title": "Explore by Category",
-    "subtitle": "Choose the perfect type of experience for any occasion"
+    "subtitle": "Choose the perfect type of experience for any occasion",
+    "adventure": "Adventure",
+    "adventureDesc": "Rafting, paragliding, climbing",
+    "spa": "Spa & Relaxation",
+    "spaDesc": "Massages, treatments, wellness",
+    "gastronomy": "Gastronomy",
+    "gastronomyDesc": "Wine tasting, cooking class",
+    "culture": "Art & Culture",
+    "cultureDesc": "Museums, shows, theaters",
+    "sports": "Sports",
+    "sportsDesc": "Golf, tennis, fitness",
+    "nature": "Nature",
+    "natureDesc": "Hiking, camping, safari",
+    "romantic": "Romantic",
+    "romanticDesc": "Dinner, sunset, spa duo",
+    "travel": "Travel",
+    "travelDesc": "City break, excursions",
+    "experiences": "experiences"
   },
   "featured": {
     "title": "Popular Experiences",
-    "subtitle": "The most appreciated experiences specially selected for you"
+    "subtitle": "The most appreciated experiences specially selected for you",
+    "viewAll": "View All Experiences",
+    "from": "from",
+    "reviews": "reviews",
+    "bestseller": "Bestseller",
+    "popular": "Popular",
+    "new": "New"
   },
   "regions": {
     "title": "Discover Romania",
-    "subtitle": "Unique experiences in all regions of the country"
+    "subtitle": "Unique experiences in all regions of the country",
+    "experiences": "experiences",
+    "explore": "Explore"
   },
   "howItWorks": {
     "title": "How It Works",
     "subtitle": "Three simple steps to give a memorable gift",
-    "step1": {
-      "title": "Choose Experience",
-      "description": "Browse our collection of unique experiences"
-    },
-    "step2": {
-      "title": "Personalize",
-      "description": "Add a personal message and choose the date"
-    },
-    "step3": {
-      "title": "Give Gift",
-      "description": "Receive voucher instantly via email"
-    }
+    "step1Title": "Choose Experience",
+    "step1Desc": "Explore categories and find the perfect experience for you or your loved ones.",
+    "step2Title": "Give Gift",
+    "step2Desc": "Receive a digital or physical voucher, personalized with a special message.",
+    "step3Title": "Schedule",
+    "step3Desc": "The recipient chooses the date and location that suits them best.",
+    "step4Title": "Enjoy!",
+    "step4Desc": "Live memorable moments and create unforgettable memories."
   },
   "testimonials": {
     "title": "What Our Clients Say",
@@ -49,7 +78,9 @@
     "title": "Stay Updated",
     "subtitle": "Subscribe for exclusive offers and new experiences",
     "placeholder": "Your email address",
-    "button": "Subscribe"
+    "button": "Subscribe",
+    "success": "Thanks for subscribing!",
+    "disclaimer": "We promise not to spam you. You can unsubscribe at any time."
   },
   "footer": {
     "description": "Your platform for unique experiential gifts in Romania",

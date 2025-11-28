@@ -16,65 +16,65 @@ import { useHomepageContent } from "@/hooks/useHomepageContent";
 const categories = [
   {
     icon: Mountain,
-    title: "Aventură",
+    titleKey: "categories.adventure",
     slug: "aventura",
-    description: "Rafting, paragliding, escaladă",
+    descKey: "categories.adventureDesc",
     count: 87,
     color: "from-orange-500 to-red-500",
   },
   {
     icon: Sparkles,
-    title: "Spa & Relaxare",
+    titleKey: "categories.spa",
     slug: "spa-relaxare",
-    description: "Masaje, tratamente, wellness",
+    descKey: "categories.spaDesc",
     count: 124,
     color: "from-cyan-500 to-blue-500",
   },
   {
     icon: UtensilsCrossed,
-    title: "Gastronomie",
+    titleKey: "categories.gastronomy",
     slug: "gastronomie",
-    description: "Degustări, cursuri de gătit",
+    descKey: "categories.gastronomyDesc",
     count: 93,
     color: "from-amber-500 to-orange-500",
   },
   {
     icon: Palette,
-    title: "Artă & Cultură",
+    titleKey: "categories.culture",
     slug: "arta-cultura",
-    description: "Workshop-uri, tururi ghidate",
+    descKey: "categories.cultureDesc",
     count: 56,
     color: "from-purple-500 to-pink-500",
   },
   {
     icon: Dumbbell,
-    title: "Sport",
+    titleKey: "categories.sports",
     slug: "sport",
-    description: "Golf, tenis, karting",
+    descKey: "categories.sportsDesc",
     count: 72,
     color: "from-green-500 to-emerald-500",
   },
   {
     icon: TreePine,
-    title: "Natură",
+    titleKey: "categories.nature",
     slug: "natura",
-    description: "Safari, pescuit, camping",
+    descKey: "categories.natureDesc",
     count: 68,
     color: "from-teal-500 to-green-500",
   },
   {
     icon: Heart,
-    title: "Romantic",
+    titleKey: "categories.romantic",
     slug: "romantic",
-    description: "Cină romantică, escapade",
+    descKey: "categories.romanticDesc",
     count: 45,
     color: "from-rose-500 to-pink-500",
   },
   {
     icon: Plane,
-    title: "Călătorii",
+    titleKey: "categories.travel",
     slug: "calatorii",
-    description: "City break, excursii",
+    descKey: "categories.travelDesc",
     count: 34,
     color: "from-indigo-500 to-purple-500",
   },
@@ -142,7 +142,7 @@ export function Categories() {
         >
           {categories.map((category) => (
             <motion.div
-              key={category.title}
+              key={category.titleKey}
               onClick={() => navigate(`/category/${category.slug}`)}
               variants={itemVariants}
               whileHover={{ scale: 1.02, y: -4 }}
@@ -158,15 +158,15 @@ export function Categories() {
 
               {/* Content */}
               <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-                {category.title}
+                {t(category.titleKey)}
               </h3>
               <p className="text-muted-foreground text-sm mb-3">
-                {category.description}
+                {t(category.descKey)}
               </p>
 
               {/* Count Badge */}
               <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
-                {category.count} experiențe
+                {category.count} {t('categories.experiences')}
               </span>
             </motion.div>
           ))}
