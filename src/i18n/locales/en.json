@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "experiences": "Experiences",
+    "regions": "Regions",
+    "howItWorks": "How It Works",
+    "contact": "Contact",
+    "login": "Log In",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Gifts that create unforgettable memories",
+    "subtitle": "Discover unique experiences across Romania - from adrenaline-filled adventures to spa relaxation",
+    "discover": "Discover Experiences",
+    "hasVoucher": "Have a Voucher?"
+  },
+  "categories": {
+    "title": "Explore by Category",
+    "subtitle": "Choose the perfect type of experience for any occasion"
+  },
+  "featured": {
+    "title": "Popular Experiences",
+    "subtitle": "The most appreciated experiences specially selected for you"
+  },
+  "regions": {
+    "title": "Discover Romania",
+    "subtitle": "Unique experiences in all regions of the country"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Three simple steps to give a memorable gift",
+    "step1": {
+      "title": "Choose Experience",
+      "description": "Browse our collection of unique experiences"
+    },
+    "step2": {
+      "title": "Personalize",
+      "description": "Add a personal message and choose the date"
+    },
+    "step3": {
+      "title": "Give Gift",
+      "description": "Receive voucher instantly via email"
+    }
+  },
+  "testimonials": {
+    "title": "What Our Clients Say",
+    "subtitle": "Thousands of memorable experiences gifted with love"
+  },
+  "newsletter": {
+    "title": "Stay Updated",
+    "subtitle": "Subscribe for exclusive offers and new experiences",
+    "placeholder": "Your email address",
+    "button": "Subscribe"
+  },
+  "footer": {
+    "description": "Your platform for unique experiential gifts in Romania",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "experiences": "Experiences",
+    "adventure": "Adventure",
+    "gastronomy": "Gastronomy",
+    "wellness": "Wellness",
+    "culture": "Culture",
+    "regions": "Regions",
+    "support": "Support",
+    "faq": "FAQ",
+    "howItWorks": "How It Works",
+    "termsConditions": "Terms & Conditions",
+    "company": "Company",
+    "about": "About Us",
+    "careers": "Careers",
+    "partners": "Partners",
+    "blog": "Blog",
+    "rights": "All rights reserved",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "gdpr": "GDPR"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "from": "from",
+    "lei": "lei"
+  }
+}

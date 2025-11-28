@@ -2,18 +2,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, Gift, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { t } = useTranslation();
   const { data: content } = useHomepageContent("newsletter");
   
   const sectionContent = content?.content || {
-    title: "Fii Primul Care Află",
-    subtitle: "Abonează-te pentru a primi oferte exclusive, experiențe noi și idei de cadouri direct în inbox-ul tău.",
-    placeholder: "Adresa ta de email",
-    ctaText: "Abonează-te",
+    title: t('newsletter.title'),
+    subtitle: t('newsletter.subtitle'),
+    placeholder: t('newsletter.placeholder'),
+    ctaText: t('newsletter.button'),
     disclaimer: "Ne angajăm să nu îți trimitem spam. Poți să te dezabonezi oricând."
   };
 

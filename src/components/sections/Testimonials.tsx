@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const testimonials = [
@@ -30,12 +31,13 @@ const testimonials = [
 ];
 
 export function Testimonials() {
+  const { t } = useTranslation();
   const { data: content } = useHomepageContent("testimonials");
   
   const sectionContent = content?.content || {
     badge: "Recenzii",
-    title: "Ce Spun Clienții Noștri",
-    subtitle: "Peste 50,000 de clienți fericiți au trăit experiențe memorabile prin platforma noastră."
+    title: t('testimonials.title'),
+    subtitle: t('testimonials.subtitle')
   };
 
   return (

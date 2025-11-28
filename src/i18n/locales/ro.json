@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "experiences": "Experiențe",
+    "regions": "Regiuni",
+    "howItWorks": "Cum Funcționează",
+    "contact": "Contact",
+    "login": "Intră în cont",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Cadouri care creează amintiri de neuitat",
+    "subtitle": "Descoperă experiențe unice în toată România - de la aventuri pline de adrenalină la relaxare la spa",
+    "discover": "Descoperă Experiențe",
+    "hasVoucher": "Ai un Voucher?"
+  },
+  "categories": {
+    "title": "Explorează după Categorie",
+    "subtitle": "Alege tipul perfect de experiență pentru orice ocazie"
+  },
+  "featured": {
+    "title": "Experiențe Populare",
+    "subtitle": "Cele mai apreciate experiențe selectate special pentru tine"
+  },
+  "regions": {
+    "title": "Descoperă România",
+    "subtitle": "Experiențe unice în toate regiunile țării"
+  },
+  "howItWorks": {
+    "title": "Cum Funcționează",
+    "subtitle": "Trei pași simpli pentru a oferi un cadou memorabil",
+    "step1": {
+      "title": "Alege Experiența",
+      "description": "Răsfoiește colecția noastră de experiențe unice"
+    },
+    "step2": {
+      "title": "Personalizează",
+      "description": "Adaugă un mesaj personal și alege data"
+    },
+    "step3": {
+      "title": "Oferă Cadoul",
+      "description": "Primește voucherul instant prin email"
+    }
+  },
+  "testimonials": {
+    "title": "Ce Spun Clienții Noștri",
+    "subtitle": "Mii de experiențe memorabile oferite cu drag"
+  },
+  "newsletter": {
+    "title": "Rămâi la curent",
+    "subtitle": "Abonează-te pentru oferte exclusive și experiențe noi",
+    "placeholder": "Adresa ta de email",
+    "button": "Abonează-te"
+  },
+  "footer": {
+    "description": "Platforma ta pentru cadouri experiențiale unice în România",
+    "contact": "Contact",
+    "phone": "Telefon",
+    "email": "Email",
+    "address": "Adresă",
+    "experiences": "Experiențe",
+    "adventure": "Aventură",
+    "gastronomy": "Gastronomie",
+    "wellness": "Wellness",
+    "culture": "Cultură",
+    "regions": "Regiuni",
+    "support": "Suport",
+    "faq": "Întrebări Frecvente",
+    "howItWorks": "Cum Funcționează",
+    "termsConditions": "Termeni și Condiții",
+    "company": "Companie",
+    "about": "Despre Noi",
+    "careers": "Cariere",
+    "partners": "Parteneri",
+    "blog": "Blog",
+    "rights": "Toate drepturile rezervate",
+    "privacy": "Confidențialitate",
+    "cookies": "Cookies",
+    "gdpr": "GDPR"
+  },
+  "common": {
+    "loading": "Se încarcă...",
+    "error": "A apărut o eroare",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "edit": "Editează",
+    "view": "Vezi",
+    "back": "Înapoi",
+    "next": "Următorul",
+    "previous": "Anterior",
+    "search": "Caută",
+    "filter": "Filtrează",
+    "sort": "Sortează",
+    "from": "de la",
+    "lei": "lei"
+  }
+}

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Heart, Star, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const experiences = [
@@ -95,12 +96,13 @@ const cardVariants = {
 
 export function FeaturedExperiences() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: content } = useHomepageContent("featured");
   
   const sectionContent = content?.content || {
     badge: "Recomandate",
-    title: "Experiențe Populare",
-    subtitle: "Cele mai apreciate experiențe de către clienții noștri.",
+    title: t('featured.title'),
+    subtitle: t('featured.subtitle'),
     ctaText: "Vezi Toate"
   };
 

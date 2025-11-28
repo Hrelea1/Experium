@@ -10,6 +10,7 @@ import {
   Heart,
   Plane
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const categories = [
@@ -102,12 +103,13 @@ const itemVariants = {
 
 export function Categories() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: content } = useHomepageContent("categories");
   
   const sectionContent = content?.content || {
     badge: "Categorii",
-    title: "Explorează După Interes",
-    subtitle: "Alege categoria perfectă pentru tine sau pentru cei dragi și descoperă experiențe memorabile în toată România."
+    title: t('categories.title'),
+    subtitle: t('categories.subtitle')
   };
 
   return (

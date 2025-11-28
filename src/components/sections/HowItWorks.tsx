@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Search, Gift, Calendar, PartyPopper } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const steps = [
@@ -26,12 +27,13 @@ const steps = [
 ];
 
 export function HowItWorks() {
+  const { t } = useTranslation();
   const { data: content } = useHomepageContent("how-it-works");
   
   const sectionContent = content?.content || {
     badge: "Cum funcționează",
-    title: "Simplu ca 1, 2, 3, 4",
-    subtitle: "Oferirea de experiențe cadou nu a fost niciodată mai simplă. Urmează acești pași și surprinde pe cei dragi."
+    title: t('howItWorks.title'),
+    subtitle: t('howItWorks.subtitle')
   };
 
   return (
