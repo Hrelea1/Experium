@@ -99,15 +99,15 @@ export function Hero() {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
           >
-            <Button asChild size="lg" className="group px-8 py-6 text-lg">
+            <Button asChild size="lg" className="group">
               <Link to={heroContent.ctaPrimaryLink}>
-                <Sparkles className="w-6 h-6 mr-2 group-hover:rotate-12 transition-transform" />
+                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
                 {heroContent.ctaPrimary}
               </Link>
             </Button>
-            <Button asChild size="lg" variant="secondary" className="group px-8 py-6 text-lg bg-card/20 backdrop-blur-sm border-2 border-card/30 hover:bg-card/30 text-card hover:text-card">
+            <Button asChild size="lg" variant="secondary" className="group bg-card/20 backdrop-blur-sm border border-card/30 hover:bg-card/30 text-card hover:text-card">
               <Link to={heroContent.ctaSecondaryLink}>
-                <Gift className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+                <Gift className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                 {heroContent.ctaSecondary}
               </Link>
             </Button>
