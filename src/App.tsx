@@ -25,6 +25,7 @@ import ContentEditor from "./pages/admin/ContentEditor";
 import ContentAudit from "./pages/admin/ContentAudit";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { DemoPopup } from "./components/DemoPopup";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
         <Sonner />
         <HashRouter>
           <ScrollToTop />
+          <DemoPopup />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />

@@ -32,14 +32,17 @@ export function Header() {
       <div className="container">
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center group">
-            <motion.span
+          <Link to="/" className="flex items-center gap-2 group">
+            <motion.div 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="font-medieval text-2xl sm:text-3xl text-coral tracking-wide transition-all"
+              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center transition-shadow group-hover:shadow-lg group-hover:shadow-primary/25"
             >
+              <span className="text-primary-foreground font-bold text-xl">E</span>
+            </motion.div>
+            <span className="hidden sm:block font-bold text-xl text-foreground">
               Experium
-            </motion.span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
