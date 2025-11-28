@@ -19,7 +19,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'ro',
+    fallbackLng: 'en',
+    supportedLngs: ['ro', 'en'],
     debug: false,
     interpolation: {
       escapeValue: false
@@ -27,7 +28,8 @@ i18n
     detection: {
       order: ['navigator', 'htmlTag', 'path', 'subdomain'],
       caches: ['localStorage']
-    }
+    },
+    load: 'languageOnly'
   });
 
 export default i18n;
