@@ -39,7 +39,7 @@ export function Header() {
               alt="Experium"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="h-14 sm:h-16 w-auto transition-all"
+              className="h-10 sm:h-12 w-auto transition-all"
             />
           </Link>
 
