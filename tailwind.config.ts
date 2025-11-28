@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
-        medieval: ["Cinzel", "serif"],
+        medieval: ["MedievalSharp", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
