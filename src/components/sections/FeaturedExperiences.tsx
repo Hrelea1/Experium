@@ -197,17 +197,17 @@ export function FeaturedExperiences() {
                     <span className="font-semibold text-foreground">{exp.rating}</span>
                   </div>
                   <span className="text-muted-foreground text-sm">
-                    ({exp.reviews} recenzii)
+                    ({exp.reviews} {t('featured.reviews')})
                   </span>
                 </div>
 
                 {/* Price */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-primary">{exp.price} lei</span>
+                    <span className="text-2xl font-bold text-primary">{exp.price} {t('common.lei')}</span>
                     {exp.originalPrice && (
                       <span className="text-muted-foreground line-through text-sm">
-                        {exp.originalPrice} lei
+                        {exp.originalPrice} {t('common.lei')}
                       </span>
                     )}
                   </div>

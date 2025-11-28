@@ -75,7 +75,7 @@ export function Newsletter() {
               {isSubmitted ? (
                 <>
                   <CheckCircle className="w-5 h-5 mr-2" />
-                  Mulțumim!
+                  {t('newsletter.success')}
                 </>
               ) : (
                 <>

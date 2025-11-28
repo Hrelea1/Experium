@@ -3,26 +3,26 @@ import { Search, Gift, Calendar, PartyPopper } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
-const steps = [
+const getSteps = (t: any) => [
   {
     icon: Search,
-    title: "Alege Experiența",
-    description: "Explorează categoriile și găsește experiența perfectă pentru tine sau cei dragi.",
+    titleKey: "howItWorks.step1Title",
+    descKey: "howItWorks.step1Desc",
   },
   {
     icon: Gift,
-    title: "Oferă Cadoul",
-    description: "Primește un voucher digital sau fizic, personalizat cu un mesaj special.",
+    titleKey: "howItWorks.step2Title",
+    descKey: "howItWorks.step2Desc",
   },
   {
     icon: Calendar,
-    title: "Programează",
-    description: "Beneficiarul alege data și locația care i se potrivește cel mai bine.",
+    titleKey: "howItWorks.step3Title",
+    descKey: "howItWorks.step3Desc",
   },
   {
     icon: PartyPopper,
-    title: "Bucurați-vă!",
-    description: "Trăiește momente memorabile și creează amintiri de neuitat.",
+    titleKey: "howItWorks.step4Title",
+    descKey: "howItWorks.step4Desc",
   },
 ];
 
@@ -61,9 +61,9 @@ export function HowItWorks() {
           {/* Connection Line */}
           <div className="hidden lg:block absolute top-16 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
 
-          {steps.map((step, index) => (
+          {getSteps(t).map((step, index) => (
             <motion.div
-              key={step.title}
+              key={step.titleKey}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -78,8 +78,8 @@ export function HowItWorks() {
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-              <p className="text-secondary-foreground/70">{step.description}</p>
+              <h3 className="text-xl font-bold mb-3">{t(step.titleKey)}</h3>
+              <p className="text-secondary-foreground/70">{t(step.descKey)}</p>
             </motion.div>
           ))}
         </div>

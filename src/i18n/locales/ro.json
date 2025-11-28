@@ -11,35 +11,64 @@
     "title": "Cadouri care creează amintiri de neuitat",
     "subtitle": "Descoperă experiențe unice în toată România - de la aventuri pline de adrenalină la relaxare la spa",
     "discover": "Descoperă Experiențe",
-    "hasVoucher": "Ai un Voucher?"
+    "hasVoucher": "Ai un Voucher?",
+    "badge": "Peste 500+ experiențe unice în România",
+    "search": "Caută",
+    "allRegions": "Toate Regiunile",
+    "allCategories": "Toate Categoriile",
+    "experiences": "Experiențe",
+    "counties": "Județe",
+    "happyClients": "Clienți Fericiți",
+    "rating": "Rating"
   },
   "categories": {
     "title": "Explorează după Categorie",
-    "subtitle": "Alege tipul perfect de experiență pentru orice ocazie"
+    "subtitle": "Alege tipul perfect de experiență pentru orice ocazie",
+    "adventure": "Aventură",
+    "adventureDesc": "Rafting, paragliding, escaladă",
+    "spa": "Spa & Relaxare",
+    "spaDesc": "Masaje, tratamente, wellness",
+    "gastronomy": "Gastronomie",
+    "gastronomyDesc": "Degustări, cooking class",
+    "culture": "Artă & Cultură",
+    "cultureDesc": "Muzee, spectacole, teatre",
+    "sports": "Sport",
+    "sportsDesc": "Golf, tenis, fitness",
+    "nature": "Natură",
+    "natureDesc": "Drumeții, camping, safari",
+    "romantic": "Romantic",
+    "romanticDesc": "Cină, sunset, spa duo",
+    "travel": "Călătorii",
+    "travelDesc": "City break, excursii",
+    "experiences": "experiențe"
   },
   "featured": {
     "title": "Experiențe Populare",
-    "subtitle": "Cele mai apreciate experiențe selectate special pentru tine"
+    "subtitle": "Cele mai apreciate experiențe selectate special pentru tine",
+    "viewAll": "Vezi Toate Experiențele",
+    "from": "de la",
+    "reviews": "recenzii",
+    "bestseller": "Bestseller",
+    "popular": "Popular",
+    "new": "Nou"
   },
   "regions": {
     "title": "Descoperă România",
-    "subtitle": "Experiențe unice în toate regiunile țării"
+    "subtitle": "Experiențe unice în toate regiunile țării",
+    "experiences": "experiențe",
+    "explore": "Explorează"
   },
   "howItWorks": {
     "title": "Cum Funcționează",
     "subtitle": "Trei pași simpli pentru a oferi un cadou memorabil",
-    "step1": {
-      "title": "Alege Experiența",
-      "description": "Răsfoiește colecția noastră de experiențe unice"
-    },
-    "step2": {
-      "title": "Personalizează",
-      "description": "Adaugă un mesaj personal și alege data"
-    },
-    "step3": {
-      "title": "Oferă Cadoul",
-      "description": "Primește voucherul instant prin email"
-    }
+    "step1Title": "Alege Experiența",
+    "step1Desc": "Explorează categoriile și găsește experiența perfectă pentru tine sau cei dragi.",
+    "step2Title": "Oferă Cadoul",
+    "step2Desc": "Primește un voucher digital sau fizic, personalizat cu un mesaj special.",
+    "step3Title": "Programează",
+    "step3Desc": "Beneficiarul alege data și locația care i se potrivește cel mai bine.",
+    "step4Title": "Bucurați-vă!",
+    "step4Desc": "Trăiește momente memorabile și creează amintiri de neuitat."
   },
   "testimonials": {
     "title": "Ce Spun Clienții Noștri",
@@ -49,7 +78,9 @@
     "title": "Rămâi la curent",
     "subtitle": "Abonează-te pentru oferte exclusive și experiențe noi",
     "placeholder": "Adresa ta de email",
-    "button": "Abonează-te"
+    "button": "Abonează-te",
+    "success": "Mulțumim pentru abonare!",
+    "disclaimer": "Ne angajăm să nu îți trimitem spam. Poți să te dezabonezi oricând."
   },
   "footer": {
     "description": "Platforma ta pentru cadouri experiențiale unice în România",
