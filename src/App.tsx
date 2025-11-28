@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import ExperienceDetail from "./pages/ExperienceDetail";
 import CategorySearch from "./pages/CategorySearch";
+import MapView from "./pages/MapView";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import MyVouchers from "./pages/MyVouchers";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/category/:category" element={<CategorySearch />} />
+            <Route path="/map" element={<MapView />} />
             <Route path="/my-vouchers" element={<MyVouchers />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/redeem-voucher" element={<RedeemVoucher />} />
