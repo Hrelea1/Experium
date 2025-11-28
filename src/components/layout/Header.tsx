@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield } from "lucide-react";
-import experiumLogo from "@/assets/experium-logo.svg";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
@@ -33,14 +32,14 @@ export function Header() {
       <div className="container">
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <motion.img
-              src={experiumLogo}
-              alt="Experium"
+          <Link to="/" className="flex items-center group">
+            <motion.span
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-[30%] h-auto transition-all"
-            />
+              className="font-medieval font-bold text-2xl sm:text-3xl text-foreground tracking-wide transition-all"
+            >
+              Experium
+            </motion.span>
           </Link>
 
           {/* Desktop Navigation */}
