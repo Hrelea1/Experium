@@ -192,6 +192,19 @@ export function Hero() {
                 <Search className="w-5 h-5 mr-2" />
                 {t('hero.search')}
               </Button>
+
+              {/* Show on Map Button */}
+              <Button 
+                size="lg" 
+                variant="secondary" 
+                className="md:w-auto"
+                asChild
+              >
+                <Link to="/map">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  {t('hero.showOnMap')}
+                </Link>
+              </Button>
             </div>
           </motion.div>
 
