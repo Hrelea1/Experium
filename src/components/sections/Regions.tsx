@@ -50,7 +50,7 @@ export function Regions() {
   };
 
   const handleRegionClick = (regionName: string) => {
-    navigate(`/category/all?region=${regionName}`);
+    navigate(`/category/toate-categoriile?region=${regionName}`);
   };
 
   return (
@@ -82,20 +82,21 @@ export function Regions() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            whileHover={{ y: -8 }}
-            className="md:col-span-2 lg:row-span-2 group relative rounded-2xl overflow-hidden min-h-[300px] lg:min-h-[500px] cursor-pointer"
+            whileHover={{ y: -8, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="md:col-span-2 lg:row-span-2 group relative rounded-2xl overflow-hidden min-h-[300px] lg:min-h-[500px] cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300"
           >
             <img
               src={regions[0].image}
               alt={regions[0].name}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/30 to-transparent group-hover:from-secondary/90 transition-colors duration-300" />
             <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-              <span className="inline-block px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-semibold mb-3">
+              <span className="inline-block px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-semibold mb-3 group-hover:scale-110 transition-transform">
                 Cel mai popular
               </span>
-              <h3 className="text-2xl lg:text-4xl font-bold text-card mb-2">
+              <h3 className="text-2xl lg:text-4xl font-bold text-card mb-2 group-hover:text-primary transition-colors">
                 {regions[0].name}
               </h3>
               <p className="text-card/80 mb-4">
@@ -117,20 +118,21 @@ export function Regions() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -6 }}
-              className="group relative rounded-2xl overflow-hidden min-h-[200px] cursor-pointer"
+              whileHover={{ y: -8, scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="group relative rounded-2xl overflow-hidden min-h-[200px] cursor-pointer shadow-md hover:shadow-xl transition-shadow duration-300"
             >
               <img
                 src={region.image}
                 alt={region.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-secondary via-secondary/20 to-transparent group-hover:from-secondary/70 transition-colors duration-300" />
               <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h3 className="text-xl font-bold text-card mb-1">
+                <h3 className="text-xl font-bold text-card mb-1 group-hover:text-primary transition-colors">
                   {region.name}
                 </h3>
-                <p className="text-card/80 text-sm">
+                <p className="text-card/80 text-sm group-hover:text-card transition-colors">
                   {region.experiences} experiențe
                 </p>
               </div>
