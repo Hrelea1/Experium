@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Heart, Star, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
+
 const experiences = [
   {
     id: 1,
@@ -93,6 +95,14 @@ const cardVariants = {
 
 export function FeaturedExperiences() {
   const navigate = useNavigate();
+  const { data: content } = useHomepageContent("featured");
+  
+  const sectionContent = content?.content || {
+    badge: "Recomandate",
+    title: "Experiențe Populare",
+    subtitle: "Cele mai apreciate experiențe de către clienții noștri.",
+    ctaText: "Vezi Toate"
+  };
 
   return (
     <section id="experiences" className="py-20 lg:py-28 bg-cream">
@@ -106,17 +116,17 @@ export function FeaturedExperiences() {
         >
           <div>
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
-              Recomandate
+              {sectionContent.badge}
             </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Experiențe Populare
+              {sectionContent.title}
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
-              Cele mai apreciate experiențe de către clienții noștri.
+              {sectionContent.subtitle}
             </p>
           </div>
           <Button variant="outline" className="sm:w-auto">
-            Vezi Toate
+            {sectionContent.ctaText}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </motion.div>

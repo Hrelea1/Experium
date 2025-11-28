@@ -10,6 +10,8 @@ import {
   Heart,
   Plane
 } from "lucide-react";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
+
 const categories = [
   {
     icon: Mountain,
@@ -100,6 +102,13 @@ const itemVariants = {
 
 export function Categories() {
   const navigate = useNavigate();
+  const { data: content } = useHomepageContent("categories");
+  
+  const sectionContent = content?.content || {
+    badge: "Categorii",
+    title: "Explorează După Interes",
+    subtitle: "Alege categoria perfectă pentru tine sau pentru cei dragi și descoperă experiențe memorabile în toată România."
+  };
 
   return (
     <section id="categories" className="py-20 lg:py-28 bg-background">
@@ -112,14 +121,13 @@ export function Categories() {
           className="text-center mb-14"
         >
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
-            Categorii
+            {sectionContent.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Explorează După Interes
+            {sectionContent.title}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Alege categoria perfectă pentru tine sau pentru cei dragi și descoperă 
-            experiențe memorabile în toată România.
+            {sectionContent.subtitle}
           </p>
         </motion.div>
 

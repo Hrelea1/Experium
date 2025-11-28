@@ -2,10 +2,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, Gift, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { data: content } = useHomepageContent("newsletter");
+  
+  const sectionContent = content?.content || {
+    title: "Fii Primul Care Află",
+    subtitle: "Abonează-te pentru a primi oferte exclusive, experiențe noi și idei de cadouri direct în inbox-ul tău.",
+    placeholder: "Adresa ta de email",
+    ctaText: "Abonează-te",
+    disclaimer: "Ne angajăm să nu îți trimitem spam. Poți să te dezabonezi oricând."
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,11 +47,10 @@ export function Newsletter() {
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Fii Primul Care Află
+            {sectionContent.title}
           </h2>
           <p className="text-muted-foreground text-lg mb-8">
-            Abonează-te pentru a primi oferte exclusive, experiențe noi și 
-            idei de cadouri direct în inbox-ul tău.
+            {sectionContent.subtitle}
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
@@ -50,7 +59,7 @@ export function Newsletter() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Adresa ta de email"
+                placeholder={sectionContent.placeholder}
                 className="w-full h-12 px-5 rounded-xl bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 required
               />
@@ -69,14 +78,14 @@ export function Newsletter() {
               ) : (
                 <>
                   <Send className="w-5 h-5 mr-2" />
-                  Abonează-te
+                  {sectionContent.ctaText}
                 </>
               )}
             </Button>
           </form>
 
           <p className="text-muted-foreground text-sm mt-4">
-            Ne angajăm să nu îți trimitem spam. Poți să te dezabonezi oricând.
+            {sectionContent.disclaimer}
           </p>
         </motion.div>
       </div>
