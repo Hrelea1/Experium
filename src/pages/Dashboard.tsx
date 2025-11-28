@@ -15,7 +15,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Gift, ShoppingBag, Settings, Ticket, Clock, MapPin, Users, XCircle, Edit3, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Gift, ShoppingBag, Settings, Ticket, Clock, MapPin, Users, XCircle, Edit3, AlertCircle, Shield } from 'lucide-react';
+import { TwoFactorSetup } from '@/components/auth/TwoFactorSetup';
 import { format } from 'date-fns';
 import { ro } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -632,6 +633,8 @@ const Dashboard = () => {
                   </form>
                 </CardContent>
               </Card>
+
+              <TwoFactorSetup />
             </TabsContent>
           </Tabs>
 

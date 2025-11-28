@@ -8,12 +8,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { TwoFactorChallenge } from '@/components/auth/TwoFactorChallenge';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, signIn, signUp, resetPassword } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [requires2FA, setRequires2FA] = useState(false);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -47,11 +50,46 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(loginEmail, loginPassword);
-    setLoading(false);
-    if (!error) {
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: loginPassword,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Check if 2FA is required
+      if (data?.user) {
+        const { data: factors } = await supabase.auth.mfa.listFactors();
+        const hasTOTP = factors?.totp?.some((f) => f.status === 'verified');
+        
+        if (hasTOTP) {
+          setRequires2FA(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       navigate('/');
+    } catch (error: any) {
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handle2FASuccess = () => {
+    setRequires2FA(false);
+    navigate('/');
+  };
+
+  const handle2FACancel = async () => {
+    await supabase.auth.signOut();
+    setRequires2FA(false);
+    setLoginPassword('');
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -134,6 +172,21 @@ const Auth = () => {
               </form>
             </CardContent>
           </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (requires2FA) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center px-4 py-12">
+          <TwoFactorChallenge 
+            onSuccess={handle2FASuccess} 
+            onCancel={handle2FACancel}
+          />
         </main>
         <Footer />
       </div>
