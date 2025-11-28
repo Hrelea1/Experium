@@ -32,9 +32,7 @@ const categories = [
 
 export function Hero() {
   const { t } = useTranslation();
-  const [selectedRegion, setSelectedRegion] = useState("hero.allRegions");
   const [selectedCategory, setSelectedCategory] = useState("hero.allCategories");
-  const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
   const { data: content } = useHomepageContent("hero");
@@ -121,46 +119,10 @@ export function Hero() {
             className="bg-card rounded-2xl p-4 shadow-xl max-w-3xl mx-auto"
           >
             <div className="flex flex-col md:flex-row gap-3">
-              {/* Region Dropdown */}
-              <div className="relative flex-1">
-                <button
-                  onClick={() => {
-                    setIsRegionOpen(!isRegionOpen);
-                    setIsCategoryOpen(false);
-                  }}
-                  className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-muted rounded-xl text-left hover:bg-muted/80 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-primary" />
-                    <span className="text-foreground font-medium">{t(selectedRegion)}</span>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isRegionOpen ? "rotate-180" : ""}`} />
-                </button>
-                {isRegionOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-lg border border-border z-20 max-h-60 overflow-auto">
-                    {regions.map((region) => (
-                      <button
-                        key={region}
-                        onClick={() => {
-                          setSelectedRegion(region);
-                          setIsRegionOpen(false);
-                        }}
-                        className="w-full px-4 py-3 text-left hover:bg-muted transition-colors first:rounded-t-xl last:rounded-b-xl"
-                      >
-                        {t(region)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
               {/* Category Dropdown */}
               <div className="relative flex-1">
                 <button
-                  onClick={() => {
-                    setIsCategoryOpen(!isCategoryOpen);
-                    setIsRegionOpen(false);
-                  }}
+                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                   className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-muted rounded-xl text-left hover:bg-muted/80 transition-colors"
                 >
                   <div className="flex items-center gap-2">
