@@ -34,7 +34,7 @@ const mainItems = [
 
 const otherItems = [
   { title: "Setări", url: "/admin/settings", icon: Settings },
-  { title: "Înapoi la Site", url: "/", icon: Home },
+  { title: "Înapoi la Site", url: "/", icon: Home, external: true },
 ];
 
 export function AdminSidebar() {
@@ -88,14 +88,24 @@ export function AdminSidebar() {
               {otherItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className="hover:bg-muted/50"
-                      activeClassName="bg-muted text-primary font-medium"
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {open && <span>{item.title}</span>}
-                    </NavLink>
+                    {'external' in item && item.external ? (
+                      <a
+                        href={item.url}
+                        className="hover:bg-muted/50"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {open && <span>{item.title}</span>}
+                      </a>
+                    ) : (
+                      <NavLink
+                        to={item.url}
+                        className="hover:bg-muted/50"
+                        activeClassName="bg-muted text-primary font-medium"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {open && <span>{item.title}</span>}
+                      </NavLink>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
