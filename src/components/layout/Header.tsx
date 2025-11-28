@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Crown } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
@@ -32,14 +32,7 @@ export function Header() {
       <div className="container">
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="transition-all"
-            >
-              <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-coral" />
-            </motion.div>
+          <Link to="/" className="flex items-center group">
             <motion.span
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
