@@ -145,27 +145,28 @@ export function Categories() {
               key={category.titleKey}
               onClick={() => navigate(`/category/${category.slug}`)}
               variants={itemVariants}
-              whileHover={{ scale: 1.02, y: -4 }}
-              className="group relative bg-card rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer overflow-hidden border border-border/50"
+              whileHover={{ scale: 1.05, y: -8 }}
+              whileTap={{ scale: 0.98 }}
+              className="group relative bg-card rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer overflow-hidden border border-border/50 hover:border-primary/30"
             >
               {/* Gradient Background on Hover */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+              <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
               
               {/* Icon */}
-              <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
                 <category.icon className="w-7 h-7 text-card" />
               </div>
 
               {/* Content */}
-              <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+              <h3 className="relative text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
                 {t(category.titleKey)}
               </h3>
-              <p className="text-muted-foreground text-sm mb-3">
+              <p className="relative text-muted-foreground text-sm mb-3">
                 {t(category.descKey)}
               </p>
 
               {/* Count Badge */}
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium">
+              <span className="relative inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-medium group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                 {category.count} {t('categories.experiences')}
               </span>
             </motion.div>
