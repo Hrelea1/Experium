@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import MyVouchers from "./pages/MyVouchers";
 import MyBookings from "./pages/MyBookings";
 import RedeemVoucher from "./pages/RedeemVoucher";
+import VoucherConfirmation from "./pages/VoucherConfirmation";
 import CreateTestVoucher from "./pages/CreateTestVoucher";
 import Cart from "./pages/Cart";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/my-vouchers" element={<MyVouchers />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/redeem-voucher" element={<RedeemVoucher />} />
+            <Route path="/voucher-confirmation" element={<VoucherConfirmation />} />
             <Route path="/cart" element={<Cart />} />
             
             {/* Admin Routes */}
