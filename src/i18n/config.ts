@@ -19,17 +19,26 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
+    fallbackLng: (code) => {
+      // If the detected language is Romanian, use Romanian
+      if (code && code.toLowerCase().startsWith('ro')) {
+        return 'ro';
+      }
+      // For all other languages, use English
+      return 'en';
+    },
     supportedLngs: ['ro', 'en'],
     debug: false,
     interpolation: {
       escapeValue: false
     },
     detection: {
-      order: ['navigator', 'htmlTag', 'path', 'subdomain'],
-      caches: ['localStorage']
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng'
     },
-    load: 'languageOnly'
+    load: 'languageOnly',
+    nonExplicitSupportedLngs: true
   });
 
 export default i18n;

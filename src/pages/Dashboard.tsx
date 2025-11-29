@@ -18,10 +18,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarIcon, Gift, ShoppingBag, Settings, Ticket, Clock, MapPin, Users, XCircle, Edit3, AlertCircle, Shield } from 'lucide-react';
 import { TwoFactorSetup } from '@/components/auth/TwoFactorSetup';
 import { format } from 'date-fns';
-import { ro } from 'date-fns/locale';
+import { ro, enUS } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useTranslation } from 'react-i18next';
 
 interface Voucher {
   id: string;
@@ -59,11 +60,15 @@ const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profile, setProfile] = useState<Profile>({ full_name: '', email: '', phone: '' });
   const [updatingProfile, setUpdatingProfile] = useState(false);
+
+  // Get date-fns locale based on current language
+  const dateLocale = i18n.language === 'ro' ? ro : enUS;
 
   // Cancel booking dialog state
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -158,14 +163,14 @@ const Dashboard = () => {
 
     if (error) {
       toast({
-        title: 'Eroare',
-        description: 'Nu s-a putut actualiza profilul',
+        title: t('common.error'),
+        description: t('dashboard.profileUpdateError'),
         variant: 'destructive',
       });
     } else {
       toast({
-        title: 'Success',
-        description: 'Profilul a fost actualizat',
+        title: t('common.save'),
+        description: t('dashboard.profileUpdateSuccess'),
       });
     }
   };
@@ -181,8 +186,8 @@ const Dashboard = () => {
     if (error || !data || data.length === 0) {
       setCancelling(false);
       toast({
-        title: 'Eroare',
-        description: error?.message || 'Nu s-a putut anula rezervarea',
+        title: t('common.error'),
+        description: error?.message || t('common.error'),
         variant: 'destructive',
       });
       return;
@@ -193,7 +198,7 @@ const Dashboard = () => {
     if (!result.success) {
       setCancelling(false);
       toast({
-        title: 'Eroare',
+        title: t('common.error'),
         description: result.error_message,
         variant: 'destructive',
       });
@@ -214,10 +219,10 @@ const Dashboard = () => {
 
     setCancelling(false);
     toast({
-      title: 'Rezervare anulată',
+      title: t('dashboard.bookingCancelled'),
       description: result.refund_eligible 
-        ? 'Rezervarea a fost anulată cu succes. Vei primi un refund.' 
-        : 'Rezervarea a fost anulată. Nu ești eligibil pentru refund (anulare sub 48h).',
+        ? t('dashboard.bookingCancelledRefund')
+        : t('dashboard.bookingCancelledNoRefund'),
     });
 
     setCancelDialogOpen(false);
@@ -228,8 +233,8 @@ const Dashboard = () => {
   const handleRescheduleBooking = async () => {
     if (!newBookingDate) {
       toast({
-        title: 'Eroare',
-        description: 'Te rog selectează o dată nouă',
+        title: t('common.error'),
+        description: t('dashboard.selectNewDateError'),
         variant: 'destructive',
       });
       return;
@@ -246,8 +251,8 @@ const Dashboard = () => {
 
     if (error || !data || data.length === 0) {
       toast({
-        title: 'Eroare',
-        description: error?.message || 'Nu s-a putut reprograma rezervarea',
+        title: t('common.error'),
+        description: error?.message || t('common.error'),
         variant: 'destructive',
       });
       return;
@@ -257,7 +262,7 @@ const Dashboard = () => {
     
     if (!result.success) {
       toast({
-        title: 'Eroare',
+        title: t('common.error'),
         description: result.error_message,
         variant: 'destructive',
       });
@@ -265,8 +270,8 @@ const Dashboard = () => {
     }
 
     toast({
-      title: 'Rezervare reprogramată',
-      description: 'Rezervarea a fost reprogramată cu succes',
+      title: t('dashboard.bookingRescheduled'),
+      description: t('dashboard.bookingRescheduledSuccess'),
     });
 
     setRescheduleDialogOpen(false);
@@ -313,7 +318,7 @@ const Dashboard = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground">Se încarcă...</p>
+          <p className="text-muted-foreground">{t('common.loading')}</p>
         </main>
         <Footer />
       </div>
@@ -327,42 +332,42 @@ const Dashboard = () => {
         <div className="container max-w-7xl">
           {/* Header Section */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Contul meu</h1>
-            <p className="text-muted-foreground">Gestionează voucherele, rezervările și setările tale</p>
+            <h1 className="text-3xl font-bold mb-2">{t('dashboard.title')}</h1>
+            <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
           </div>
 
           {/* Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Vouchere active</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('dashboard.activeVouchers')}</CardTitle>
                 <Ticket className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{activeVouchers.length}</div>
-                <p className="text-xs text-muted-foreground">Gata de folosit</p>
+                <p className="text-xs text-muted-foreground">{t('dashboard.readyToUse')}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Rezervări viitoare</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('dashboard.upcomingBookings')}</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{upcomingBookings.length}</div>
-                <p className="text-xs text-muted-foreground">Experiențe programate</p>
+                <p className="text-xs text-muted-foreground">{t('dashboard.scheduledExperiences')}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total comenzi</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('dashboard.totalOrders')}</CardTitle>
                 <ShoppingBag className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{vouchers.length}</div>
-                <p className="text-xs text-muted-foreground">Toate voucherele</p>
+                <p className="text-xs text-muted-foreground">{t('dashboard.allVouchers')}</p>
               </CardContent>
             </Card>
           </div>
@@ -372,19 +377,19 @@ const Dashboard = () => {
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="vouchers">
                 <Gift className="h-4 w-4 mr-2" />
-                Vouchere
+                {t('dashboard.vouchers')}
               </TabsTrigger>
               <TabsTrigger value="bookings">
                 <Calendar className="h-4 w-4 mr-2" />
-                Rezervări
+                {t('dashboard.bookings')}
               </TabsTrigger>
               <TabsTrigger value="orders">
                 <ShoppingBag className="h-4 w-4 mr-2" />
-                Istoric comenzi
+                {t('dashboard.orders')}
               </TabsTrigger>
               <TabsTrigger value="settings">
                 <Settings className="h-4 w-4 mr-2" />
-                Setări
+                {t('dashboard.settings')}
               </TabsTrigger>
             </TabsList>
 
