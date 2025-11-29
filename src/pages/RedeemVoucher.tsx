@@ -164,13 +164,8 @@ const RedeemVoucher = () => {
         return;
       }
 
-      toast({
-        title: 'Rezervare confirmată!',
-        description: 'Voucher-ul a fost utilizat cu succes',
-      });
-
-      // Navigate to bookings page
-      navigate('/my-bookings');
+      // Navigate to confirmation page
+      navigate(`/voucher-confirmation?code=${voucherDetails.voucherCode}`);
     } catch (error: any) {
       toast({
         title: 'Eroare',

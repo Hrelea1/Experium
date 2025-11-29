@@ -8,8 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, MapPin, Users, CheckCircle, XCircle, Clock, Gift } from 'lucide-react';
+import { Calendar, MapPin, Users, CheckCircle, XCircle, Clock, Gift, Ban, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Booking {
@@ -35,6 +39,17 @@ const MyBookings = () => {
   const { toast } = useToast();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Cancel dialog
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [cancellationReason, setCancellationReason] = useState('');
+  const [cancelling, setCancelling] = useState(false);
+  
+  // Change date dialog
+  const [changeDateDialogOpen, setChangeDateDialogOpen] = useState(false);
+  const [newDate, setNewDate] = useState('');
+  const [changingDate, setChangingDate] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -108,6 +123,120 @@ const MyBookings = () => {
 
   const upcomingBookings = bookings.filter(isUpcoming);
 
+  const handleCancelClick = (bookingId: string) => {
+    setSelectedBookingId(bookingId);
+    setCancellationReason('');
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelBooking = async () => {
+    if (!selectedBookingId || !cancellationReason.trim()) {
+      toast({
+        title: 'Eroare',
+        description: 'Te rog să introduci un motiv pentru anulare',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setCancelling(true);
+
+    try {
+      const { data, error } = await supabase.rpc('cancel_booking', {
+        p_booking_id: selectedBookingId,
+        p_cancellation_reason: cancellationReason,
+      });
+
+      if (error) throw error;
+
+      const result = data[0];
+
+      if (!result.success) {
+        toast({
+          title: 'Eroare',
+          description: result.error_message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Rezervare anulată',
+        description: result.refund_eligible 
+          ? 'Rezervarea a fost anulată. Ești eligibil pentru rambursare.'
+          : 'Rezervarea a fost anulată.',
+      });
+
+      setCancelDialogOpen(false);
+      setCancellationReason('');
+      fetchBookings();
+    } catch (error: any) {
+      toast({
+        title: 'Eroare',
+        description: error.message || 'Nu am putut anula rezervarea',
+        variant: 'destructive',
+      });
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const handleChangeDateClick = (bookingId: string) => {
+    setSelectedBookingId(bookingId);
+    setNewDate('');
+    setChangeDateDialogOpen(true);
+  };
+
+  const handleChangeDate = async () => {
+    if (!selectedBookingId || !newDate) {
+      toast({
+        title: 'Eroare',
+        description: 'Te rog să selectezi o dată nouă',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setChangingDate(true);
+
+    try {
+      const { data, error } = await supabase.rpc('reschedule_booking', {
+        p_booking_id: selectedBookingId,
+        p_new_booking_date: new Date(newDate).toISOString(),
+      });
+
+      if (error) throw error;
+
+      const result = data[0];
+
+      if (!result.success) {
+        toast({
+          title: 'Eroare',
+          description: result.error_message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      toast({
+        title: 'Data schimbată',
+        description: 'Rezervarea a fost reprogramată cu succes',
+      });
+
+      setChangeDateDialogOpen(false);
+      setNewDate('');
+      fetchBookings();
+    } catch (error: any) {
+      toast({
+        title: 'Eroare',
+        description: error.message || 'Nu am putut schimba data',
+        variant: 'destructive',
+      });
+    } finally {
+      setChangingDate(false);
+    }
+  };
+
   if (loading || authLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -152,30 +281,115 @@ const MyBookings = () => {
             </TabsList>
 
             <TabsContent value="upcoming">
-              <BookingGrid bookings={upcomingBookings} getStatusBadge={getStatusBadge} />
+              <BookingGrid 
+                bookings={upcomingBookings} 
+                getStatusBadge={getStatusBadge}
+                onCancelClick={handleCancelClick}
+                onChangeDateClick={handleChangeDateClick}
+              />
             </TabsContent>
 
             <TabsContent value="all">
-              <BookingGrid bookings={bookings} getStatusBadge={getStatusBadge} />
+              <BookingGrid 
+                bookings={bookings} 
+                getStatusBadge={getStatusBadge}
+                onCancelClick={handleCancelClick}
+                onChangeDateClick={handleChangeDateClick}
+              />
             </TabsContent>
 
             <TabsContent value="completed">
               <BookingGrid 
                 bookings={filterBookingsByStatus(['completed'])} 
-                getStatusBadge={getStatusBadge} 
+                getStatusBadge={getStatusBadge}
+                onCancelClick={handleCancelClick}
+                onChangeDateClick={handleChangeDateClick}
               />
             </TabsContent>
 
             <TabsContent value="cancelled">
               <BookingGrid 
                 bookings={filterBookingsByStatus(['cancelled'])} 
-                getStatusBadge={getStatusBadge} 
+                getStatusBadge={getStatusBadge}
+                onCancelClick={handleCancelClick}
+                onChangeDateClick={handleChangeDateClick}
               />
             </TabsContent>
           </Tabs>
         </div>
       </main>
       <Footer />
+
+      {/* Cancel Booking Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Anulează Rezervarea</DialogTitle>
+            <DialogDescription>
+              Te rog să ne spui de ce dorești să anulezi această rezervare
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="reason">Motiv anulare *</Label>
+              <Textarea
+                id="reason"
+                placeholder="Ex: Program schimbat, altă prioritate..."
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
+              Înapoi
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={handleCancelBooking} 
+              disabled={cancelling || !cancellationReason.trim()}
+            >
+              {cancelling ? 'Se anulează...' : 'Confirmă Anularea'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Date Dialog */}
+      <Dialog open={changeDateDialogOpen} onOpenChange={setChangeDateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Schimbă Data Rezervării</DialogTitle>
+            <DialogDescription>
+              Selectează o dată nouă pentru această rezervare
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-date">Data nouă *</Label>
+              <Input
+                id="new-date"
+                type="datetime-local"
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setChangeDateDialogOpen(false)}>
+              Anulează
+            </Button>
+            <Button 
+              onClick={handleChangeDate} 
+              disabled={changingDate || !newDate}
+            >
+              {changingDate ? 'Se salvează...' : 'Salvează Data'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -183,9 +397,11 @@ const MyBookings = () => {
 interface BookingGridProps {
   bookings: Booking[];
   getStatusBadge: (status: string) => React.ReactNode;
+  onCancelClick?: (bookingId: string) => void;
+  onChangeDateClick?: (bookingId: string) => void;
 }
 
-const BookingGrid = ({ bookings, getStatusBadge }: BookingGridProps) => {
+const BookingGrid = ({ bookings, getStatusBadge, onCancelClick, onChangeDateClick }: BookingGridProps) => {
   if (bookings.length === 0) {
     return (
       <Card>
@@ -245,13 +461,31 @@ const BookingGrid = ({ bookings, getStatusBadge }: BookingGridProps) => {
               )}
 
               {/* Actions */}
-              {booking.status === 'confirmed' && new Date(booking.booking_date) > new Date() && (
-                <div className="pt-3 border-t">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Vezi Detalii
+              <div className="pt-3 border-t space-y-2">
+                {booking.status === 'confirmed' && new Date(booking.booking_date) > new Date() && onCancelClick && (
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="w-full gap-2"
+                    onClick={() => onCancelClick(booking.id)}
+                  >
+                    <Ban className="h-4 w-4" />
+                    Anulează Rezervarea
                   </Button>
-                </div>
-              )}
+                )}
+                
+                {booking.status === 'cancelled' && onChangeDateClick && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full gap-2"
+                    onClick={() => onChangeDateClick(booking.id)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    Schimbă Data
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
