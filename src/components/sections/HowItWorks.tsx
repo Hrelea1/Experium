@@ -37,7 +37,7 @@ export function HowItWorks() {
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-secondary text-secondary-foreground overflow-hidden">
+    <section id="how-it-works" className="py-20 lg:py-28 bg-secondary text-secondary-foreground overflow-hidden">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
