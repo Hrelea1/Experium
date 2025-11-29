@@ -21,11 +21,22 @@ export function Header() {
   const { isAdmin } = useAdminCheck();
   const { t } = useTranslation();
 
+  const handleNavClick = (sectionId: string) => {
+    if (window.location.pathname !== '/') {
+      window.location.href = `/#${sectionId}`;
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   const navLinks = [
-    { label: t('nav.experiences'), href: "#experiences" },
-    { label: t('nav.regions'), href: "#regions" },
-    { label: t('nav.howItWorks'), href: "#how-it-works" },
-    { label: t('nav.contact'), href: "#contact" },
+    { label: t('nav.experiences'), id: "experiences" },
+    { label: t('nav.regions'), id: "regions" },
+    { label: t('nav.howItWorks'), id: "how-it-works" },
+    { label: t('nav.contact'), id: "contact" },
   ];
 
   return (
@@ -49,14 +60,14 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
+              <button
+                key={link.id}
+                onClick={() => handleNavClick(link.id)}
                 className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
               >
                 {link.label}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-              </a>
+              </button>
             ))}
             {isAdmin && (
               <Link
@@ -160,14 +171,16 @@ export function Header() {
           >
             <nav className="container py-4 flex flex-col gap-2">
               {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                <button
+                  key={link.id}
+                  onClick={() => {
+                    handleNavClick(link.id);
+                    setIsMenuOpen(false);
+                  }}
+                  className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors text-left"
                 >
                   {link.label}
-                </a>
+                </button>
               ))}
                {isAdmin && (
                 <Link
