@@ -13,9 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Gift, ShoppingBag, Settings, Ticket, Clock, MapPin, Users, XCircle, Edit3, AlertCircle, Shield } from 'lucide-react';
+import { Calendar, Gift, ShoppingBag, Settings, Ticket, Clock, MapPin, Users, XCircle, Edit3, AlertCircle, Shield } from 'lucide-react';
 import { TwoFactorSetup } from '@/components/auth/TwoFactorSetup';
 import { DateCard } from '@/components/dashboard/DateCard';
 import { format } from 'date-fns';
@@ -79,7 +77,7 @@ const Dashboard = () => {
 
   // Reschedule booking dialog state
   const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false);
-  const [newBookingDate, setNewBookingDate] = useState<Date>();
+  const [newBookingDate, setNewBookingDate] = useState<string>('');
   const [rescheduling, setRescheduling] = useState(false);
 
   useEffect(() => {
@@ -245,7 +243,7 @@ const Dashboard = () => {
 
     const { data, error } = await supabase.rpc('reschedule_booking', {
       p_booking_id: selectedBookingId,
-      p_new_booking_date: newBookingDate.toISOString(),
+      p_new_booking_date: new Date(newBookingDate).toISOString(),
     });
 
     setRescheduling(false);
@@ -276,7 +274,7 @@ const Dashboard = () => {
     });
 
     setRescheduleDialogOpen(false);
-    setNewBookingDate(undefined);
+    setNewBookingDate('');
     fetchDashboardData();
   };
 
@@ -708,31 +706,14 @@ const Dashboard = () => {
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>{t('dashboard.newDate')}</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !newBookingDate && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {newBookingDate ? format(newBookingDate, "PPP", { locale: dateLocale }) : t('dashboard.selectDate')}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={newBookingDate}
-                        onSelect={setNewBookingDate}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Label htmlFor="new-date">{t('dashboard.newDate')}</Label>
+                  <Input
+                    id="new-date"
+                    type="datetime-local"
+                    value={newBookingDate}
+                    onChange={(e) => setNewBookingDate(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                  />
                 </div>
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
