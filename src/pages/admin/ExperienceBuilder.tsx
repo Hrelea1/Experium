@@ -211,10 +211,10 @@ const ExperienceBuilder = () => {
               <div className="space-y-2">
                 <Label htmlFor="region">Regiune *</Label>
                 <Select value={regionId} onValueChange={setRegionId}>
-                  <SelectTrigger id="region">
+                  <SelectTrigger id="region" className="bg-background">
                     <SelectValue placeholder="Selectează regiune" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-popover z-[100]">
                     {regions.map((region) => (
                       <SelectItem key={region.id} value={region.id}>
                         {region.name}
@@ -229,10 +229,10 @@ const ExperienceBuilder = () => {
             <div className="space-y-2">
               <Label htmlFor="category">Categorie *</Label>
               <Select value={categoryId} onValueChange={setCategoryId}>
-                <SelectTrigger id="category">
+                <SelectTrigger id="category" className="bg-background">
                   <SelectValue placeholder="Selectează categorie" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-[100]">
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
