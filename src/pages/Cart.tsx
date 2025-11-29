@@ -1,16 +1,20 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, X, Plus, Minus, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ShoppingBag, X, Plus, Minus, ArrowRight, ArrowLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Cart() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   // Mock cart items - in production this would come from state management
-  const cartItems = [
+  const [cartItems, setCartItems] = useState([
     {
       id: 1,
       title: "Zbor cu Balonul în Transilvania",
@@ -19,7 +23,24 @@ export default function Cart() {
       quantity: 1,
       image: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=200&h=200&fit=crop",
     },
-  ];
+  ]);
+
+  const handleUpdateQuantity = (id: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
+    setCartItems(items =>
+      items.map(item =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
+
+  const handleRemoveItem = (id: number) => {
+    setCartItems(items => items.filter(item => item.id !== id));
+    toast({
+      title: "Produs eliminat",
+      description: "Produsul a fost eliminat din coș",
+    });
+  };
 
   const isEmpty = cartItems.length === 0;
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -34,9 +55,19 @@ export default function Cart() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="flex items-center gap-3 mb-8">
-            <ShoppingBag className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold text-foreground">Coșul Meu</h1>
+          <div className="flex items-center gap-4 mb-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-3">
+              <ShoppingBag className="h-8 w-8 text-primary" />
+              <h1 className="text-4xl font-bold text-foreground">Coșul Meu</h1>
+            </div>
           </div>
 
           {isEmpty ? (
@@ -71,19 +102,34 @@ export default function Cart() {
                         </p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <Button variant="outline" size="icon" className="h-8 w-8">
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                            >
                               <Minus className="h-4 w-4" />
                             </Button>
                             <span className="font-medium w-8 text-center">
                               {item.quantity}
                             </span>
-                            <Button variant="outline" size="icon" className="h-8 w-8">
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                            >
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
                           <div className="flex items-center gap-4">
                             <span className="font-bold text-lg">{item.price} lei</span>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => handleRemoveItem(item.id)}
+                            >
                               <X className="h-4 w-4" />
                             </Button>
                           </div>
