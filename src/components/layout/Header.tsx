@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useTranslation } from "react-i18next";
+import { SearchDialog } from "@/components/layout/SearchDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,7 @@ import {
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { t } = useTranslation();
@@ -83,7 +85,12 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 lg:gap-4">
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="hidden sm:flex"
+              onClick={() => setSearchOpen(true)}
+            >
               <Search className="h-5 w-5" />
             </Button>
             <Button variant="ghost" size="icon" className="hidden sm:flex">
@@ -193,7 +200,14 @@ export function Header() {
                 </Link>
               )}
               <div className="flex items-center gap-4 px-4 pt-4 border-t border-border mt-2">
-                <Button variant="ghost" size="icon">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => {
+                    setSearchOpen(true);
+                    setIsMenuOpen(false);
+                  }}
+                >
                   <Search className="h-5 w-5" />
                 </Button>
                 <Button variant="ghost" size="icon">
@@ -225,6 +239,9 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Search Dialog */}
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }
