@@ -17,6 +17,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarIcon, Gift, ShoppingBag, Settings, Ticket, Clock, MapPin, Users, XCircle, Edit3, AlertCircle, Shield } from 'lucide-react';
 import { TwoFactorSetup } from '@/components/auth/TwoFactorSetup';
+import { DateCard } from '@/components/dashboard/DateCard';
 import { format } from 'date-fns';
 import { ro, enUS } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -465,88 +466,78 @@ const Dashboard = () => {
                       const canReschedule = booking.rescheduled_count < 1;
                       
                       return (
-                        <div key={booking.id} className="border rounded-lg p-4 space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="space-y-1">
-                              <h3 className="font-semibold">{booking.experiences?.title}</h3>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <MapPin className="h-4 w-4" />
-                                {booking.experiences?.location_name}
-                              </div>
-                            </div>
-                            {getStatusBadge(booking.status)}
-                          </div>
-                          <Separator />
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <p className="text-muted-foreground">{t('dashboard.bookingDate')}</p>
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4" />
-                                <p className="font-semibold">
-                                  {format(new Date(booking.booking_date), 'dd MMMM yyyy, HH:mm', { locale: dateLocale })}
-                                </p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">{t('dashboard.participants')}</p>
-                              <div className="flex items-center gap-2">
-                                <Users className="h-4 w-4" />
-                                <p className="font-semibold">{booking.participants}</p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">{t('dashboard.totalPrice')}</p>
-                              <p className="font-semibold">{booking.total_price} RON</p>
-                            </div>
-                            {booking.rescheduled_count > 0 && (
-                              <div>
-                                <p className="text-muted-foreground">{i18n.language === 'ro' ? 'Reprogramări' : 'Reschedulings'}</p>
-                                <p className="font-semibold">{booking.rescheduled_count}/1</p>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {booking.status === 'confirmed' && isUpcoming && (
-                            <>
-                              {!canModify && (
-                                <Alert>
-                                  <AlertCircle className="h-4 w-4" />
-                                  <AlertDescription>
-                                    {i18n.language === 'ro' 
-                                      ? 'Anularea și reprogramarea sunt posibile doar cu minimum 48 de ore înainte.'
-                                      : 'Cancellation and rescheduling are only possible with minimum 48 hours notice.'}
-                                  </AlertDescription>
-                                </Alert>
-                              )}
-                              <div className="flex gap-2">
-                                {canModify && canReschedule && (
-                                  <Button 
-                                    variant="outline" 
-                                    className="flex-1"
-                                    onClick={() => openRescheduleDialog(booking.id)}
-                                  >
-                                    <Edit3 className="h-4 w-4 mr-2" />
-                                    {t('dashboard.reschedule')}
-                                  </Button>
-                                )}
-                                {!canReschedule && (
-                                  <div className="flex-1 text-center text-sm text-muted-foreground py-2">
-                                    {i18n.language === 'ro' ? 'Limită reprogramări atinsă' : 'Reschedule limit reached'}
+                        <div key={booking.id} className="border rounded-lg p-4">
+                          <div className="flex flex-col sm:flex-row gap-4">
+                            {/* Date Card */}
+                            <DateCard date={booking.booking_date} showTime />
+                            
+                            {/* Booking Details */}
+                            <div className="flex-1 space-y-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-lg truncate">{booking.experiences?.title}</h3>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                                    <span className="truncate">{booking.experiences?.location_name}</span>
                                   </div>
-                                )}
-                                {canModify && (
-                                  <Button 
-                                    variant="destructive" 
-                                    className="flex-1"
-                                    onClick={() => openCancelDialog(booking.id)}
-                                  >
-                                    <XCircle className="h-4 w-4 mr-2" />
-                                    {t('dashboard.cancelBooking')}
-                                  </Button>
-                                )}
+                                </div>
+                                {getStatusBadge(booking.status)}
                               </div>
-                            </>
-                          )}
+                              
+                              <Separator />
+                              
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <p className="text-muted-foreground">{t('dashboard.participants')}</p>
+                                  <div className="flex items-center gap-2">
+                                    <Users className="h-4 w-4" />
+                                    <p className="font-semibold">{booking.participants}</p>
+                                  </div>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">{t('dashboard.totalPrice')}</p>
+                                  <p className="font-semibold">{booking.total_price} RON</p>
+                                </div>
+                              </div>
+                              
+                              {isUpcoming && booking.status === 'confirmed' && (
+                                <div className="flex flex-wrap gap-2 mt-4">
+                                  {canModify && canReschedule ? (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => openRescheduleDialog(booking.id)}
+                                    >
+                                      <Edit3 className="h-4 w-4 mr-2" />
+                                      {t('dashboard.reschedule')}
+                                    </Button>
+                                  ) : (
+                                    !canReschedule && (
+                                      <Button variant="outline" size="sm" disabled>
+                                        <AlertCircle className="h-4 w-4 mr-2" />
+                                        {t('dashboard.cannotModify')} ({t('dashboard.alreadyRescheduled')})
+                                      </Button>
+                                    )
+                                  )}
+                                  {canModify ? (
+                                    <Button 
+                                      variant="destructive" 
+                                      size="sm"
+                                      onClick={() => openCancelDialog(booking.id)}
+                                    >
+                                      <XCircle className="h-4 w-4 mr-2" />
+                                      {t('dashboard.cancelBooking')}
+                                    </Button>
+                                  ) : (
+                                    <Button variant="outline" size="sm" disabled>
+                                      <AlertCircle className="h-4 w-4 mr-2" />
+                                      {t('dashboard.cannotModify')} ({t('dashboard.lessThan48h')})
+                                    </Button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       );
                     })
@@ -560,26 +551,47 @@ const Dashboard = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>{t('dashboard.orders')}</CardTitle>
-                  <CardDescription>{i18n.language === 'ro' ? 'Toate achizițiile tale de vouchere' : 'All your voucher purchases'}</CardDescription>
+                  <CardDescription>{t('dashboard.orderHistoryDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {vouchers.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-8">{i18n.language === 'ro' ? 'Nu ai nicio comandă încă' : 'You don\'t have any orders yet'}</p>
+                    <p className="text-center text-muted-foreground py-8">{t('dashboard.noOrdersYet')}</p>
                   ) : (
-                    <div className="space-y-3">
-                      {vouchers.map((voucher) => (
-                        <div key={voucher.id} className="flex items-center justify-between border-b pb-3">
-                          <div className="space-y-1">
-                            <p className="font-medium">{voucher.experiences?.title}</p>
-                            <p className="text-sm text-muted-foreground">{i18n.language === 'ro' ? 'Cod' : 'Code'}: {voucher.code}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-semibold">{voucher.purchase_price} RON</p>
-                            {getStatusBadge(voucher.status)}
+                    vouchers.map((voucher) => (
+                      <div key={voucher.id} className="border rounded-lg p-4">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                          {/* Date Card - using issue_date as purchase date */}
+                          <DateCard date={voucher.expiry_date} />
+                          
+                          {/* Order Details */}
+                          <div className="flex-1 space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-lg truncate">{voucher.experiences?.title}</h3>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                                  <span className="truncate">{voucher.experiences?.location_name}</span>
+                                </div>
+                              </div>
+                              {getStatusBadge(voucher.status)}
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <p className="text-muted-foreground">{t('dashboard.voucherCode')}</p>
+                                <p className="font-mono font-semibold">{voucher.code}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">{t('dashboard.orderAmount')}</p>
+                                <p className="font-semibold">{voucher.purchase_price} RON</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))
                   )}
                 </CardContent>
               </Card>

@@ -186,6 +186,9 @@
     "bookingCancelledNoRefund": "Rezervarea a fost anulată. Nu ești eligibil pentru refund (anulare sub 48h).",
     "bookingRescheduled": "Rezervare reprogramată",
     "bookingRescheduledSuccess": "Rezervarea a fost reprogramată cu succes",
-    "selectNewDateError": "Te rog selectează o dată nouă"
+    "selectNewDateError": "Te rog selectează o dată nouă",
+    "orderHistoryDesc": "Istoricul comenzilor tale de experiențe",
+    "noOrdersYet": "Nu ai nicio comandă încă",
+    "orderAmount": "Suma plătită"
   }
 }

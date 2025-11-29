@@ -186,6 +186,9 @@
     "bookingCancelledNoRefund": "Booking has been cancelled. You are not eligible for a refund (cancelled under 48h).",
     "bookingRescheduled": "Booking Rescheduled",
     "bookingRescheduledSuccess": "Booking has been rescheduled successfully",
-    "selectNewDateError": "Please select a new date"
+    "selectNewDateError": "Please select a new date",
+    "orderHistoryDesc": "Your experience order history",
+    "noOrdersYet": "You don't have any orders yet",
+    "orderAmount": "Amount Paid"
   }
 }
