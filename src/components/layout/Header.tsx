@@ -109,9 +109,6 @@ export function Header() {
             >
               <Link to="/cart">
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
-                  0
-                </span>
               </Link>
             </Button>
             

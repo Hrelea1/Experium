@@ -397,12 +397,12 @@ const Dashboard = () => {
             <TabsContent value="vouchers" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Voucherele mele</CardTitle>
-                  <CardDescription>Toate voucherele tale pentru experiențe</CardDescription>
+                  <CardTitle>{t('dashboard.myVouchers')}</CardTitle>
+                  <CardDescription>{t('dashboard.allYourVouchers')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {vouchers.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-8">Nu ai niciun voucher încă</p>
+                    <p className="text-center text-muted-foreground py-8">{t('dashboard.noVouchersYet')}</p>
                   ) : (
                     vouchers.map((voucher) => (
                       <div key={voucher.id} className="border rounded-lg p-4 space-y-3">
@@ -419,17 +419,17 @@ const Dashboard = () => {
                         <Separator />
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
-                            <p className="text-muted-foreground">Cod voucher</p>
+                            <p className="text-muted-foreground">{t('dashboard.voucherCode')}</p>
                             <p className="font-mono font-semibold">{voucher.code}</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground">Valoare</p>
+                            <p className="text-muted-foreground">{t('dashboard.value')}</p>
                             <p className="font-semibold">{voucher.purchase_price} RON</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground">Valabil până la</p>
+                            <p className="text-muted-foreground">{t('dashboard.validUntil')}</p>
                             <p className="font-semibold">
-                              {format(new Date(voucher.expiry_date), 'dd MMMM yyyy', { locale: ro })}
+                              {format(new Date(voucher.expiry_date), 'dd MMMM yyyy', { locale: dateLocale })}
                             </p>
                           </div>
                         </div>
@@ -438,7 +438,7 @@ const Dashboard = () => {
                             className="w-full" 
                             onClick={() => navigate('/redeem-voucher')}
                           >
-                            Folosește voucherul
+                            {t('dashboard.useVoucher')}
                           </Button>
                         )}
                       </div>
@@ -452,12 +452,12 @@ const Dashboard = () => {
             <TabsContent value="bookings" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Rezervările mele</CardTitle>
-                  <CardDescription>Experiențele tale programate</CardDescription>
+                  <CardTitle>{t('dashboard.myBookings')}</CardTitle>
+                  <CardDescription>{t('dashboard.yourScheduled')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {bookings.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-8">Nu ai nicio rezervare încă</p>
+                    <p className="text-center text-muted-foreground py-8">{t('dashboard.noBookingsYet')}</p>
                   ) : (
                     bookings.map((booking) => {
                       const canModify = canCancelOrReschedule(booking.booking_date);
@@ -479,28 +479,28 @@ const Dashboard = () => {
                           <Separator />
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <p className="text-muted-foreground">Data rezervării</p>
+                              <p className="text-muted-foreground">{t('dashboard.bookingDate')}</p>
                               <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4" />
                                 <p className="font-semibold">
-                                  {format(new Date(booking.booking_date), 'dd MMMM yyyy, HH:mm', { locale: ro })}
+                                  {format(new Date(booking.booking_date), 'dd MMMM yyyy, HH:mm', { locale: dateLocale })}
                                 </p>
                               </div>
                             </div>
                             <div>
-                              <p className="text-muted-foreground">Participanți</p>
+                              <p className="text-muted-foreground">{t('dashboard.participants')}</p>
                               <div className="flex items-center gap-2">
                                 <Users className="h-4 w-4" />
                                 <p className="font-semibold">{booking.participants}</p>
                               </div>
                             </div>
                             <div>
-                              <p className="text-muted-foreground">Preț total</p>
+                              <p className="text-muted-foreground">{t('dashboard.totalPrice')}</p>
                               <p className="font-semibold">{booking.total_price} RON</p>
                             </div>
                             {booking.rescheduled_count > 0 && (
                               <div>
-                                <p className="text-muted-foreground">Reprogramări</p>
+                                <p className="text-muted-foreground">{i18n.language === 'ro' ? 'Reprogramări' : 'Reschedulings'}</p>
                                 <p className="font-semibold">{booking.rescheduled_count}/1</p>
                               </div>
                             )}
@@ -512,7 +512,9 @@ const Dashboard = () => {
                                 <Alert>
                                   <AlertCircle className="h-4 w-4" />
                                   <AlertDescription>
-                                    Anularea și reprogramarea sunt posibile doar cu minimum 48 de ore înainte.
+                                    {i18n.language === 'ro' 
+                                      ? 'Anularea și reprogramarea sunt posibile doar cu minimum 48 de ore înainte.'
+                                      : 'Cancellation and rescheduling are only possible with minimum 48 hours notice.'}
                                   </AlertDescription>
                                 </Alert>
                               )}
@@ -524,12 +526,12 @@ const Dashboard = () => {
                                     onClick={() => openRescheduleDialog(booking.id)}
                                   >
                                     <Edit3 className="h-4 w-4 mr-2" />
-                                    Reprogramează
+                                    {t('dashboard.reschedule')}
                                   </Button>
                                 )}
                                 {!canReschedule && (
                                   <div className="flex-1 text-center text-sm text-muted-foreground py-2">
-                                    Limită reprogramări atinsă
+                                    {i18n.language === 'ro' ? 'Limită reprogramări atinsă' : 'Reschedule limit reached'}
                                   </div>
                                 )}
                                 {canModify && (
@@ -539,7 +541,7 @@ const Dashboard = () => {
                                     onClick={() => openCancelDialog(booking.id)}
                                   >
                                     <XCircle className="h-4 w-4 mr-2" />
-                                    Anulează
+                                    {t('dashboard.cancelBooking')}
                                   </Button>
                                 )}
                               </div>
@@ -557,19 +559,19 @@ const Dashboard = () => {
             <TabsContent value="orders" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Istoric comenzi</CardTitle>
-                  <CardDescription>Toate achizițiile tale de vouchere</CardDescription>
+                  <CardTitle>{t('dashboard.orders')}</CardTitle>
+                  <CardDescription>{i18n.language === 'ro' ? 'Toate achizițiile tale de vouchere' : 'All your voucher purchases'}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {vouchers.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-8">Nu ai nicio comandă încă</p>
+                    <p className="text-center text-muted-foreground py-8">{i18n.language === 'ro' ? 'Nu ai nicio comandă încă' : 'You don\'t have any orders yet'}</p>
                   ) : (
                     <div className="space-y-3">
                       {vouchers.map((voucher) => (
                         <div key={voucher.id} className="flex items-center justify-between border-b pb-3">
                           <div className="space-y-1">
                             <p className="font-medium">{voucher.experiences?.title}</p>
-                            <p className="text-sm text-muted-foreground">Cod: {voucher.code}</p>
+                            <p className="text-sm text-muted-foreground">{i18n.language === 'ro' ? 'Cod' : 'Code'}: {voucher.code}</p>
                           </div>
                           <div className="text-right">
                             <p className="font-semibold">{voucher.purchase_price} RON</p>
@@ -587,13 +589,13 @@ const Dashboard = () => {
             <TabsContent value="settings" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Setări cont</CardTitle>
-                  <CardDescription>Actualizează informațiile tale personale</CardDescription>
+                  <CardTitle>{t('dashboard.accountSettings')}</CardTitle>
+                  <CardDescription>{t('dashboard.manageProfile')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleUpdateProfile} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="full-name">Nume complet</Label>
+                      <Label htmlFor="full-name">{t('dashboard.fullName')}</Label>
                       <Input
                         id="full-name"
                         value={profile.full_name || ''}
@@ -603,7 +605,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t('dashboard.email')}</Label>
                       <Input
                         id="email"
                         type="email"
@@ -611,11 +613,13 @@ const Dashboard = () => {
                         disabled
                         className="bg-muted"
                       />
-                      <p className="text-xs text-muted-foreground">Emailul nu poate fi schimbat</p>
+                      <p className="text-xs text-muted-foreground">
+                        {i18n.language === 'ro' ? 'Emailul nu poate fi schimbat' : 'Email cannot be changed'}
+                      </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Telefon</Label>
+                      <Label htmlFor="phone">{t('dashboard.phone')}</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -629,10 +633,10 @@ const Dashboard = () => {
 
                     <div className="flex gap-4">
                       <Button type="submit" disabled={updatingProfile}>
-                        {updatingProfile ? 'Se salvează...' : 'Salvează modificările'}
+                        {updatingProfile ? t('dashboard.updating') : t('dashboard.updateProfile')}
                       </Button>
                       <Button type="button" variant="outline" onClick={signOut}>
-                        Deconectare
+                        {t('dashboard.signOut')}
                       </Button>
                     </div>
                   </form>
@@ -647,20 +651,20 @@ const Dashboard = () => {
           <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Anulează rezervarea</DialogTitle>
+                <DialogTitle>{t('dashboard.cancelBookingTitle')}</DialogTitle>
                 <DialogDescription>
-                  Ești sigur că vrei să anulezi această rezervare? 
-                  {canCancelOrReschedule(bookings.find(b => b.id === selectedBookingId)?.booking_date || '') 
-                    ? ' Vei primi un refund complet.' 
-                    : ' Nu vei fi eligibil pentru refund (anulare sub 48h).'}
+                  {t('dashboard.cancelWarning')}
+                  {!canCancelOrReschedule(bookings.find(b => b.id === selectedBookingId)?.booking_date || '') 
+                    ? ` ${t('dashboard.within48h')}` 
+                    : ''}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="cancellation-reason">Motiv anulare (opțional)</Label>
+                  <Label htmlFor="cancellation-reason">{t('dashboard.cancellationReason')}</Label>
                   <Textarea
                     id="cancellation-reason"
-                    placeholder="De ce anulezi rezervarea?"
+                    placeholder={t('dashboard.reasonPlaceholder')}
                     value={cancellationReason}
                     onChange={(e) => setCancellationReason(e.target.value)}
                     rows={3}
@@ -669,10 +673,10 @@ const Dashboard = () => {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
-                  Renunță
+                  {t('common.cancel')}
                 </Button>
                 <Button variant="destructive" onClick={handleCancelBooking} disabled={cancelling}>
-                  {cancelling ? 'Se anulează...' : 'Confirmă anularea'}
+                  {cancelling ? t('dashboard.cancelling') : i18n.language === 'ro' ? 'Confirmă anularea' : 'Confirm cancellation'}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -682,17 +686,17 @@ const Dashboard = () => {
           <Dialog open={rescheduleDialogOpen} onOpenChange={setRescheduleDialogOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Reprogramează rezervarea</DialogTitle>
+                <DialogTitle>{t('dashboard.rescheduleTitle')}</DialogTitle>
                 <DialogDescription>
-                  Selectează o nouă dată pentru experiența ta. 
+                  {t('dashboard.selectNewDate')}
                   {bookings.find(b => b.id === selectedBookingId)?.rescheduled_count === 0 
-                    ? ' Ai o singură reprogramare gratuită.' 
+                    ? (i18n.language === 'ro' ? ' Ai o singură reprogramare gratuită.' : ' You have one free reschedule.')
                     : ''}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>Data nouă</Label>
+                  <Label>{t('dashboard.newDate')}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -703,7 +707,7 @@ const Dashboard = () => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {newBookingDate ? format(newBookingDate, "PPP", { locale: ro }) : "Selectează data"}
+                        {newBookingDate ? format(newBookingDate, "PPP", { locale: dateLocale }) : t('dashboard.selectDate')}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -721,16 +725,18 @@ const Dashboard = () => {
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Reprogramarea este posibilă doar cu minimum 48 de ore înainte de data curentă.
+                    {i18n.language === 'ro' 
+                      ? 'Reprogramarea este posibilă doar cu minimum 48 de ore înainte de data curentă.'
+                      : 'Rescheduling is only possible with minimum 48 hours notice.'}
                   </AlertDescription>
                 </Alert>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setRescheduleDialogOpen(false)}>
-                  Renunță
+                  {t('common.cancel')}
                 </Button>
                 <Button onClick={handleRescheduleBooking} disabled={rescheduling || !newBookingDate}>
-                  {rescheduling ? 'Se reprogramează...' : 'Confirmă reprogramarea'}
+                  {rescheduling ? t('dashboard.rescheduling') : (i18n.language === 'ro' ? 'Confirmă reprogramarea' : 'Confirm reschedule')}
                 </Button>
               </DialogFooter>
             </DialogContent>
