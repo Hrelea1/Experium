@@ -208,6 +208,37 @@ export function Header() {
                   {t('nav.admin')}
                 </Link>
               )}
+              {user && (
+                <>
+                  <div className="px-4 pt-2 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Contul Meu
+                  </div>
+                  <Link
+                    to="/dashboard"
+                    className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/my-vouchers"
+                    className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Voucherele Mele
+                  </Link>
+                  <Link
+                    to="/redeem-voucher"
+                    className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Folosește Voucher
+                  </Link>
+                </>
+              )}
               <div className="flex items-center gap-4 px-4 pt-4 border-t border-border mt-2">
                 <Button 
                   variant="ghost" 
