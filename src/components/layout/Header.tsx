@@ -101,11 +101,18 @@ export function Header() {
             <Button variant="ghost" size="icon" className="hidden sm:flex">
               <Heart className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="hidden sm:flex relative">
-              <ShoppingBag className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
-                0
-              </span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="hidden sm:flex relative"
+              asChild
+            >
+              <Link to="/cart">
+                <ShoppingBag className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                  0
+                </span>
+              </Link>
             </Button>
             
             {user ? (
@@ -221,8 +228,15 @@ export function Header() {
                 <Button variant="ghost" size="icon">
                   <Heart className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingBag className="h-5 w-5" />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="relative"
+                  asChild
+                >
+                  <Link to="/cart" onClick={() => setIsMenuOpen(false)}>
+                    <ShoppingBag className="h-5 w-5" />
+                  </Link>
                 </Button>
                 {user ? (
                   <Button 

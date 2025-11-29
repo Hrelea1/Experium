@@ -15,6 +15,7 @@ import MyVouchers from "./pages/MyVouchers";
 import MyBookings from "./pages/MyBookings";
 import RedeemVoucher from "./pages/RedeemVoucher";
 import CreateTestVoucher from "./pages/CreateTestVoucher";
+import Cart from "./pages/Cart";
 import AdminDashboard from "./pages/admin/Dashboard";
 import ManageExperiences from "./pages/admin/ManageExperiences";
 import ManageBookings from "./pages/admin/ManageBookings";
@@ -47,7 +48,7 @@ const App = () => (
             <Route path="/my-vouchers" element={<MyVouchers />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/redeem-voucher" element={<RedeemVoucher />} />
-            <Route path="/create-test-voucher" element={<CreateTestVoucher />} />
+            <Route path="/cart" element={<Cart />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
