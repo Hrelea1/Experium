@@ -135,7 +135,7 @@ export function BookingForm({ experience }: BookingFormProps) {
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-card border border-border shadow-xl z-50" align="start">
+            <PopoverContent className="w-auto p-0 bg-popover border border-border shadow-xl z-[100] pointer-events-auto" align="start">
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -146,7 +146,7 @@ export function BookingForm({ experience }: BookingFormProps) {
                 disabled={disabledDays}
                 initialFocus
                 locale={ro}
-                className={cn("p-3 pointer-events-auto")}
+                className="pointer-events-auto"
               />
               <div className="px-4 pb-3 pt-0">
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
