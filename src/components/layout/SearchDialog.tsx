@@ -54,7 +54,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
         <DialogHeader className="p-6 pb-4">
           <DialogTitle className="sr-only">Caută experiențe</DialogTitle>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="Caută experiențe, locații, categorii..."
               value={query}

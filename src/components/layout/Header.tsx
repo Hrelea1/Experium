@@ -88,8 +88,13 @@ export function Header() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="hidden sm:flex"
-              onClick={() => setSearchOpen(true)}
+              className="hidden sm:flex relative z-10"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setSearchOpen(true);
+              }}
+              aria-label="Search"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -203,10 +208,13 @@ export function Header() {
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setSearchOpen(true);
                     setIsMenuOpen(false);
                   }}
+                  aria-label="Search"
                 >
                   <Search className="h-5 w-5" />
                 </Button>
