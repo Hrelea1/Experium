@@ -163,9 +163,11 @@ export default function Cart() {
                     <span>{total.toFixed(2)} lei</span>
                   </div>
 
-                  <Button className="w-full" size="lg">
-                    Finalizează Comanda
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                  <Button className="w-full" size="lg" asChild>
+                    <Link to="/auth">
+                      Finalizează Comanda
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center mt-4">

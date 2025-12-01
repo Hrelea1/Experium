@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface BookingFormProps {
   experience: {
@@ -25,6 +28,8 @@ interface BookingFormProps {
 
 export function BookingForm({ experience }: BookingFormProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [participants, setParticipants] = useState(1);
   const [isGift, setIsGift] = useState(false);
@@ -63,6 +68,16 @@ export function BookingForm({ experience }: BookingFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast({
+        title: "Autentificare necesară",
+        description: "Trebuie să fii autentificat pentru a face o rezervare.",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
     if (!selectedDate) {
       toast({
         title: "Selectează o dată",
@@ -72,17 +87,67 @@ export function BookingForm({ experience }: BookingFormProps) {
       return;
     }
 
+    if (isGift && (!giftDetails.recipientName || !giftDetails.recipientEmail)) {
+      toast({
+        title: "Detalii cadou incomplete",
+        description: "Te rugăm să completezi numele și emailul destinatarului.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast({
-      title: "Rezervare confirmată! 🎉",
-      description: `Ai rezervat ${experience.title} pentru ${participants} ${participants === 1 ? "persoană" : "persoane"} pe ${format(selectedDate, "d MMMM yyyy", { locale: ro })}.`,
-    });
-    
-    setIsSubmitting(false);
+    try {
+      // Create a voucher first
+      const { data: voucherData, error: voucherError } = await supabase.functions.invoke('create-voucher', {
+        body: {
+          experienceId: experience.id.toString(),
+          notes: isGift ? `Cadou pentru ${giftDetails.recipientName} (${giftDetails.recipientEmail})${giftDetails.message ? ': ' + giftDetails.message : ''}` : undefined,
+          validityMonths: 12
+        }
+      });
+
+      if (voucherError) throw voucherError;
+
+      // Create the booking
+      const { data: bookingData, error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: user.id,
+          experience_id: experience.id.toString(),
+          voucher_id: voucherData.voucher.id,
+          booking_date: selectedDate.toISOString(),
+          participants,
+          total_price: totalPrice,
+          payment_method: 'card',
+          status: 'confirmed'
+        })
+        .select()
+        .single();
+
+      if (bookingError) throw bookingError;
+
+      toast({
+        title: "Rezervare confirmată! 🎉",
+        description: `Ai rezervat ${experience.title} pentru ${participants} ${participants === 1 ? "persoană" : "persoane"} pe ${format(selectedDate, "d MMMM yyyy", { locale: ro })}.`,
+      });
+
+      // Navigate to bookings page
+      setTimeout(() => {
+        navigate("/my-bookings");
+      }, 1500);
+
+    } catch (error: any) {
+      console.error('Booking error:', error);
+      toast({
+        title: "Eroare",
+        description: error.message || "A apărut o eroare la procesarea rezervării.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
