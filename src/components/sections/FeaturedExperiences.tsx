@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Heart, Star, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -127,9 +127,11 @@ export function FeaturedExperiences() {
               {sectionContent.subtitle}
             </p>
           </div>
-          <Button variant="outline" className="sm:w-auto">
-            {sectionContent.ctaText}
-            <ArrowRight className="w-4 h-4 ml-2" />
+          <Button variant="outline" className="sm:w-auto" asChild>
+            <Link to="/category/toate-categoriile">
+              {sectionContent.ctaText}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
           </Button>
         </motion.div>
 

@@ -98,8 +98,15 @@ export function Header() {
             >
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="hidden sm:flex">
-              <Heart className="h-5 w-5" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="hidden sm:flex"
+              asChild
+            >
+              <Link to="/my-bookings">
+                <Heart className="h-5 w-5" />
+              </Link>
             </Button>
             <Button 
               variant="ghost" 
@@ -253,8 +260,14 @@ export function Header() {
                 >
                   <Search className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon">
-                  <Heart className="h-5 w-5" />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  asChild
+                >
+                  <Link to="/my-bookings" onClick={() => setIsMenuOpen(false)}>
+                    <Heart className="h-5 w-5" />
+                  </Link>
                 </Button>
                 <Button 
                   variant="ghost" 
