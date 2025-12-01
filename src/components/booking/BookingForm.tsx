@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 
 interface BookingFormProps {
   experience: {
-    id: number;
+    id: string; // UUID from database
     title: string;
     price: number;
     originalPrice?: number;
@@ -102,7 +102,7 @@ export function BookingForm({ experience }: BookingFormProps) {
       // Create a voucher first
       const { data: voucherData, error: voucherError } = await supabase.functions.invoke('create-voucher', {
         body: {
-          experienceId: experience.id.toString(),
+          experienceId: experience.id, // Already a string UUID
           notes: isGift ? `Cadou pentru ${giftDetails.recipientName} (${giftDetails.recipientEmail})${giftDetails.message ? ': ' + giftDetails.message : ''}` : undefined,
           validityMonths: 12
         }
@@ -115,7 +115,7 @@ export function BookingForm({ experience }: BookingFormProps) {
         .from('bookings')
         .insert({
           user_id: user.id,
-          experience_id: experience.id.toString(),
+          experience_id: experience.id, // Already a string UUID
           voucher_id: voucherData.voucher.id,
           booking_date: selectedDate.toISOString(),
           participants,

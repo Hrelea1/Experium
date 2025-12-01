@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { Heart, Star, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
+import { supabase } from "@/integrations/supabase/client";
 
 const experiences = [
   {
@@ -98,6 +100,8 @@ export function FeaturedExperiences() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { data: content } = useHomepageContent("featured");
+  const [experiences, setExperiences] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   
   const sectionContent = content?.content || {
     badge: "Recomandate",
@@ -105,6 +109,54 @@ export function FeaturedExperiences() {
     subtitle: t('featured.subtitle'),
     ctaText: "Vezi Toate"
   };
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('experiences')
+          .select(`
+            *,
+            categories(name),
+            experience_images(image_url, is_primary)
+          `)
+          .eq('is_active', true)
+          .eq('is_featured', true)
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (error) throw error;
+
+        const formattedExperiences = data?.map((exp: any) => {
+          const primaryImage = exp.experience_images?.find((img: any) => img.is_primary)?.image_url 
+            || exp.experience_images?.[0]?.image_url
+            || "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop";
+
+          return {
+            id: exp.id,
+            title: exp.title,
+            location: exp.location_name,
+            price: Number(exp.price),
+            originalPrice: exp.original_price ? Number(exp.original_price) : undefined,
+            rating: exp.avg_rating || 4.5,
+            reviews: exp.total_reviews || 0,
+            duration: exp.duration_minutes ? `${Math.floor(exp.duration_minutes / 60)} ore` : "Variabil",
+            image: primaryImage,
+            badge: exp.categories?.name || null,
+            badgeColor: "bg-primary"
+          };
+        }) || [];
+
+        setExperiences(formattedExperiences);
+      } catch (error) {
+        console.error('Error fetching experiences:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExperiences();
+  }, []);
 
   return (
     <section id="experiences" className="py-20 lg:py-28 bg-cream">
@@ -135,14 +187,24 @@ export function FeaturedExperiences() {
           </Button>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-        >
-          {experiences.map((exp) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Se încarcă experiențele...</p>
+          </div>
+        ) : experiences.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Nu există experiențe disponibile momentan.</p>
+          </div>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+          >
+            {experiences.map((exp) => (
             <motion.article
               key={exp.id}
               variants={cardVariants}
@@ -225,8 +287,9 @@ export function FeaturedExperiences() {
                 </div>
               </div>
             </motion.article>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   );
