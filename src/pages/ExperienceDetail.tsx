@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   Star, 
@@ -148,10 +150,82 @@ const experiencesData: Record<string, {
 export default function ExperienceDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [experience, setExperience] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const experience = id ? experiencesData[id] : null;
+  useEffect(() => {
+    const fetchExperience = async () => {
+      if (!id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('experiences')
+          .select(`
+            *,
+            categories(name),
+            experience_images(image_url, is_primary, display_order)
+          `)
+          .eq('id', id)
+          .eq('is_active', true)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          // Transform database data to match expected format
+          const images = data.experience_images
+            ?.sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
+            .map((img: any) => img.image_url) || [];
+
+          setExperience({
+            id: data.id,
+            title: data.title,
+            location: data.location_name,
+            price: Number(data.price),
+            originalPrice: data.original_price ? Number(data.original_price) : undefined,
+            rating: data.avg_rating || 4.5,
+            reviews: data.total_reviews || 0,
+            duration: data.duration_minutes ? `${Math.floor(data.duration_minutes / 60)} ore` : "Variabil",
+            image: images[0] || "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&h=800&fit=crop",
+            gallery: images.length > 0 ? images : [
+              "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop",
+              "https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=600&h=400&fit=crop",
+            ],
+            description: data.description,
+            includes: ["Echipament complet", "Instructor profesionist", "Asigurare", "Fotografii"],
+            maxParticipants: data.max_participants || 10,
+          });
+        }
+      } catch (error: any) {
+        console.error('Error fetching experience:', error);
+        toast({
+          title: "Eroare",
+          description: "Nu am putut încărca experiența",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExperience();
+  }, [id, toast]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container py-20 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Se încarcă...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!experience) {
     return (
