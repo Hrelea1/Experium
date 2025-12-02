@@ -122,9 +122,8 @@ export function Header() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="hidden lg:flex">
-                    <User className="h-4 w-4 mr-2" />
-                    {t('nav.login')}
+                  <Button variant="ghost" size="icon" className="hidden lg:flex">
+                    <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">

@@ -112,12 +112,8 @@ const Auth = () => {
     const { error } = await signUp(signupEmail, signupPassword, signupFullName);
     setLoading(false);
     if (!error) {
-      alert('Cont creat cu succes! Verifică-ți emailul pentru confirmarea contului.');
-      // Reset form
-      setSignupEmail('');
-      setSignupPassword('');
-      setSignupConfirmPassword('');
-      setSignupFullName('');
+      // Account created successfully, redirect to home
+      navigate('/');
     } else {
       if (error.message.includes('already registered')) {
         setPasswordError('Acest email este deja înregistrat');

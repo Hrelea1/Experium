@@ -37,6 +37,11 @@ export function BookingForm({ experience }: BookingFormProps) {
     recipientName: "",
     recipientEmail: "",
     message: "",
+    country: "România",
+    county: "",
+    city: "",
+    address: "",
+    postcode: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -87,10 +92,10 @@ export function BookingForm({ experience }: BookingFormProps) {
       return;
     }
 
-    if (isGift && (!giftDetails.recipientName || !giftDetails.recipientEmail)) {
+    if (isGift && (!giftDetails.recipientName || !giftDetails.recipientEmail || !giftDetails.county || !giftDetails.city || !giftDetails.address || !giftDetails.postcode)) {
       toast({
         title: "Detalii cadou incomplete",
-        description: "Te rugăm să completezi numele și emailul destinatarului.",
+        description: "Te rugăm să completezi toate câmpurile pentru livrare.",
         variant: "destructive",
       });
       return;
@@ -311,6 +316,50 @@ export function BookingForm({ experience }: BookingFormProps) {
                 rows={3}
                 className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
+              
+              {/* Address Form */}
+              <div className="border-t border-border pt-4 mt-4">
+                <p className="text-sm font-medium text-foreground mb-3">Adresa de livrare</p>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Țara"
+                    value={giftDetails.country}
+                    onChange={(e) => setGiftDetails({ ...giftDetails, country: e.target.value })}
+                    className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Județ"
+                      value={giftDetails.county}
+                      onChange={(e) => setGiftDetails({ ...giftDetails, county: e.target.value })}
+                      className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Oraș"
+                      value={giftDetails.city}
+                      onChange={(e) => setGiftDetails({ ...giftDetails, city: e.target.value })}
+                      className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Adresă completă"
+                    value={giftDetails.address}
+                    onChange={(e) => setGiftDetails({ ...giftDetails, address: e.target.value })}
+                    className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Cod poștal"
+                    value={giftDetails.postcode}
+                    onChange={(e) => setGiftDetails({ ...giftDetails, postcode: e.target.value })}
+                    className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+              </div>
             </motion.div>
           )}
         </div>
