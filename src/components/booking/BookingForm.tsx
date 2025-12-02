@@ -110,6 +110,20 @@ export function BookingForm({ experience }: BookingFormProps) {
 
       if (voucherError) throw voucherError;
 
+      // Assign voucher to user and mark as used since booking is created
+      const { error: updateError } = await supabase
+        .from('vouchers')
+        .update({ 
+          user_id: user.id,
+          status: 'used',
+          redemption_date: new Date().toISOString()
+        })
+        .eq('id', voucherData.voucher.id);
+
+      if (updateError) {
+        console.error('Failed to update voucher:', updateError);
+      }
+
       // Create the booking
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
