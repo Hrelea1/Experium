@@ -50,7 +50,9 @@ export function Regions() {
   };
 
   const handleRegionClick = (regionName: string) => {
-    navigate(`/category/toate-categoriile?region=${regionName}`);
+    // Use lowercase slug format for URL
+    const slug = regionName.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/category/toate-categoriile?region=${slug}`);
   };
 
   return (

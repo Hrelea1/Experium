@@ -362,7 +362,9 @@ const VoucherGrid = ({ vouchers, onDownload, getStatusBadge }: VoucherGridProps)
                   <Button 
                     size="sm" 
                     className="flex-1"
-                    onClick={() => window.location.href = `/#/redeem-voucher?code=${voucher.code}`}
+                    onClick={() => {
+                      window.location.hash = `/redeem-voucher?code=${voucher.code}`;
+                    }}
                   >
                     Rezervă
                   </Button>
