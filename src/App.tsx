@@ -17,6 +17,8 @@ import RedeemVoucher from "./pages/RedeemVoucher";
 import VoucherConfirmation from "./pages/VoucherConfirmation";
 import CreateTestVoucher from "./pages/CreateTestVoucher";
 import Cart from "./pages/Cart";
+import GiftIdeas from "./pages/GiftIdeas";
+import Partners from "./pages/Partners";
 import AdminDashboard from "./pages/admin/Dashboard";
 import ManageExperiences from "./pages/admin/ManageExperiences";
 import ManageBookings from "./pages/admin/ManageBookings";
@@ -51,6 +53,8 @@ const App = () => (
             <Route path="/redeem-voucher" element={<RedeemVoucher />} />
             <Route path="/voucher-confirmation" element={<VoucherConfirmation />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/gift-ideas" element={<GiftIdeas />} />
+            <Route path="/partners" element={<Partners />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />

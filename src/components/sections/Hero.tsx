@@ -58,7 +58,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
@@ -174,26 +174,6 @@ export function Hero() {
                 </Link>
               </Button>
             </div>
-          </motion.div>
-
-          {/* Quick Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-wrap justify-center gap-8 mt-12"
-          >
-            {[
-              { value: "500+", label: t('hero.experiences') },
-              { value: "42", label: t('hero.counties') },
-              { value: "50k+", label: t('hero.happyClients') },
-              { value: "4.9★", label: t('hero.rating') },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-card">{stat.value}</div>
-                <div className="text-card/70 text-sm">{stat.label}</div>
-              </div>
-            ))}
           </motion.div>
         </motion.div>
       </div>

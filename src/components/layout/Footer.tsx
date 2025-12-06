@@ -2,81 +2,50 @@ import { Link } from "react-router-dom";
 import { Facebook, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const footerLinks = {
-  experiențe: [
-    { label: "Aventură", href: "#" },
-    { label: "Spa & Relaxare", href: "#" },
-    { label: "Gastronomie", href: "#" },
-    { label: "Artă & Cultură", href: "#" },
-    { label: "Sport", href: "#" },
-  ],
-  regiuni: [
-    { label: "Transilvania", href: "#" },
-    { label: "Bucovina", href: "#" },
-    { label: "Maramureș", href: "#" },
-    { label: "Dobrogea", href: "#" },
-    { label: "Banat", href: "#" },
-  ],
-  suport: [
-    { label: "Întrebări Frecvente", href: "#" },
-    { label: "Contact", href: "#" },
-    { label: "Cum Funcționează", href: "#" },
-    { label: "Politica de Retur", href: "#" },
-    { label: "Termeni și Condiții", href: "#" },
-  ],
-  companie: [
-    { label: "Despre Noi", href: "#" },
-    { label: "Cariere", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Parteneri", href: "#" },
-    { label: "Presă", href: "#" },
-  ],
-};
-
 export function Footer() {
   const { t } = useTranslation();
 
   const dynamicFooterLinks = {
     experiențe: [
-      { label: t('footer.adventure'), href: "#" },
-      { label: t('footer.wellness'), href: "#" },
-      { label: t('footer.gastronomy'), href: "#" },
-      { label: t('footer.culture'), href: "#" },
+      { label: t('footer.adventure'), href: "/category/aventura" },
+      { label: t('footer.wellness'), href: "/category/spa-relaxare" },
+      { label: t('footer.gastronomy'), href: "/category/gastronomie" },
+      { label: t('footer.culture'), href: "/category/arta-cultura" },
     ],
     regiuni: [
-      { label: "Transilvania", href: "#" },
-      { label: "Bucovina", href: "#" },
-      { label: "Maramureș", href: "#" },
-      { label: "Dobrogea", href: "#" },
-      { label: "Banat", href: "#" },
+      { label: "Transilvania", href: "/category/toate-categoriile?region=transilvania" },
+      { label: "Bucovina", href: "/category/toate-categoriile?region=bucovina" },
+      { label: "Maramureș", href: "/category/toate-categoriile?region=maramures" },
+      { label: "Dobrogea", href: "/category/toate-categoriile?region=dobrogea" },
+      { label: "Banat", href: "/category/toate-categoriile?region=banat" },
     ],
     suport: [
-      { label: t('footer.faq'), href: "#" },
-      { label: t('footer.contact'), href: "#" },
-      { label: t('footer.howItWorks'), href: "#" },
-      { label: t('footer.termsConditions'), href: "#" },
+      { label: t('footer.faq'), href: "/faq" },
+      { label: t('footer.contact'), href: "/contact" },
+      { label: t('footer.howItWorks'), href: "/#how-it-works" },
+      { label: t('footer.termsConditions'), href: "/terms" },
     ],
     companie: [
-      { label: t('footer.about'), href: "#" },
-      { label: t('footer.careers'), href: "#" },
-      { label: t('footer.blog'), href: "#" },
-      { label: t('footer.partners'), href: "#" },
+      { label: t('footer.about'), href: "/about" },
+      { label: t('footer.careers'), href: "/careers" },
+      { label: t('footer.partners'), href: "/partners" },
+      { label: t('footer.blog'), href: "/blog" },
     ],
   };
 
   return (
-    <footer className="bg-secondary text-secondary-foreground">
+    <footer id="contact" className="bg-secondary text-secondary-foreground">
       {/* Main Footer */}
       <div className="container py-16">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-3 lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">E</span>
-              </div>
-              <span className="font-bold text-xl">
-                Experium
+              <span 
+                className="font-bold text-2xl text-primary"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              >
+                experium
               </span>
             </Link>
             <p className="text-secondary-foreground/70 mb-6 max-w-xs">
@@ -106,6 +75,7 @@ export function Footer() {
                   key={i}
                   href="#"
                   className="w-10 h-10 rounded-lg bg-secondary-foreground/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all"
+                  aria-label={`Social link ${i + 1}`}
                 >
                   <Icon className="w-5 h-5" />
                 </a>
@@ -119,9 +89,9 @@ export function Footer() {
             <ul className="space-y-2">
               {dynamicFooterLinks.experiențe.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -132,9 +102,9 @@ export function Footer() {
             <ul className="space-y-2">
               {dynamicFooterLinks.regiuni.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -145,9 +115,9 @@ export function Footer() {
             <ul className="space-y-2">
               {dynamicFooterLinks.suport.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -158,9 +128,9 @@ export function Footer() {
             <ul className="space-y-2">
               {dynamicFooterLinks.companie.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
+                  <Link to={link.href} className="text-secondary-foreground/70 hover:text-primary transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -175,15 +145,15 @@ export function Footer() {
             © 2025 Experium. {t('footer.rights')}
           </p>
           <div className="flex items-center gap-6 text-sm">
-            <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">
+            <Link to="/privacy" className="text-secondary-foreground/60 hover:text-primary transition-colors">
               {t('footer.privacy')}
-            </a>
-            <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">
+            </Link>
+            <Link to="/cookies" className="text-secondary-foreground/60 hover:text-primary transition-colors">
               {t('footer.cookies')}
-            </a>
-            <a href="#" className="text-secondary-foreground/60 hover:text-primary transition-colors">
+            </Link>
+            <Link to="/gdpr" className="text-secondary-foreground/60 hover:text-primary transition-colors">
               {t('footer.gdpr')}
-            </a>
+            </Link>
           </div>
         </div>
       </div>

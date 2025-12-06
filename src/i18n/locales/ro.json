@@ -1,9 +1,11 @@
 {
   "nav": {
+    "categories": "Categorii",
     "experiences": "Experiențe",
     "regions": "Regiuni",
     "howItWorks": "Cum Funcționează",
-    "contact": "Contact",
+    "giftIdeas": "Idei Cadouri",
+    "partners": "Parteneri",
     "login": "Intră în cont",
     "admin": "Admin"
   },
