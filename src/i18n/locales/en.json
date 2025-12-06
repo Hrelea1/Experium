@@ -1,9 +1,11 @@
 {
   "nav": {
+    "categories": "Categories",
     "experiences": "Experiences",
     "regions": "Regions",
     "howItWorks": "How It Works",
-    "contact": "Contact",
+    "giftIdeas": "Gift Ideas",
+    "partners": "Partners",
     "login": "Log In",
     "admin": "Admin"
   },
