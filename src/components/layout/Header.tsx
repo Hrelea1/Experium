@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, ChevronDown, Sparkles, Gift, Handshake } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, ChevronDown, Sparkles, Gift, Handshake, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
@@ -42,7 +42,15 @@ export function Header() {
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminCheck();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const currentLanguage = i18n.language;
+
+  const toggleLanguage = () => {
+    const newLang = currentLanguage === 'ro' ? 'en' : 'ro';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('i18nextLng', newLang);
+  };
 
   const handleNavClick = (sectionId: string) => {
     if (window.location.pathname !== '/') {
@@ -166,6 +174,18 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 lg:gap-4">
+            {/* Language Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="hidden sm:flex items-center gap-1 text-muted-foreground hover:text-foreground"
+              aria-label={t('nav.language')}
+            >
+              <Globe className="h-4 w-4" />
+              <span className="text-xs font-medium uppercase">{currentLanguage}</span>
+            </Button>
+
             <Button 
               variant="ghost" 
               size="icon" 
@@ -225,7 +245,7 @@ export function Header() {
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="flex items-center gap-2">
                           <Shield className="h-4 w-4" />
-                          Admin Panel
+                          {t('nav.adminPanel')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -234,22 +254,22 @@ export function Header() {
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="flex items-center gap-2">
                       <User className="h-4 w-4" />
-                      Profilul meu
+                      {t('nav.myProfile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/my-vouchers">Voucherele mele</Link>
+                    <Link to="/my-vouchers">{t('nav.myVouchers')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/my-bookings">Rezervările mele</Link>
+                    <Link to="/my-bookings">{t('nav.myBookings')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/redeem-voucher">Folosește voucher</Link>
+                    <Link to="/redeem-voucher">{t('nav.useVoucher')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
                     <LogOut className="h-4 w-4 mr-2" />
-                    Deconectare
+                    {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -378,7 +398,7 @@ export function Header() {
               {user && (
                 <>
                   <div className="px-4 pt-2 pb-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Contul meu
+                    {t('nav.myAccount')}
                   </div>
                   <Link
                     to="/dashboard"
@@ -386,7 +406,7 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <User className="h-4 w-4" />
-                    Profilul meu
+                    {t('nav.myProfile')}
                   </Link>
                   <Link
                     to="/my-vouchers"
@@ -394,7 +414,7 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <ShoppingBag className="h-4 w-4" />
-                    Voucherele mele
+                    {t('nav.myVouchers')}
                   </Link>
                   <Link
                     to="/redeem-voucher"
@@ -402,7 +422,7 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Gift className="h-4 w-4" />
-                    Folosește voucher
+                    {t('nav.useVoucher')}
                   </Link>
                 </>
               )}
@@ -440,6 +460,17 @@ export function Header() {
                     <ShoppingBag className="h-5 w-5" />
                   </Link>
                 </Button>
+                {/* Language Toggle Mobile */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-1"
+                  aria-label={t('nav.language')}
+                >
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium uppercase">{currentLanguage}</span>
+                </Button>
                 {user ? (
                   <Button 
                     variant="outline" 
@@ -448,7 +479,7 @@ export function Header() {
                     onClick={signOut}
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Deconectare
+                    {t('nav.logout')}
                   </Button>
                 ) : (
                   <Button variant="default" size="sm" className="ml-auto" asChild>
