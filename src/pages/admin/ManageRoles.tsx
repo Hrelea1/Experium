@@ -41,18 +41,21 @@ interface UserRole {
   user_id: string;
   role: string;
   created_at: string;
-  profiles?: {
-    email: string;
-    full_name: string | null;
-  };
+}
+
+interface Profile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  created_at: string;
 }
 
 const ManageRoles = () => {
   const { user } = useAuth();
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, { email: string; full_name: string | null }>>({});
+  const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newUserEmail, setNewUserEmail] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [newUserRole, setNewUserRole] = useState<'admin' | 'moderator'>('moderator');
   const [granting, setGranting] = useState(false);
   const [isPrimaryAdmin, setIsPrimaryAdmin] = useState(false);
@@ -60,8 +63,13 @@ const ManageRoles = () => {
 
   useEffect(() => {
     checkPrimaryAdmin();
-    fetchUserRoles();
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    if (isPrimaryAdmin) {
+      fetchData();
+    }
+  }, [isPrimaryAdmin]);
 
   const checkPrimaryAdmin = async () => {
     if (!user) return;
@@ -75,41 +83,35 @@ const ManageRoles = () => {
       setIsPrimaryAdmin(data);
     } catch (error) {
       console.error('Error checking primary admin:', error);
+    } finally {
+      if (!isPrimaryAdmin) setLoading(false);
     }
   };
 
-  const fetchUserRoles = async () => {
+  const fetchData = async () => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch all profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, created_at')
+        .order('created_at', { ascending: false });
+
+      if (profilesError) throw profilesError;
+      setAllProfiles(profilesData || []);
+
+      // Fetch all user roles
+      const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-
-      const rolesData = data || [];
-      setUserRoles(rolesData);
-
-      // Fetch profiles for all users
-      const userIds = [...new Set(rolesData.map(r => r.user_id))];
-      if (userIds.length > 0) {
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, email, full_name')
-          .in('id', userIds);
-
-        if (!profilesError && profilesData) {
-          const profilesMap: Record<string, { email: string; full_name: string | null }> = {};
-          profilesData.forEach(p => {
-            profilesMap[p.id] = { email: p.email, full_name: p.full_name };
-          });
-          setProfiles(profilesMap);
-        }
-      }
+      if (rolesError) throw rolesError;
+      setUserRoles(rolesData || []);
     } catch (error: any) {
       toast({
         title: 'Eroare',
-        description: 'Nu am putut încărca rolurile',
+        description: 'Nu am putut încărca datele',
         variant: 'destructive',
       });
     } finally {
@@ -117,11 +119,15 @@ const ManageRoles = () => {
     }
   };
 
+  const getUserRoles = (userId: string): string[] => {
+    return userRoles.filter(r => r.user_id === userId).map(r => r.role);
+  };
+
   const grantRole = async () => {
-    if (!newUserEmail.trim()) {
+    if (!selectedUserId) {
       toast({
         title: 'Eroare',
-        description: 'Introdu adresa de email',
+        description: 'Selectează un utilizator',
         variant: 'destructive',
       });
       return;
@@ -139,27 +145,10 @@ const ManageRoles = () => {
     setGranting(true);
 
     try {
-      // First, find the user by email
-      const { data: profiles, error: profileError } = await supabase
-        .from('profiles')
-        .select('id, email')
-        .eq('email', newUserEmail.trim().toLowerCase())
-        .single();
-
-      if (profileError || !profiles) {
-        toast({
-          title: 'Utilizator Negăsit',
-          description: 'Nu există un cont cu această adresă de email',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Grant the role
       const { error } = await supabase
         .from('user_roles')
         .insert({
-          user_id: profiles.id,
+          user_id: selectedUserId,
           role: newUserRole,
         });
 
@@ -178,8 +167,8 @@ const ManageRoles = () => {
           description: `Rolul ${newUserRole} a fost acordat`,
         });
 
-        setNewUserEmail('');
-        fetchUserRoles();
+        setSelectedUserId('');
+        fetchData();
       }
     } catch (error: any) {
       toast({
@@ -224,7 +213,7 @@ const ManageRoles = () => {
         description: 'Rolul a fost revocat',
       });
 
-      fetchUserRoles();
+      fetchData();
     } catch (error: any) {
       toast({
         title: 'Eroare',
@@ -232,6 +221,10 @@ const ManageRoles = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  const getProfileById = (userId: string): Profile | undefined => {
+    return allProfiles.find(p => p.id === userId);
   };
 
   const getRoleBadge = (role: string) => {
@@ -271,56 +264,13 @@ const ManageRoles = () => {
           </p>
         </div>
 
-        {/* Grant Role Form */}
+        {/* All Users List */}
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5 text-primary" />
-              <div>
-                <CardTitle>Acordă Rol Nou</CardTitle>
-                <CardDescription>
-                  Adaugă un administrator sau moderator nou
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-[1fr,auto,auto]">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Utilizator</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="utilizator@email.com"
-                  value={newUserEmail}
-                  onChange={(e) => setNewUserEmail(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role">Rol</Label>
-                <Select value={newUserRole} onValueChange={(v: 'admin' | 'moderator') => setNewUserRole(v)}>
-                  <SelectTrigger id="role">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="moderator">Moderator</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end">
-                <Button onClick={grantRole} disabled={granting}>
-                  {granting ? 'Se acordă...' : 'Acordă Rol'}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* User Roles List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Utilizatori cu Roluri</CardTitle>
+            <CardTitle>Toți Utilizatorii ({allProfiles.length})</CardTitle>
+            <CardDescription>
+              Selectează un utilizator pentru a-i acorda un rol
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -328,6 +278,109 @@ const ManageRoles = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
               </div>
             ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nume</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Roluri Actuale</TableHead>
+                    <TableHead>Înregistrat</TableHead>
+                    <TableHead className="text-right">Acordă Rol</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allProfiles.map((profile) => {
+                    const roles = getUserRoles(profile.id);
+                    const isPrimary = profile.email === 'hrelea001@gmail.com';
+                    return (
+                      <TableRow key={profile.id}>
+                        <TableCell className="font-medium">
+                          {profile.full_name || 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            {profile.email}
+                            {isPrimary && (
+                              <Badge variant="outline" className="ml-2">Primary</Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 flex-wrap">
+                            {roles.length > 0 ? (
+                              roles.map(role => (
+                                <span key={role}>{getRoleBadge(role)}</span>
+                              ))
+                            ) : (
+                              <Badge variant="outline">User</Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(profile.created_at).toLocaleDateString('ro-RO')}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {!isPrimary && (
+                            <div className="flex items-center justify-end gap-2">
+                              <Select 
+                                value={selectedUserId === profile.id ? newUserRole : ''} 
+                                onValueChange={(v: 'admin' | 'moderator') => {
+                                  setSelectedUserId(profile.id);
+                                  setNewUserRole(v);
+                                }}
+                              >
+                                <SelectTrigger className="w-32">
+                                  <SelectValue placeholder="Rol" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="admin" disabled={roles.includes('admin')}>
+                                    Admin
+                                  </SelectItem>
+                                  <SelectItem value="moderator" disabled={roles.includes('moderator')}>
+                                    Moderator
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button 
+                                size="sm" 
+                                onClick={() => {
+                                  if (selectedUserId === profile.id) {
+                                    grantRole();
+                                  } else {
+                                    setSelectedUserId(profile.id);
+                                    toast({
+                                      title: 'Selectează un rol',
+                                      description: 'Alege mai întâi rolul din dropdown',
+                                    });
+                                  }
+                                }}
+                                disabled={granting || selectedUserId !== profile.id}
+                              >
+                                <UserPlus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Users with Roles - Quick Management */}
+        {userRoles.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Roluri Acordate ({userRoles.length})</CardTitle>
+              <CardDescription>
+                Gestionează rolurile existente
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -339,56 +392,60 @@ const ManageRoles = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {userRoles.map((userRole) => (
-                    <TableRow key={userRole.id}>
-                      <TableCell className="font-medium">
-                        {profiles[userRole.user_id]?.full_name || 'N/A'}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          {profiles[userRole.user_id]?.email || 'N/A'}
-                        </div>
-                      </TableCell>
-                      <TableCell>{getRoleBadge(userRole.role)}</TableCell>
-                      <TableCell>
-                        {new Date(userRole.created_at).toLocaleDateString('ro-RO')}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {profiles[userRole.user_id]?.email !== 'hrelea001@gmail.com' && (
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Ești sigur?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Această acțiune va revoca rolul de {userRole.role} pentru{' '}
-                                  {profiles[userRole.user_id]?.email}.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Anulează</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => revokeRole(userRole.id, profiles[userRole.user_id]?.email)}
-                                >
-                                  Revocă Rol
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {userRoles.map((userRole) => {
+                    const profile = getProfileById(userRole.user_id);
+                    const isPrimary = profile?.email === 'hrelea001@gmail.com';
+                    return (
+                      <TableRow key={userRole.id}>
+                        <TableCell className="font-medium">
+                          {profile?.full_name || 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            {profile?.email || 'N/A'}
+                          </div>
+                        </TableCell>
+                        <TableCell>{getRoleBadge(userRole.role)}</TableCell>
+                        <TableCell>
+                          {new Date(userRole.created_at).toLocaleDateString('ro-RO')}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {!isPrimary && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Ești sigur?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Această acțiune va revoca rolul de {userRole.role} pentru{' '}
+                                    {profile?.email}.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Anulează</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => revokeRole(userRole.id, profile?.email || '')}
+                                  >
+                                    Revocă Rol
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AdminLayout>
   );
