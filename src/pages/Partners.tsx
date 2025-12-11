@@ -9,32 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-
-const benefits = [
-  {
-    icon: Globe,
-    title: "Vizibilitate Națională",
-    description: "Expune-ți experiențele către mii de clienți potențiali din toată România.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Creșterea Vânzărilor",
-    description: "Beneficiază de platforma noastră de marketing și crește-ți veniturile.",
-  },
-  {
-    icon: Users,
-    title: "Clienți Noi",
-    description: "Atrage clienți care caută experiențe unice și sunt dispuși să plătească pentru calitate.",
-  },
-  {
-    icon: CheckCircle,
-    title: "Suport Dedicat",
-    description: "Echipa noastră te ajută să-ți optimizezi listările și să maximizezi conversiile.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const Partners = () => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     businessName: "",
@@ -46,6 +25,29 @@ const Partners = () => {
     description: "",
   });
 
+  const benefits = [
+    {
+      icon: Globe,
+      titleKey: "partners.visibility",
+      descKey: "partners.visibilityDesc",
+    },
+    {
+      icon: TrendingUp,
+      titleKey: "partners.sales",
+      descKey: "partners.salesDesc",
+    },
+    {
+      icon: Users,
+      titleKey: "partners.clients",
+      descKey: "partners.clientsDesc",
+    },
+    {
+      icon: CheckCircle,
+      titleKey: "partners.support",
+      descKey: "partners.supportDesc",
+    },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -54,8 +56,8 @@ const Partners = () => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     toast({
-      title: "Aplicație trimisă cu succes!",
-      description: "Echipa noastră te va contacta în curând pentru a discuta despre parteneriat.",
+      title: t('partners.successTitle'),
+      description: t('partners.successDesc'),
     });
 
     setFormData({
@@ -77,6 +79,12 @@ const Partners = () => {
     }));
   };
 
+  const steps = [
+    { step: "1", titleKey: "partners.step1Title", descKey: "partners.step1Desc" },
+    { step: "2", titleKey: "partners.step2Title", descKey: "partners.step2Desc" },
+    { step: "3", titleKey: "partners.step3Title", descKey: "partners.step3Desc" },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -92,14 +100,13 @@ const Partners = () => {
             >
               <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6">
                 <Handshake className="w-4 h-4" />
-                Parteneriat
+                {t('partners.badge')}
               </span>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-                Devino partenerul nostru
+                {t('partners.heroTitle')}
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
-                Alătură-te rețelei Experium și oferă experiențele tale clienților noștri. 
-                Împreună creăm amintiri memorabile pentru mii de oameni din România.
+                {t('partners.heroSubtitle')}
               </p>
             </motion.div>
           </div>
@@ -115,17 +122,17 @@ const Partners = () => {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-                De ce să devii partener Experium?
+                {t('partners.whyPartner')}
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Oferim toate instrumentele și suportul necesar pentru succesul tău.
+                {t('partners.whyPartnerSubtitle')}
               </p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {benefits.map((benefit, index) => (
                 <motion.div
-                  key={benefit.title}
+                  key={benefit.titleKey}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -136,10 +143,10 @@ const Partners = () => {
                       <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                         <benefit.icon className="w-7 h-7 text-primary" />
                       </div>
-                      <CardTitle className="text-lg">{benefit.title}</CardTitle>
+                      <CardTitle className="text-lg">{t(benefit.titleKey)}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription>{benefit.description}</CardDescription>
+                      <CardDescription>{t(benefit.descKey)}</CardDescription>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -159,10 +166,10 @@ const Partners = () => {
                 className="text-center mb-12"
               >
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-                  Aplică pentru parteneriat
+                  {t('partners.applyTitle')}
                 </h2>
                 <p className="text-muted-foreground">
-                  Completează formularul și echipa noastră te va contacta în cel mai scurt timp.
+                  {t('partners.applySubtitle')}
                 </p>
               </motion.div>
 
@@ -171,7 +178,7 @@ const Partners = () => {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="businessName">Numele firmei *</Label>
+                        <Label htmlFor="businessName">{t('partners.businessName')} *</Label>
                         <Input
                           id="businessName"
                           name="businessName"
@@ -182,7 +189,7 @@ const Partners = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="contactName">Persoană de contact *</Label>
+                        <Label htmlFor="contactName">{t('partners.contactName')} *</Label>
                         <Input
                           id="contactName"
                           name="contactName"
@@ -196,7 +203,7 @@ const Partners = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
+                        <Label htmlFor="email">{t('partners.email')} *</Label>
                         <Input
                           id="email"
                           name="email"
@@ -208,7 +215,7 @@ const Partners = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="phone">Telefon *</Label>
+                        <Label htmlFor="phone">{t('partners.phone')} *</Label>
                         <Input
                           id="phone"
                           name="phone"
@@ -223,7 +230,7 @@ const Partners = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="website">Website</Label>
+                        <Label htmlFor="website">{t('partners.website')}</Label>
                         <Input
                           id="website"
                           name="website"
@@ -234,26 +241,26 @@ const Partners = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="experienceType">Tipul de experiență *</Label>
+                        <Label htmlFor="experienceType">{t('partners.experienceType')} *</Label>
                         <Input
                           id="experienceType"
                           name="experienceType"
                           value={formData.experienceType}
                           onChange={handleChange}
-                          placeholder="ex: Spa, Aventură, Gastronomie"
+                          placeholder={t('partners.experienceTypePlaceholder')}
                           required
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="description">Descrierea experiențelor oferite *</Label>
+                      <Label htmlFor="description">{t('partners.description')} *</Label>
                       <Textarea
                         id="description"
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        placeholder="Descrieți pe scurt experiențele pe care le oferiți și ce vă diferențiază..."
+                        placeholder={t('partners.descriptionPlaceholder')}
                         rows={4}
                         required
                       />
@@ -261,11 +268,11 @@ const Partners = () => {
 
                     <Button type="submit" className="w-full" size="lg" disabled={loading}>
                       {loading ? (
-                        "Se trimite..."
+                        t('partners.submitting')
                       ) : (
                         <>
                           <Send className="w-4 h-4 mr-2" />
-                          Trimite aplicația
+                          {t('partners.submit')}
                         </>
                       )}
                     </Button>
@@ -286,16 +293,12 @@ const Partners = () => {
               className="text-center mb-12"
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-                Cum funcționează?
+                {t('partners.howItWorks')}
               </h2>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              {[
-                { step: "1", title: "Aplică", description: "Completează formularul de mai sus cu detaliile despre afacerea ta." },
-                { step: "2", title: "Discutăm", description: "Echipa noastră te contactează pentru a discuta detaliile parteneriatului." },
-                { step: "3", title: "Publicăm", description: "Îți creăm profilul și publicăm experiențele tale pe platformă." },
-              ].map((item, index) => (
+              {steps.map((item, index) => (
                 <motion.div
                   key={item.step}
                   initial={{ opacity: 0, y: 20 }}
@@ -307,8 +310,8 @@ const Partners = () => {
                   <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground text-2xl font-bold flex items-center justify-center mx-auto mb-4">
                     {item.step}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
+                  <h3 className="text-xl font-semibold mb-2">{t(item.titleKey)}</h3>
+                  <p className="text-muted-foreground">{t(item.descKey)}</p>
                 </motion.div>
               ))}
             </div>
