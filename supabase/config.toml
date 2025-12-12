@@ -1,1 +1,19 @@
 project_id = "vdukytnyzotybtcjzaub"
+
+[functions.create-voucher]
+verify_jwt = true
+
+[functions.send-booking-confirmation]
+verify_jwt = true
+
+[functions.send-booking-reminders]
+verify_jwt = true
+
+[functions.send-cancellation-confirmation]
+verify_jwt = true
+
+[functions.send-voucher-expiry-alerts]
+verify_jwt = true
+
+[functions.get-mapbox-token]
+verify_jwt = false
