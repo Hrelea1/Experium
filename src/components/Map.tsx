@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
 
 interface Experience {
-  id: number;
+  id: number | string;
   title: string;
   location: string;
   price: number;
@@ -14,20 +16,41 @@ interface Experience {
 interface MapProps {
   experiences: Experience[];
   userLocation?: [number, number];
-  onExperienceClick?: (experienceId: number) => void;
+  onExperienceClick?: (experienceId: number | string) => void;
 }
 
 const Map = ({ experiences, userLocation, onExperienceClick }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get token from environment or secrets
-    const token = import.meta.env.VITE_MAPBOX_TOKEN;
-    if (token) {
-      setMapboxToken(token);
-    }
+    const fetchToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) {
+          console.error('Error fetching Mapbox token:', error);
+          setError('Nu s-a putut încărca harta');
+          return;
+        }
+        
+        if (data?.token) {
+          setMapboxToken(data.token);
+        } else {
+          setError('Token Mapbox nu este configurat');
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        setError('Eroare la încărcarea hărții');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchToken();
   }, []);
 
   useEffect(() => {
@@ -57,7 +80,7 @@ const Map = ({ experiences, userLocation, onExperienceClick }: MapProps) => {
     if (userLocation) {
       new mapboxgl.Marker({ color: '#0EA5E9' })
         .setLngLat(userLocation)
-        .setPopup(new mapboxgl.Popup().setHTML('<p>Your Location</p>'))
+        .setPopup(new mapboxgl.Popup().setHTML('<p>Locația ta</p>'))
         .addTo(map.current);
     }
 
@@ -81,7 +104,7 @@ const Map = ({ experiences, userLocation, onExperienceClick }: MapProps) => {
               `<div style="padding: 8px;">
                 <h3 style="font-weight: bold; margin-bottom: 4px;">${experience.title}</h3>
                 <p style="color: #666; font-size: 14px; margin-bottom: 4px;">${experience.location}</p>
-                <p style="color: #8B5CF6; font-weight: bold;">${experience.price} RON</p>
+                <p style="color: #8B5CF6; font-weight: bold;">${experience.price} lei</p>
               </div>`
             )
           )
@@ -100,15 +123,23 @@ const Map = ({ experiences, userLocation, onExperienceClick }: MapProps) => {
     };
   }, [mapboxToken, experiences, userLocation, onExperienceClick]);
 
-  if (!mapboxToken) {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full bg-muted rounded-lg">
+        <div className="text-center p-8">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground mt-2">Se încarcă harta...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !mapboxToken) {
     return (
       <div className="flex items-center justify-center h-full bg-muted rounded-lg">
         <div className="text-center p-8">
           <p className="text-muted-foreground">
-            Map requires Mapbox token to be configured.
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Please add MAPBOX_TOKEN to your secrets.
+            {error || 'Harta nu este disponibilă'}
           </p>
         </div>
       </div>
