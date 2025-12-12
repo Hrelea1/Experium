@@ -39,6 +39,8 @@ export function BookingForm({ experience }: BookingFormProps) {
     city: "",
     address: "",
     postcode: "",
+    phone: "",
+    instructions: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -89,7 +91,7 @@ export function BookingForm({ experience }: BookingFormProps) {
       return;
     }
 
-    if (isGift && (!shippingAddress.county || !shippingAddress.city || !shippingAddress.address || !shippingAddress.postcode)) {
+    if (isGift && (!shippingAddress.county || !shippingAddress.city || !shippingAddress.address || !shippingAddress.postcode || !shippingAddress.phone)) {
       toast({
         title: "Adresă de livrare incompletă",
         description: "Te rugăm să completezi toate câmpurile pentru livrare.",
@@ -105,7 +107,7 @@ export function BookingForm({ experience }: BookingFormProps) {
       const { data: voucherData, error: voucherError } = await supabase.functions.invoke('create-voucher', {
         body: {
           experienceId: experience.id,
-          notes: isGift ? `Livrare: ${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.county}, ${shippingAddress.postcode}, ${shippingAddress.country}` : undefined,
+          notes: isGift ? `Livrare: ${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.county}, ${shippingAddress.postcode}, ${shippingAddress.country}. Tel: ${shippingAddress.phone}${shippingAddress.instructions ? '. Instrucțiuni: ' + shippingAddress.instructions : ''}` : undefined,
           validityMonths: 12
         }
       });
@@ -329,6 +331,20 @@ export function BookingForm({ experience }: BookingFormProps) {
                 value={shippingAddress.postcode}
                 onChange={(e) => setShippingAddress({ ...shippingAddress, postcode: e.target.value })}
                 className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <input
+                type="tel"
+                placeholder="Număr de telefon"
+                value={shippingAddress.phone}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })}
+                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <textarea
+                placeholder="Instrucțiuni de livrare (opțional)"
+                value={shippingAddress.instructions}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, instructions: e.target.value })}
+                rows={2}
+                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
             </motion.div>
           )}
