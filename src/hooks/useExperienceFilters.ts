@@ -108,12 +108,12 @@ export function useExperienceFilters(experiences: Experience[]) {
       newParams.set(key, value.toString());
     }
 
-    setSearchParams(newParams);
+    setSearchParams(newParams, { replace: true });
   };
 
   // Reset filters
   const resetFilters = () => {
-    setSearchParams({});
+    setSearchParams({}, { replace: true });
   };
 
   // Active filters count
