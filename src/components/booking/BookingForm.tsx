@@ -33,10 +33,7 @@ export function BookingForm({ experience }: BookingFormProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [participants, setParticipants] = useState(1);
   const [isGift, setIsGift] = useState(false);
-  const [giftDetails, setGiftDetails] = useState({
-    recipientName: "",
-    recipientEmail: "",
-    message: "",
+  const [shippingAddress, setShippingAddress] = useState({
     country: "România",
     county: "",
     city: "",
@@ -92,9 +89,9 @@ export function BookingForm({ experience }: BookingFormProps) {
       return;
     }
 
-    if (isGift && (!giftDetails.recipientName || !giftDetails.recipientEmail || !giftDetails.county || !giftDetails.city || !giftDetails.address || !giftDetails.postcode)) {
+    if (isGift && (!shippingAddress.county || !shippingAddress.city || !shippingAddress.address || !shippingAddress.postcode)) {
       toast({
-        title: "Detalii cadou incomplete",
+        title: "Adresă de livrare incompletă",
         description: "Te rugăm să completezi toate câmpurile pentru livrare.",
         variant: "destructive",
       });
@@ -107,8 +104,8 @@ export function BookingForm({ experience }: BookingFormProps) {
       // Create a voucher first
       const { data: voucherData, error: voucherError } = await supabase.functions.invoke('create-voucher', {
         body: {
-          experienceId: experience.id, // Already a string UUID
-          notes: isGift ? `Cadou pentru ${giftDetails.recipientName} (${giftDetails.recipientEmail})${giftDetails.message ? ': ' + giftDetails.message : ''}` : undefined,
+          experienceId: experience.id,
+          notes: isGift ? `Livrare: ${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.county}, ${shippingAddress.postcode}, ${shippingAddress.country}` : undefined,
           validityMonths: 12
         }
       });
@@ -283,11 +280,11 @@ export function BookingForm({ experience }: BookingFormProps) {
             />
             <div className="flex items-center gap-2">
               <Gift className="w-5 h-5 text-primary" />
-              <span className="font-medium text-foreground">Oferă cadou</span>
+              <span className="font-medium text-foreground">Oferă cadou (livrare fizică)</span>
             </div>
           </label>
 
-          {/* Gift Details */}
+          {/* Shipping Address Form */}
           {isGift && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
@@ -295,71 +292,44 @@ export function BookingForm({ experience }: BookingFormProps) {
               exit={{ opacity: 0, height: 0 }}
               className="mt-4 space-y-3"
             >
+              <p className="text-sm font-medium text-foreground mb-2">Adresa de livrare</p>
               <input
                 type="text"
-                placeholder="Numele destinatarului"
-                value={giftDetails.recipientName}
-                onChange={(e) => setGiftDetails({ ...giftDetails, recipientName: e.target.value })}
+                placeholder="Țara"
+                value={shippingAddress.country}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
+                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  placeholder="Județ"
+                  value={shippingAddress.county}
+                  onChange={(e) => setShippingAddress({ ...shippingAddress, county: e.target.value })}
+                  className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                  type="text"
+                  placeholder="Oraș"
+                  value={shippingAddress.city}
+                  onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
+                  className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Adresă completă"
+                value={shippingAddress.address}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
                 className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <input
-                type="email"
-                placeholder="Email destinatar"
-                value={giftDetails.recipientEmail}
-                onChange={(e) => setGiftDetails({ ...giftDetails, recipientEmail: e.target.value })}
+                type="text"
+                placeholder="Cod poștal"
+                value={shippingAddress.postcode}
+                onChange={(e) => setShippingAddress({ ...shippingAddress, postcode: e.target.value })}
                 className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
-              <textarea
-                placeholder="Mesaj personal (opțional)"
-                value={giftDetails.message}
-                onChange={(e) => setGiftDetails({ ...giftDetails, message: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              />
-              
-              {/* Address Form */}
-              <div className="border-t border-border pt-4 mt-4">
-                <p className="text-sm font-medium text-foreground mb-3">Adresa de livrare</p>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Țara"
-                    value={giftDetails.country}
-                    onChange={(e) => setGiftDetails({ ...giftDetails, country: e.target.value })}
-                    className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      placeholder="Județ"
-                      value={giftDetails.county}
-                      onChange={(e) => setGiftDetails({ ...giftDetails, county: e.target.value })}
-                      className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Oraș"
-                      value={giftDetails.city}
-                      onChange={(e) => setGiftDetails({ ...giftDetails, city: e.target.value })}
-                      className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Adresă completă"
-                    value={giftDetails.address}
-                    onChange={(e) => setGiftDetails({ ...giftDetails, address: e.target.value })}
-                    className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Cod poștal"
-                    value={giftDetails.postcode}
-                    onChange={(e) => setGiftDetails({ ...giftDetails, postcode: e.target.value })}
-                    className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-              </div>
             </motion.div>
           )}
         </div>
