@@ -60,8 +60,8 @@ export function Hero() {
     navigate(`/category/${slug}`);
   };
 
-  const handleToggleDropdown = () => {
-    if (!isCategoryOpen && buttonRef.current) {
+  const updateDropdownPosition = () => {
+    if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + 8,
@@ -69,8 +69,27 @@ export function Hero() {
         width: rect.width,
       });
     }
+  };
+
+  const handleToggleDropdown = () => {
+    if (!isCategoryOpen) {
+      updateDropdownPosition();
+    }
     setIsCategoryOpen(!isCategoryOpen);
   };
+
+  // Update position on scroll/resize when dropdown is open
+  useEffect(() => {
+    if (isCategoryOpen) {
+      updateDropdownPosition();
+      window.addEventListener('scroll', updateDropdownPosition, true);
+      window.addEventListener('resize', updateDropdownPosition);
+      return () => {
+        window.removeEventListener('scroll', updateDropdownPosition, true);
+        window.removeEventListener('resize', updateDropdownPosition);
+      };
+    }
+  }, [isCategoryOpen]);
 
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center">
