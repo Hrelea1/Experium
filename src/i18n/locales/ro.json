@@ -310,9 +310,32 @@
     "vat": "TVA (19%)",
     "total": "Total",
     "checkout": "Finalizează Comanda",
+    "processing": "Se procesează...",
     "securePayment": "Plată securizată • Anulare gratuită cu 48h înainte",
     "addedToCart": "Adăugat în coș! 🎉",
-    "addedToCartDesc": "a fost adăugat în coș"
+    "addedToCartDesc": "a fost adăugat în coș",
+    "loginRequired": "Autentificare necesară",
+    "loginRequiredDesc": "Trebuie să fii autentificat pentru a finaliza comanda"
+  },
+  "orderConfirmation": {
+    "title": "Comandă plasată cu succes!",
+    "subtitle": "Mulțumim pentru achiziție. Voucherele tale sunt gata.",
+    "orderId": "ID Comandă",
+    "yourVouchers": "Voucherele Tale",
+    "voucherCode": "Cod Voucher",
+    "validFor12Months": "Valabil 12 luni de la data achiziției",
+    "downloadPdf": "Descarcă PDF",
+    "scheduleNow": "Programează Acum",
+    "orderSummary": "Sumar Comandă",
+    "nextSteps": "Pașii Următori",
+    "step1": "Păstrează codul voucher-ului - îl vei folosi pentru a programa experiența",
+    "step2": "Accesează pagina 'Folosește Voucher' și introdu codul pentru a alege data",
+    "step3": "Bucură-te de experiență! Vei primi un email de confirmare cu toate detaliile",
+    "useVoucherNow": "Folosește Voucherul Acum",
+    "backToHome": "Înapoi Acasă",
+    "codeCopied": "Cod copiat!",
+    "downloadStarted": "Descărcare începută",
+    "downloadDesc": "PDF-ul voucher-ului va fi descărcat în curând"
   },
   "booking": {
     "perPerson": "persoană",

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, X, Plus, Minus, ArrowRight, ArrowLeft, Gift, MapPin, Phone, FileText } from "lucide-react";
+import { ShoppingBag, X, Plus, Minus, ArrowRight, ArrowLeft, Gift, MapPin, Phone, FileText, CreditCard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface GiftDetails {
   country: string;
@@ -27,7 +28,9 @@ export default function Cart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { items, removeItem, updateQuantity, toggleGift, subtotal } = useCart();
+  const { items, removeItem, updateQuantity, toggleGift, subtotal, clearCart } = useCart();
+  const { user } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [giftDetails, setGiftDetails] = useState<GiftDetails>({
     country: "România",
@@ -49,8 +52,34 @@ export default function Cart() {
 
   const hasGiftItems = items.some(item => item.isGift);
   const isEmpty = items.length === 0;
-  const tax = subtotal * 0.19; // 19% VAT
+  const tax = subtotal * 0.19;
   const total = subtotal + tax;
+
+  const handleCheckout = () => {
+    if (!user) {
+      toast({
+        title: t('cart.loginRequired'),
+        description: t('cart.loginRequiredDesc'),
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    setIsProcessing(true);
+    
+    // Simulate payment processing
+    setTimeout(() => {
+      navigate("/order-confirmation", {
+        state: {
+          cartItems: items,
+        },
+      });
+      
+      clearCart();
+      setIsProcessing(false);
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-background">
@@ -282,11 +311,27 @@ export default function Cart() {
                     <span>{total.toFixed(2)} {t('common.lei')}</span>
                   </div>
 
-                  <Button className="w-full" size="lg" asChild>
-                    <Link to="/auth">
-                      {t('cart.checkout')}
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
+                  <Button 
+                    className="w-full" 
+                    size="lg" 
+                    onClick={handleCheckout}
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full mr-2"
+                        />
+                        {t('cart.processing')}
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-5 w-5" />
+                        {t('cart.checkout')}
+                      </>
+                    )}
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center mt-4">
