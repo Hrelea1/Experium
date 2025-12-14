@@ -5,6 +5,7 @@
     "regions": "Regiuni",
     "howItWorks": "Cum Funcționează",
     "giftIdeas": "Idei Cadouri",
+    "romanianExperiences": "Experiențe 100% românești",
     "partners": "Parteneri",
     "login": "Intră în cont",
     "admin": "Admin",
@@ -283,5 +284,37 @@
     "resetInstructions": "Introdu adresa de email și îți vom trimite un link pentru resetarea parolei.",
     "checkEmail": "Verifică email-ul",
     "resetEmailSent": "Am trimis instrucțiunile de resetare pe adresa ta de email."
+  },
+  "cart": {
+    "title": "Coșul Meu",
+    "empty": "Coșul este gol",
+    "emptyDesc": "Adaugă experiențe în coș pentru a continua",
+    "discoverExperiences": "Descoperă Experiențe",
+    "itemRemoved": "Produs eliminat",
+    "itemRemovedDesc": "Produsul a fost eliminat din coș",
+    "sendAsGift": "Trimite ca și cadou",
+    "giftDeliveryDetails": "Detalii livrare cadou",
+    "country": "Țară",
+    "county": "Județ",
+    "countyPlaceholder": "Selectează județul",
+    "city": "Oraș",
+    "cityPlaceholder": "Introdu orașul",
+    "postcode": "Cod poștal",
+    "address": "Adresă",
+    "addressPlaceholder": "Strada, număr, bloc, apartament",
+    "phone": "Telefon",
+    "deliveryInstructions": "Instrucțiuni livrare",
+    "instructionsPlaceholder": "Orice informații suplimentare pentru curier...",
+    "orderSummary": "Sumar Comandă",
+    "subtotal": "Subtotal",
+    "vat": "TVA (19%)",
+    "total": "Total",
+    "checkout": "Finalizează Comanda",
+    "securePayment": "Plată securizată • Anulare gratuită cu 48h înainte"
+  },
+  "experience": {
+    "recommended": "Experiențe Recomandate",
+    "addToCart": "Adaugă în Coș",
+    "book": "Rezervă"
   }
 }

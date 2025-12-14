@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import { 
   ArrowLeft, 
   Star, 
@@ -159,6 +160,7 @@ export default function ExperienceDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [experience, setExperience] = useState<any>(null);
@@ -421,7 +423,7 @@ export default function ExperienceDetail() {
               className="mt-16"
             >
               <h2 className="text-2xl font-bold text-foreground mb-6">
-                Experiențe Recomandate
+                {t('experience.recommended')}
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {recommendedExperiences.map((rec) => {
