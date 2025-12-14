@@ -78,25 +78,15 @@ export function Hero() {
     setIsCategoryOpen(!isCategoryOpen);
   };
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on scroll outside dropdown or resize
+  // Update position on scroll/resize when dropdown is open
   useEffect(() => {
     if (isCategoryOpen) {
-      const handleScroll = (e: Event) => {
-        // Don't close if scrolling inside the dropdown
-        if (dropdownRef.current?.contains(e.target as Node)) {
-          return;
-        }
-        setIsCategoryOpen(false);
-      };
-      const handleResize = () => setIsCategoryOpen(false);
-      
-      window.addEventListener('scroll', handleScroll, true);
-      window.addEventListener('resize', handleResize);
+      updateDropdownPosition();
+      window.addEventListener('scroll', updateDropdownPosition, true);
+      window.addEventListener('resize', updateDropdownPosition);
       return () => {
-        window.removeEventListener('scroll', handleScroll, true);
-        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('scroll', updateDropdownPosition, true);
+        window.removeEventListener('resize', updateDropdownPosition);
       };
     }
   }, [isCategoryOpen]);
@@ -189,7 +179,6 @@ export function Hero() {
                       onClick={() => setIsCategoryOpen(false)} 
                     />
                     <div 
-                      ref={dropdownRef}
                       className="fixed bg-card rounded-xl shadow-2xl border border-border max-h-80 overflow-auto z-[99999] animate-fade-in"
                       style={{
                         top: dropdownPosition.top,
