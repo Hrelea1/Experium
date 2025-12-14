@@ -282,7 +282,7 @@ export function FeaturedExperiences() {
                       navigate(`/experience/${exp.id}`);
                     }}
                   >
-                    Rezervă
+                    {t('experience.book')}
                   </Button>
                 </div>
               </div>

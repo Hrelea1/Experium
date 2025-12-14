@@ -67,29 +67,20 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
-            {/* Gift Ideas Link */}
-            <Link
-              to="/gift-ideas"
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group flex items-center gap-1"
+            {/* 100% Romanian Experiences Link */}
+            <button
+              onClick={() => handleNavClick("experiences")}
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
             >
-              <Gift className="h-4 w-4" />
-              {t('nav.giftIdeas')}
+              {t('nav.romanianExperiences')}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </Link>
+            </button>
 
             <button
               onClick={() => handleNavClick("regions")}
               className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
             >
               {t('nav.regions')}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </button>
-
-            <button
-              onClick={() => handleNavClick("how-it-works")}
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
-            >
-              {t('nav.howItWorks')}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
             </button>
 
@@ -248,14 +239,15 @@ export function Header() {
             className="lg:hidden bg-card border-t border-border"
           >
             <nav className="container py-4 flex flex-col gap-2">
-              <Link
-                to="/gift-ideas"
-                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                onClick={() => {
+                  handleNavClick("experiences");
+                  setIsMenuOpen(false);
+                }}
+                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors text-left"
               >
-                <Gift className="h-4 w-4" />
-                {t('nav.giftIdeas')}
-              </Link>
+                {t('nav.romanianExperiences')}
+              </button>
 
               <button
                 onClick={() => {
@@ -265,16 +257,6 @@ export function Header() {
                 className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors text-left"
               >
                 {t('nav.regions')}
-              </button>
-
-              <button
-                onClick={() => {
-                  handleNavClick("how-it-works");
-                  setIsMenuOpen(false);
-                }}
-                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors text-left"
-              >
-                {t('nav.howItWorks')}
               </button>
 
               <Link

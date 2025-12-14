@@ -5,6 +5,7 @@
     "regions": "Regions",
     "howItWorks": "How It Works",
     "giftIdeas": "Gift Ideas",
+    "romanianExperiences": "100% Romanian Experiences",
     "partners": "Partners",
     "login": "Log In",
     "admin": "Admin",
@@ -283,5 +284,37 @@
     "resetInstructions": "Enter your email address and we'll send you a link to reset your password.",
     "checkEmail": "Check your email",
     "resetEmailSent": "We've sent the reset instructions to your email address."
+  },
+  "cart": {
+    "title": "My Cart",
+    "empty": "Cart is empty",
+    "emptyDesc": "Add experiences to cart to continue",
+    "discoverExperiences": "Discover Experiences",
+    "itemRemoved": "Item removed",
+    "itemRemovedDesc": "The item has been removed from cart",
+    "sendAsGift": "Send as a gift",
+    "giftDeliveryDetails": "Gift delivery details",
+    "country": "Country",
+    "county": "County",
+    "countyPlaceholder": "Select county",
+    "city": "City",
+    "cityPlaceholder": "Enter city",
+    "postcode": "Postcode",
+    "address": "Address",
+    "addressPlaceholder": "Street, number, building, apartment",
+    "phone": "Phone",
+    "deliveryInstructions": "Delivery instructions",
+    "instructionsPlaceholder": "Any additional information for the courier...",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "vat": "VAT (19%)",
+    "total": "Total",
+    "checkout": "Complete Order",
+    "securePayment": "Secure payment • Free cancellation 48h before"
+  },
+  "experience": {
+    "recommended": "Recommended Experiences",
+    "addToCart": "Add to Cart",
+    "book": "Book"
   }
 }
