@@ -122,7 +122,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-card rounded-2xl p-4 shadow-xl max-w-3xl mx-auto"
+            className="bg-card rounded-2xl p-4 shadow-xl max-w-3xl mx-auto relative z-[9999]"
           >
             <div className="flex flex-col md:flex-row gap-3">
               {/* Category Dropdown */}
