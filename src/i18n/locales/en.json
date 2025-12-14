@@ -310,9 +310,32 @@
     "vat": "VAT (19%)",
     "total": "Total",
     "checkout": "Complete Order",
+    "processing": "Processing...",
     "securePayment": "Secure payment • Free cancellation 48h before",
     "addedToCart": "Added to cart! 🎉",
-    "addedToCartDesc": "has been added to cart"
+    "addedToCartDesc": "has been added to cart",
+    "loginRequired": "Login required",
+    "loginRequiredDesc": "You need to be logged in to complete the order"
+  },
+  "orderConfirmation": {
+    "title": "Order placed successfully!",
+    "subtitle": "Thank you for your purchase. Your vouchers are ready.",
+    "orderId": "Order ID",
+    "yourVouchers": "Your Vouchers",
+    "voucherCode": "Voucher Code",
+    "validFor12Months": "Valid for 12 months from purchase date",
+    "downloadPdf": "Download PDF",
+    "scheduleNow": "Schedule Now",
+    "orderSummary": "Order Summary",
+    "nextSteps": "Next Steps",
+    "step1": "Keep your voucher code - you'll use it to schedule the experience",
+    "step2": "Go to the 'Use Voucher' page and enter the code to choose a date",
+    "step3": "Enjoy your experience! You'll receive a confirmation email with all details",
+    "useVoucherNow": "Use Voucher Now",
+    "backToHome": "Back Home",
+    "codeCopied": "Code copied!",
+    "downloadStarted": "Download started",
+    "downloadDesc": "The voucher PDF will be downloaded shortly"
   },
   "booking": {
     "perPerson": "person",

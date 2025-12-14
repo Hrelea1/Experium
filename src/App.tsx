@@ -18,6 +18,7 @@ import RedeemVoucher from "./pages/RedeemVoucher";
 import VoucherConfirmation from "./pages/VoucherConfirmation";
 import CreateTestVoucher from "./pages/CreateTestVoucher";
 import Cart from "./pages/Cart";
+import OrderConfirmation from "./pages/OrderConfirmation";
 import GiftIdeas from "./pages/GiftIdeas";
 import Partners from "./pages/Partners";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/redeem-voucher" element={<RedeemVoucher />} />
               <Route path="/voucher-confirmation" element={<VoucherConfirmation />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/gift-ideas" element={<GiftIdeas />} />
               <Route path="/partners" element={<Partners />} />
               
