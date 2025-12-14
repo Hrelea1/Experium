@@ -137,20 +137,32 @@ export function Hero() {
                   </div>
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isCategoryOpen ? "rotate-180" : ""}`} />
                 </button>
-                {isCategoryOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-lg border border-border z-20 max-h-60 overflow-auto">
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setIsCategoryOpen(false);
-                        }}
-                        className="w-full px-4 py-3 text-left hover:bg-muted transition-colors first:rounded-t-xl last:rounded-b-xl"
-                      >
-                        {t(category)}
-                      </button>
-                    ))}
+              {isCategoryOpen && (
+                  <div className="fixed inset-0 z-[100]" onClick={() => setIsCategoryOpen(false)}>
+                    <div 
+                      className="absolute bg-card rounded-xl shadow-2xl border border-border max-h-80 overflow-auto"
+                      style={{
+                        top: 'auto',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        marginTop: '8px',
+                        width: 'min(400px, 90vw)'
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {categories.map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => {
+                            setSelectedCategory(category);
+                            setIsCategoryOpen(false);
+                          }}
+                          className="w-full px-4 py-3 text-left hover:bg-muted transition-colors first:rounded-t-xl last:rounded-b-xl text-foreground"
+                        >
+                          {t(category)}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

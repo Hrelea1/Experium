@@ -148,15 +148,7 @@ export default function CategorySearch() {
         {/* Hero Banner */}
         <div className="bg-gradient-to-r from-primary to-coral-dark py-12 lg:py-16">
           <div className="container">
-            <Button 
-              variant="glass" 
-              onClick={() => navigate(-1)}
-              className="mb-4"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Înapoi
-            </Button>
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-2"

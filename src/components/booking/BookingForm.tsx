@@ -1,17 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { ro } from "date-fns/locale";
-import { CalendarIcon, Users, Gift, CreditCard } from "lucide-react";
+import { Users, CreditCard, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -30,44 +21,13 @@ export function BookingForm({ experience }: BookingFormProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [participants, setParticipants] = useState(1);
-  const [isGift, setIsGift] = useState(false);
-  const [shippingAddress, setShippingAddress] = useState({
-    country: "România",
-    county: "",
-    city: "",
-    address: "",
-    postcode: "",
-    phone: "",
-    instructions: "",
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const totalPrice = experience.price * participants;
   const savings = experience.originalPrice 
     ? (experience.originalPrice - experience.price) * participants 
     : 0;
-
-  // Disable dates in the past and some random unavailable dates
-  const disabledDays = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Disable past dates
-    if (date < today) return true;
-    
-    // Disable dates within next 2 days (preparation time)
-    const minDate = new Date(today);
-    minDate.setDate(today.getDate() + 2);
-    if (date < minDate) return true;
-    
-    // Simulate some unavailable dates (every Sunday and some random dates)
-    if (date.getDay() === 0) return true;
-    
-    return false;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,52 +35,31 @@ export function BookingForm({ experience }: BookingFormProps) {
     if (!user) {
       toast({
         title: "Autentificare necesară",
-        description: "Trebuie să fii autentificat pentru a face o rezervare.",
+        description: "Trebuie să fii autentificat pentru a adăuga în coș.",
         variant: "destructive",
       });
       navigate("/auth");
       return;
     }
 
-    if (!selectedDate) {
-      toast({
-        title: "Selectează o dată",
-        description: "Te rugăm să alegi o dată pentru experiență.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (isGift && (!shippingAddress.county || !shippingAddress.city || !shippingAddress.address || !shippingAddress.postcode || !shippingAddress.phone)) {
-      toast({
-        title: "Adresă de livrare incompletă",
-        description: "Te rugăm să completezi toate câmpurile pentru livrare.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
-      // Create a voucher first
+      // Create a voucher for the experience
       const { data: voucherData, error: voucherError } = await supabase.functions.invoke('create-voucher', {
         body: {
           experienceId: experience.id,
-          notes: isGift ? `Livrare: ${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.county}, ${shippingAddress.postcode}, ${shippingAddress.country}. Tel: ${shippingAddress.phone}${shippingAddress.instructions ? '. Instrucțiuni: ' + shippingAddress.instructions : ''}` : undefined,
           validityMonths: 12
         }
       });
 
       if (voucherError) throw voucherError;
 
-      // Assign voucher to user and mark as used since booking is created
+      // Assign voucher to user
       const { error: updateError } = await supabase
         .from('vouchers')
         .update({ 
           user_id: user.id,
-          status: 'used',
-          redemption_date: new Date().toISOString()
         })
         .eq('id', voucherData.voucher.id);
 
@@ -128,39 +67,21 @@ export function BookingForm({ experience }: BookingFormProps) {
         console.error('Failed to update voucher:', updateError);
       }
 
-      // Create the booking
-      const { data: bookingData, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user.id,
-          experience_id: experience.id, // Already a string UUID
-          voucher_id: voucherData.voucher.id,
-          booking_date: selectedDate.toISOString(),
-          participants,
-          total_price: totalPrice,
-          payment_method: 'card',
-          status: 'confirmed'
-        })
-        .select()
-        .single();
-
-      if (bookingError) throw bookingError;
-
       toast({
-        title: "Rezervare confirmată! 🎉",
-        description: `Ai rezervat ${experience.title} pentru ${participants} ${participants === 1 ? "persoană" : "persoane"} pe ${format(selectedDate, "d MMMM yyyy", { locale: ro })}.`,
+        title: "Adăugat în coș! 🎉",
+        description: `${experience.title} a fost adăugat în coș. Poți alege data după verificarea codului voucher.`,
       });
 
-      // Navigate to bookings page
+      // Navigate to cart
       setTimeout(() => {
-        navigate("/my-bookings");
+        navigate("/cart");
       }, 1500);
 
     } catch (error: any) {
-      console.error('Booking error:', error);
+      console.error('Error:', error);
       toast({
         title: "Eroare",
-        description: error.message || "A apărut o eroare la procesarea rezervării.",
+        description: error.message || "A apărut o eroare.",
         variant: "destructive",
       });
     } finally {
@@ -188,59 +109,13 @@ export function BookingForm({ experience }: BookingFormProps) {
         </div>
         {savings > 0 && (
           <p className="text-primary-foreground/90 text-sm mt-1">
-            Economisești {savings} lei la această rezervare!
+            Economisești {savings} lei la această comandă!
           </p>
         )}
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="p-6 space-y-5">
-        {/* Date Selection with Calendar */}
-        <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
-            <CalendarIcon className="w-4 h-4 text-primary" />
-            Data experienței
-          </label>
-          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal h-12 rounded-xl bg-muted border-0 hover:bg-muted/80",
-                  !selectedDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                {selectedDate ? (
-                  format(selectedDate, "EEEE, d MMMM yyyy", { locale: ro })
-                ) : (
-                  <span>Selectează o dată</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-popover border border-border shadow-xl z-[100] pointer-events-auto" align="start">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => {
-                  setSelectedDate(date);
-                  setCalendarOpen(false);
-                }}
-                disabled={disabledDays}
-                initialFocus
-                locale={ro}
-                className="pointer-events-auto"
-              />
-              <div className="px-4 pb-3 pt-0">
-                <p className="text-xs text-muted-foreground flex items-center gap-2">
-                  <span className="w-3 h-3 rounded bg-muted"></span>
-                  Indisponibil
-                </p>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-
         {/* Participants */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
@@ -271,83 +146,11 @@ export function BookingForm({ experience }: BookingFormProps) {
           </div>
         </div>
 
-        {/* Gift Toggle */}
+        {/* Info about date selection */}
         <div className="bg-muted/50 rounded-xl p-4">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isGift}
-              onChange={(e) => setIsGift(e.target.checked)}
-              className="w-5 h-5 rounded border-border text-primary focus:ring-primary"
-            />
-            <div className="flex items-center gap-2">
-              <Gift className="w-5 h-5 text-primary" />
-              <span className="font-medium text-foreground">Oferă cadou (livrare fizică)</span>
-            </div>
-          </label>
-
-          {/* Shipping Address Form */}
-          {isGift && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-4 space-y-3"
-            >
-              <p className="text-sm font-medium text-foreground mb-2">Adresa de livrare</p>
-              <input
-                type="text"
-                placeholder="Țara"
-                value={shippingAddress.country}
-                onChange={(e) => setShippingAddress({ ...shippingAddress, country: e.target.value })}
-                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="Județ"
-                  value={shippingAddress.county}
-                  onChange={(e) => setShippingAddress({ ...shippingAddress, county: e.target.value })}
-                  className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <input
-                  type="text"
-                  placeholder="Oraș"
-                  value={shippingAddress.city}
-                  onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                  className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <input
-                type="text"
-                placeholder="Adresă completă"
-                value={shippingAddress.address}
-                onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
-                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                type="text"
-                placeholder="Cod poștal"
-                value={shippingAddress.postcode}
-                onChange={(e) => setShippingAddress({ ...shippingAddress, postcode: e.target.value })}
-                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                type="tel"
-                placeholder="Număr de telefon"
-                value={shippingAddress.phone}
-                onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })}
-                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <textarea
-                placeholder="Instrucțiuni de livrare (opțional)"
-                value={shippingAddress.instructions}
-                onChange={(e) => setShippingAddress({ ...shippingAddress, instructions: e.target.value })}
-                rows={2}
-                className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              />
-            </motion.div>
-          )}
+          <p className="text-sm text-muted-foreground">
+            📅 Data experienței se selectează după achiziție, când folosești codul voucher.
+          </p>
         </div>
 
         {/* Total */}
@@ -376,15 +179,15 @@ export function BookingForm({ experience }: BookingFormProps) {
             </span>
           ) : (
             <>
-              <CreditCard className="w-5 h-5 mr-2" />
-              {isGift ? "Oferă Cadou" : "Rezervă Acum"}
+              <ShoppingBag className="w-5 h-5 mr-2" />
+              Adaugă în Coș
             </>
           )}
         </Button>
 
         {/* Security Note */}
         <p className="text-center text-xs text-muted-foreground">
-          🔒 Plată securizată • Anulare gratuită cu 48h înainte
+          🔒 Plată securizată • Voucher valabil 12 luni
         </p>
       </form>
     </motion.div>

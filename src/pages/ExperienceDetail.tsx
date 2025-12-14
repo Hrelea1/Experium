@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +9,6 @@ import {
   MapPin, 
   Clock, 
   Users, 
-  Calendar,
   Heart,
   Share2,
   Check,
@@ -19,6 +18,15 @@ import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BookingForm } from "@/components/booking/BookingForm";
+
+interface RecommendedExperience {
+  id: string;
+  title: string;
+  location_name: string;
+  price: number;
+  avg_rating: number;
+  experience_images: { image_url: string; is_primary: boolean }[];
+}
 
 // Mock data - in production this would come from an API
 const experiencesData: Record<string, {
@@ -154,6 +162,7 @@ export default function ExperienceDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [experience, setExperience] = useState<any>(null);
+  const [recommendedExperiences, setRecommendedExperiences] = useState<RecommendedExperience[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -211,7 +220,31 @@ export default function ExperienceDetail() {
       }
     };
 
+    const fetchRecommended = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('experiences')
+          .select(`
+            id,
+            title,
+            location_name,
+            price,
+            avg_rating,
+            experience_images (image_url, is_primary)
+          `)
+          .eq('is_active', true)
+          .neq('id', id)
+          .limit(4);
+
+        if (error) throw error;
+        setRecommendedExperiences(data || []);
+      } catch (error) {
+        console.error('Error fetching recommended:', error);
+      }
+    };
+
     fetchExperience();
+    fetchRecommended();
   }, [id, toast]);
 
   if (loading) {
@@ -378,6 +411,60 @@ export default function ExperienceDetail() {
               />
             </motion.div>
           </div>
+
+          {/* Recommended Experiences Section */}
+          {recommendedExperiences.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-16"
+            >
+              <h2 className="text-2xl font-bold text-foreground mb-6">
+                Experiențe Recomandate
+              </h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {recommendedExperiences.map((rec) => {
+                  const primaryImage = rec.experience_images?.find(img => img.is_primary);
+                  const imageUrl = primaryImage?.image_url || 
+                    rec.experience_images?.[0]?.image_url || 
+                    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop";
+                  
+                  return (
+                    <Link
+                      key={rec.id}
+                      to={`/experience/${rec.id}`}
+                      className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50"
+                    >
+                      <div className="relative h-40 overflow-hidden">
+                        <img
+                          src={imageUrl}
+                          alt={rec.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="p-4">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                          <MapPin className="w-3 h-3" />
+                          {rec.location_name}
+                        </div>
+                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                          {rec.title}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <span className="text-primary font-bold">{rec.price} lei</span>
+                          <div className="flex items-center gap-1 text-sm">
+                            <Star className="w-4 h-4 fill-accent text-accent" />
+                            <span>{rec.avg_rating?.toFixed(1) || "N/A"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.section>
+          )}
         </div>
       </main>
 
