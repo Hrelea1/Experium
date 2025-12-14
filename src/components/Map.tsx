@@ -134,13 +134,21 @@ const Map = ({ experiences, userLocation, onExperienceClick }: MapProps) => {
     );
   }
 
-  if (error || !mapboxToken) {
+  if (error) {
     return (
       <div className="flex items-center justify-center h-full bg-muted rounded-lg">
         <div className="text-center p-8">
-          <p className="text-muted-foreground">
-            {error || 'Harta nu este disponibilă'}
-          </p>
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!mapboxToken) {
+    return (
+      <div className="flex items-center justify-center h-full bg-muted rounded-lg">
+        <div className="text-center p-8">
+          <p className="text-muted-foreground">Se încarcă harta...</p>
         </div>
       </div>
     );
