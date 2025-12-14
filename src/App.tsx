@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
 import Index from "./pages/Index";
 import ExperienceDetail from "./pages/ExperienceDetail";
 import CategorySearch from "./pages/CategorySearch";
@@ -36,42 +37,44 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <HashRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/experience/:id" element={<ExperienceDetail />} />
-            <Route path="/category/:category" element={<CategorySearch />} />
-            <Route path="/map" element={<MapView />} />
-            <Route path="/my-vouchers" element={<MyVouchers />} />
-            <Route path="/my-bookings" element={<MyBookings />} />
-            <Route path="/redeem-voucher" element={<RedeemVoucher />} />
-            <Route path="/voucher-confirmation" element={<VoucherConfirmation />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/gift-ideas" element={<GiftIdeas />} />
-            <Route path="/partners" element={<Partners />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/content" element={<ContentEditor />} />
-            <Route path="/admin/content/audit" element={<ContentAudit />} />
-            <Route path="/admin/experiences" element={<ManageExperiences />} />
-            <Route path="/admin/experiences/create" element={<ExperienceBuilder />} />
-            <Route path="/admin/bookings" element={<ManageBookings />} />
-            <Route path="/admin/orders" element={<ManageOrders />} />
-            <Route path="/admin/orders/create" element={<VoucherBuilder />} />
-            <Route path="/admin/roles" element={<ManageRoles />} />
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </HashRouter>
-      </TooltipProvider>
+      <CartProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <HashRouter>
+            <ScrollToTop />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/experience/:id" element={<ExperienceDetail />} />
+              <Route path="/category/:category" element={<CategorySearch />} />
+              <Route path="/map" element={<MapView />} />
+              <Route path="/my-vouchers" element={<MyVouchers />} />
+              <Route path="/my-bookings" element={<MyBookings />} />
+              <Route path="/redeem-voucher" element={<RedeemVoucher />} />
+              <Route path="/voucher-confirmation" element={<VoucherConfirmation />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/gift-ideas" element={<GiftIdeas />} />
+              <Route path="/partners" element={<Partners />} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/content" element={<ContentEditor />} />
+              <Route path="/admin/content/audit" element={<ContentAudit />} />
+              <Route path="/admin/experiences" element={<ManageExperiences />} />
+              <Route path="/admin/experiences/create" element={<ExperienceBuilder />} />
+              <Route path="/admin/bookings" element={<ManageBookings />} />
+              <Route path="/admin/orders" element={<ManageOrders />} />
+              <Route path="/admin/orders/create" element={<VoucherBuilder />} />
+              <Route path="/admin/roles" element={<ManageRoles />} />
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </HashRouter>
+        </TooltipProvider>
+      </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

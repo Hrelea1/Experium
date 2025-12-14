@@ -409,7 +409,10 @@ export default function ExperienceDetail() {
               className="lg:sticky lg:top-24 lg:self-start"
             >
               <BookingForm 
-                experience={experience}
+                experience={{
+                  ...experience,
+                  image: experience.gallery?.[0] || experience.image
+                }}
               />
             </motion.div>
           </div>

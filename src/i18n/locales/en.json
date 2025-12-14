@@ -310,7 +310,17 @@
     "vat": "VAT (19%)",
     "total": "Total",
     "checkout": "Complete Order",
-    "securePayment": "Secure payment • Free cancellation 48h before"
+    "securePayment": "Secure payment • Free cancellation 48h before",
+    "addedToCart": "Added to cart! 🎉",
+    "addedToCartDesc": "has been added to cart"
+  },
+  "booking": {
+    "perPerson": "person",
+    "savings": "You save {{amount}} lei on this order!",
+    "participants": "Number of people",
+    "max": "max",
+    "dateInfo": "The experience date is selected after purchase when you use the voucher code.",
+    "securityNote": "Secure payment • Voucher valid for 12 months"
   },
   "experience": {
     "recommended": "Recommended Experiences",

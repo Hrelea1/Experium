@@ -1,28 +1,30 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Users, CreditCard, ShoppingBag } from "lucide-react";
+import { Users, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
+import { useTranslation } from "react-i18next";
 
 interface BookingFormProps {
   experience: {
-    id: string; // UUID from database
+    id: string;
     title: string;
+    location: string;
     price: number;
     originalPrice?: number;
     maxParticipants: number;
+    image?: string;
   };
 }
 
 export function BookingForm({ experience }: BookingFormProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { addItem } = useCart();
+  const { t } = useTranslation();
   const [participants, setParticipants] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const totalPrice = experience.price * participants;
   const savings = experience.originalPrice 
@@ -32,61 +34,23 @@ export function BookingForm({ experience }: BookingFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) {
-      toast({
-        title: "Autentificare necesară",
-        description: "Trebuie să fii autentificat pentru a adăuga în coș.",
-        variant: "destructive",
+    // Add to cart for each participant
+    for (let i = 0; i < participants; i++) {
+      addItem({
+        id: `${experience.id}-${Date.now()}-${i}`,
+        title: experience.title,
+        location: experience.location,
+        price: experience.price,
+        image: experience.image || "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=200&h=200&fit=crop",
       });
-      navigate("/auth");
-      return;
     }
 
-    setIsSubmitting(true);
-    
-    try {
-      // Create a voucher for the experience
-      const { data: voucherData, error: voucherError } = await supabase.functions.invoke('create-voucher', {
-        body: {
-          experienceId: experience.id,
-          validityMonths: 12
-        }
-      });
+    toast({
+      title: t('cart.addedToCart'),
+      description: `${experience.title} ${t('cart.addedToCartDesc')}`,
+    });
 
-      if (voucherError) throw voucherError;
-
-      // Assign voucher to user
-      const { error: updateError } = await supabase
-        .from('vouchers')
-        .update({ 
-          user_id: user.id,
-        })
-        .eq('id', voucherData.voucher.id);
-
-      if (updateError) {
-        console.error('Failed to update voucher:', updateError);
-      }
-
-      toast({
-        title: "Adăugat în coș! 🎉",
-        description: `${experience.title} a fost adăugat în coș. Poți alege data după verificarea codului voucher.`,
-      });
-
-      // Navigate to cart
-      setTimeout(() => {
-        navigate("/cart");
-      }, 1500);
-
-    } catch (error: any) {
-      console.error('Error:', error);
-      toast({
-        title: "Eroare",
-        description: error.message || "A apărut o eroare.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate("/cart");
   };
 
   return (
@@ -99,17 +63,17 @@ export function BookingForm({ experience }: BookingFormProps) {
       {/* Price Header */}
       <div className="bg-gradient-to-r from-primary to-coral-dark p-6 text-primary-foreground">
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-bold">{experience.price} lei</span>
+          <span className="text-3xl font-bold">{experience.price} {t('common.lei')}</span>
           {experience.originalPrice && (
             <span className="text-primary-foreground/70 line-through text-lg">
-              {experience.originalPrice} lei
+              {experience.originalPrice} {t('common.lei')}
             </span>
           )}
-          <span className="text-primary-foreground/80">/ persoană</span>
+          <span className="text-primary-foreground/80">/ {t('booking.perPerson')}</span>
         </div>
         {savings > 0 && (
           <p className="text-primary-foreground/90 text-sm mt-1">
-            Economisești {savings} lei la această comandă!
+            {t('booking.savings', { amount: savings })}
           </p>
         )}
       </div>
@@ -120,7 +84,7 @@ export function BookingForm({ experience }: BookingFormProps) {
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
             <Users className="w-4 h-4 text-primary" />
-            Număr persoane
+            {t('booking.participants')}
           </label>
           <div className="flex items-center gap-3">
             <button
@@ -141,7 +105,7 @@ export function BookingForm({ experience }: BookingFormProps) {
               +
             </button>
             <span className="text-sm text-muted-foreground ml-2">
-              (max {experience.maxParticipants})
+              ({t('booking.max')} {experience.maxParticipants})
             </span>
           </div>
         </div>
@@ -149,15 +113,15 @@ export function BookingForm({ experience }: BookingFormProps) {
         {/* Info about date selection */}
         <div className="bg-muted/50 rounded-xl p-4">
           <p className="text-sm text-muted-foreground">
-            📅 Data experienței se selectează după achiziție, când folosești codul voucher.
+            📅 {t('booking.dateInfo')}
           </p>
         </div>
 
         {/* Total */}
         <div className="border-t border-border pt-4">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-muted-foreground">Total</span>
-            <span className="text-2xl font-bold text-foreground">{totalPrice} lei</span>
+            <span className="text-muted-foreground">{t('cart.total')}</span>
+            <span className="text-2xl font-bold text-foreground">{totalPrice} {t('common.lei')}</span>
           </div>
         </div>
 
@@ -166,28 +130,14 @@ export function BookingForm({ experience }: BookingFormProps) {
           type="submit" 
           size="xl" 
           className="w-full"
-          disabled={isSubmitting}
         >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <motion.span
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
-              />
-              Se procesează...
-            </span>
-          ) : (
-            <>
-              <ShoppingBag className="w-5 h-5 mr-2" />
-              Adaugă în Coș
-            </>
-          )}
+          <ShoppingBag className="w-5 h-5 mr-2" />
+          {t('experience.addToCart')}
         </Button>
 
         {/* Security Note */}
         <p className="text-center text-xs text-muted-foreground">
-          🔒 Plată securizată • Voucher valabil 12 luni
+          🔒 {t('booking.securityNote')}
         </p>
       </form>
     </motion.div>
