@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, ChevronDown, Sparkles, Gift, Handshake, Globe } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
@@ -15,31 +15,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-const categories = [
-  { label: "Aventură", slug: "aventura", icon: "🏔️" },
-  { label: "Spa & Relaxare", slug: "spa-relaxare", icon: "🧖" },
-  { label: "Gastronomie", slug: "gastronomie", icon: "🍷" },
-  { label: "Artă & Cultură", slug: "arta-cultura", icon: "🎭" },
-  { label: "Sport", slug: "sport", icon: "⚽" },
-  { label: "Natură", slug: "natura", icon: "🌲" },
-  { label: "Romantic", slug: "romantic", icon: "💕" },
-  { label: "Călătorii", slug: "calatorii", icon: "✈️" },
-];
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { t, i18n } = useTranslation();
@@ -87,43 +67,6 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
-            {/* Categories Dropdown */}
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent text-muted-foreground hover:text-foreground font-medium">
-                    {t('nav.categories')}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid gap-3 p-4 w-[400px] md:w-[500px] md:grid-cols-2">
-                      {categories.map((category) => (
-                        <NavigationMenuLink key={category.slug} asChild>
-                          <Link
-                            to={`/category/${category.slug}`}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                          >
-                            <span className="text-2xl">{category.icon}</span>
-                            <span className="font-medium text-foreground">{category.label}</span>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            {/* Experiences Link */}
-            <Link
-              to="/category/toate-categoriile"
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group flex items-center gap-1"
-              aria-label="Vezi toate experiențele"
-            >
-              <Sparkles className="h-4 w-4" />
-              {t('nav.experiences')}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </Link>
-
             {/* Gift Ideas Link */}
             <Link
               to="/gift-ideas"
@@ -305,47 +248,6 @@ export function Header() {
             className="lg:hidden bg-card border-t border-border"
           >
             <nav className="container py-4 flex flex-col gap-2">
-              {/* Categories Accordion */}
-              <button
-                onClick={() => setMobileCategoriesOpen(!mobileCategoriesOpen)}
-                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors text-left flex items-center justify-between"
-              >
-                <span>{t('nav.categories')}</span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${mobileCategoriesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              <AnimatePresence>
-                {mobileCategoriesOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="pl-4"
-                  >
-                    {categories.map((category) => (
-                      <Link
-                        key={category.slug}
-                        to={`/category/${category.slug}`}
-                        className="px-4 py-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <span>{category.icon}</span>
-                        {category.label}
-                      </Link>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <Link
-                to="/category/toate-categoriile"
-                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Sparkles className="h-4 w-4" />
-                {t('nav.experiences')}
-              </Link>
-
               <Link
                 to="/gift-ideas"
                 className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
