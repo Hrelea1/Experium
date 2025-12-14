@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, MapPin, Sparkles, ChevronDown, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
 import heroBg from "@/assets/hero-bg.jpg";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
@@ -35,6 +36,8 @@ export function Hero() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("hero.allCategories");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { data: content } = useHomepageContent("hero");
   
@@ -57,8 +60,20 @@ export function Hero() {
     navigate(`/category/${slug}`);
   };
 
+  const handleToggleDropdown = () => {
+    if (!isCategoryOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+    setIsCategoryOpen(!isCategoryOpen);
+  };
+
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[85vh] flex items-center justify-center">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img
@@ -122,13 +137,14 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-card rounded-2xl p-4 shadow-xl max-w-3xl mx-auto relative z-[9999]"
+            className="bg-card rounded-2xl p-4 shadow-xl max-w-3xl mx-auto"
           >
             <div className="flex flex-col md:flex-row gap-3">
               {/* Category Dropdown */}
-              <div className="relative flex-1 z-50">
+              <div className="relative flex-1">
                 <button
-                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  ref={buttonRef}
+                  onClick={handleToggleDropdown}
                   className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-muted rounded-xl text-left hover:bg-muted/80 transition-colors"
                 >
                   <div className="flex items-center gap-2">
@@ -137,14 +153,19 @@ export function Hero() {
                   </div>
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isCategoryOpen ? "rotate-180" : ""}`} />
                 </button>
-                {isCategoryOpen && (
+                {isCategoryOpen && createPortal(
                   <>
                     <div 
-                      className="fixed inset-0 z-[998]" 
+                      className="fixed inset-0 z-[99998]" 
                       onClick={() => setIsCategoryOpen(false)} 
                     />
                     <div 
-                      className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border max-h-80 overflow-auto z-[999]"
+                      className="fixed bg-card rounded-xl shadow-2xl border border-border max-h-80 overflow-auto z-[99999] animate-fade-in"
+                      style={{
+                        top: dropdownPosition.top,
+                        left: dropdownPosition.left,
+                        width: dropdownPosition.width,
+                      }}
                     >
                       {categories.map((category) => (
                         <button
@@ -159,7 +180,8 @@ export function Hero() {
                         </button>
                       ))}
                     </div>
-                  </>
+                  </>,
+                  document.body
                 )}
               </div>
 
