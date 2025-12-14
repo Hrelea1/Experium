@@ -126,7 +126,7 @@ export function Hero() {
           >
             <div className="flex flex-col md:flex-row gap-3">
               {/* Category Dropdown */}
-              <div className="relative flex-1">
+              <div className="relative flex-1 z-50">
                 <button
                   onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                   className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-muted rounded-xl text-left hover:bg-muted/80 transition-colors"
@@ -138,23 +138,28 @@ export function Hero() {
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isCategoryOpen ? "rotate-180" : ""}`} />
                 </button>
                 {isCategoryOpen && (
-                  <div 
-                    className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border max-h-80 overflow-auto z-[100]"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setIsCategoryOpen(false);
-                        }}
-                        className="w-full px-4 py-3 text-left hover:bg-muted transition-colors first:rounded-t-xl last:rounded-b-xl text-foreground"
-                      >
-                        {t(category)}
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    <div 
+                      className="fixed inset-0 z-[998]" 
+                      onClick={() => setIsCategoryOpen(false)} 
+                    />
+                    <div 
+                      className="absolute top-full left-0 right-0 mt-2 bg-card rounded-xl shadow-2xl border border-border max-h-80 overflow-auto z-[999]"
+                    >
+                      {categories.map((category) => (
+                        <button
+                          key={category}
+                          onClick={() => {
+                            setSelectedCategory(category);
+                            setIsCategoryOpen(false);
+                          }}
+                          className="w-full px-4 py-3 text-left hover:bg-muted transition-colors first:rounded-t-xl last:rounded-b-xl text-foreground"
+                        >
+                          {t(category)}
+                        </button>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
 
