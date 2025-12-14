@@ -78,15 +78,15 @@ export function Hero() {
     setIsCategoryOpen(!isCategoryOpen);
   };
 
-  // Update position on scroll/resize when dropdown is open
+  // Close dropdown on scroll/resize
   useEffect(() => {
     if (isCategoryOpen) {
-      updateDropdownPosition();
-      window.addEventListener('scroll', updateDropdownPosition, true);
-      window.addEventListener('resize', updateDropdownPosition);
+      const handleClose = () => setIsCategoryOpen(false);
+      window.addEventListener('scroll', handleClose, true);
+      window.addEventListener('resize', handleClose);
       return () => {
-        window.removeEventListener('scroll', updateDropdownPosition, true);
-        window.removeEventListener('resize', updateDropdownPosition);
+        window.removeEventListener('scroll', handleClose, true);
+        window.removeEventListener('resize', handleClose);
       };
     }
   }, [isCategoryOpen]);
