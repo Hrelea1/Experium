@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useTranslation } from "react-i18next";
 import { SearchDialog } from "@/components/layout/SearchDialog";
@@ -21,6 +22,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { totalItems } = useCart();
   const { isAdmin } = useAdminCheck();
   const { t, i18n } = useTranslation();
 
@@ -151,6 +153,11 @@ export function Header() {
             >
               <Link to="/cart" aria-label="Coș de cumpărături">
                 <ShoppingBag className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium">
+                    {totalItems > 9 ? '9+' : totalItems}
+                  </span>
+                )}
               </Link>
             </Button>
             

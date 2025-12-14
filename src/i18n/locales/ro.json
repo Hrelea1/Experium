@@ -310,7 +310,17 @@
     "vat": "TVA (19%)",
     "total": "Total",
     "checkout": "Finalizează Comanda",
-    "securePayment": "Plată securizată • Anulare gratuită cu 48h înainte"
+    "securePayment": "Plată securizată • Anulare gratuită cu 48h înainte",
+    "addedToCart": "Adăugat în coș! 🎉",
+    "addedToCartDesc": "a fost adăugat în coș"
+  },
+  "booking": {
+    "perPerson": "persoană",
+    "savings": "Economisești {{amount}} lei la această comandă!",
+    "participants": "Număr persoane",
+    "max": "max",
+    "dateInfo": "Data experienței se selectează după achiziție, când folosești codul voucher.",
+    "securityNote": "Plată securizată • Voucher valabil 12 luni"
   },
   "experience": {
     "recommended": "Experiențe Recomandate",

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 
 interface GiftDetails {
   country: string;
@@ -26,19 +27,7 @@ export default function Cart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  // Mock cart items - in production this would come from state management
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      title: "Zbor cu Balonul în Transilvania",
-      location: "Brașov, Transilvania",
-      price: 899,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=200&h=200&fit=crop",
-      isGift: false,
-    },
-  ]);
+  const { items, removeItem, updateQuantity, toggleGift, subtotal } = useCart();
 
   const [giftDetails, setGiftDetails] = useState<GiftDetails>({
     country: "România",
@@ -50,34 +39,16 @@ export default function Cart() {
     instructions: "",
   });
 
-  const handleUpdateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  const handleRemoveItem = (id: number) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+  const handleRemoveItem = (id: string) => {
+    removeItem(id);
     toast({
       title: t('cart.itemRemoved'),
       description: t('cart.itemRemovedDesc'),
     });
   };
 
-  const handleToggleGift = (id: number, isGift: boolean) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, isGift } : item
-      )
-    );
-  };
-
-  const hasGiftItems = cartItems.some(item => item.isGift);
-  const isEmpty = cartItems.length === 0;
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const hasGiftItems = items.some(item => item.isGift);
+  const isEmpty = items.length === 0;
   const tax = subtotal * 0.19; // 19% VAT
   const total = subtotal + tax;
 
@@ -121,7 +92,7 @@ export default function Cart() {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2 space-y-4">
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <Card key={item.id} className="p-4">
                     <div className="flex gap-4">
                       <img
@@ -140,7 +111,7 @@ export default function Cart() {
                               variant="outline" 
                               size="icon" 
                               className="h-8 w-8"
-                              onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
@@ -151,7 +122,7 @@ export default function Cart() {
                               variant="outline" 
                               size="icon" 
                               className="h-8 w-8"
-                              onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -180,7 +151,7 @@ export default function Cart() {
                       </div>
                       <Switch 
                         checked={item.isGift}
-                        onCheckedChange={(checked) => handleToggleGift(item.id, checked)}
+                        onCheckedChange={(checked) => toggleGift(item.id, checked)}
                       />
                     </div>
                   </Card>
