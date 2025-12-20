@@ -110,10 +110,10 @@ export function BookingForm({ experience }: BookingFormProps) {
           </div>
         </div>
 
-        {/* Info about date selection */}
+        {/* Info about VAT included */}
         <div className="bg-muted/50 rounded-xl p-4">
           <p className="text-sm text-muted-foreground">
-            📅 {t('booking.dateInfo')}
+            💰 {t('booking.priceIncludesVat')}
           </p>
         </div>
 

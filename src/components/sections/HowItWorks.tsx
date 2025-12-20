@@ -18,6 +18,7 @@ const getSteps = (t: any) => [
     icon: Calendar,
     titleKey: "howItWorks.step3Title",
     descKey: "howItWorks.step3Desc",
+    extraInfo: "howItWorks.step3Extra",
   },
   {
     icon: PartyPopper,
@@ -80,6 +81,9 @@ export function HowItWorks() {
 
               <h3 className="text-xl font-bold mb-3">{t(step.titleKey)}</h3>
               <p className="text-secondary-foreground/70">{t(step.descKey)}</p>
+              {step.extraInfo && (
+                <p className="text-sm text-primary mt-2 font-medium">{t(step.extraInfo)}</p>
+              )}
             </motion.div>
           ))}
         </div>
