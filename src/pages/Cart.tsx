@@ -334,7 +334,6 @@ export default function Cart() {
           
           <Label className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
             <RadioGroupItem value="apple" />
-            <span className="font-semibold">🍎</span>
             <span className="font-medium text-sm sm:text-base">{t('cart.applePay')}</span>
           </Label>
           
