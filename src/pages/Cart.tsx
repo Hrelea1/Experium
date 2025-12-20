@@ -139,46 +139,46 @@ export default function Cart() {
   };
 
   const renderDeliveryTypeSelection = () => (
-    <Card className="p-6">
-      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <Package className="h-6 w-6 text-primary" />
+    <Card className="p-4 sm:p-6">
+      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+        <Package className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
         {t('cart.chooseDeliveryType')}
       </h3>
       
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => handleSelectDeliveryType('physical')}
-          className="p-6 rounded-xl border-2 border-border hover:border-primary transition-colors text-left group"
+          className="p-4 sm:p-6 rounded-xl border-2 border-border hover:border-primary transition-colors text-left group"
         >
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-            <Gift className="h-6 w-6 text-primary" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
+            <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
-          <h4 className="font-semibold text-lg mb-2">{t('cart.physicalBox')}</h4>
-          <p className="text-sm text-muted-foreground">{t('cart.physicalBoxDesc')}</p>
+          <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">{t('cart.physicalBox')}</h4>
+          <p className="text-xs sm:text-sm text-muted-foreground">{t('cart.physicalBoxDesc')}</p>
         </motion.button>
 
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => handleSelectDeliveryType('digital')}
-          className="p-6 rounded-xl border-2 border-border hover:border-primary transition-colors text-left group"
+          className="p-4 sm:p-6 rounded-xl border-2 border-border hover:border-primary transition-colors text-left group"
         >
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-            <Mail className="h-6 w-6 text-primary" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-primary/20 transition-colors">
+            <Mail className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
           </div>
-          <h4 className="font-semibold text-lg mb-2">{t('cart.digitalBox')}</h4>
-          <p className="text-sm text-muted-foreground">{t('cart.digitalBoxDesc')}</p>
+          <h4 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">{t('cart.digitalBox')}</h4>
+          <p className="text-xs sm:text-sm text-muted-foreground">{t('cart.digitalBoxDesc')}</p>
         </motion.button>
       </div>
     </Card>
   );
 
   const renderPersonalDetails = () => (
-    <Card className="p-6">
-      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <User className="h-6 w-6 text-primary" />
+    <Card className="p-4 sm:p-6">
+      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+        <User className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
         {t('cart.personalDetails')}
       </h3>
       
@@ -221,8 +221,8 @@ export default function Cart() {
         )}
       </div>
 
-      <div className="flex gap-4 mt-6">
-        <Button variant="outline" onClick={() => setCheckoutStep(0)}>
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
+        <Button variant="outline" onClick={() => setCheckoutStep(0)} className="w-full sm:w-auto">
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t('cart.backToCart')}
         </Button>
@@ -235,9 +235,9 @@ export default function Cart() {
   );
 
   const renderDeliveryAddress = () => (
-    <Card className="p-6">
-      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <MapPin className="h-6 w-6 text-primary" />
+    <Card className="p-4 sm:p-6">
+      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+        <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
         {t('cart.deliveryAddress')}
       </h3>
       
@@ -298,8 +298,8 @@ export default function Cart() {
         </div>
       </div>
 
-      <div className="flex gap-4 mt-6">
-        <Button variant="outline" onClick={() => setCheckoutStep(1)}>
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
+        <Button variant="outline" onClick={() => setCheckoutStep(1)} className="w-full sm:w-auto">
           <ArrowLeft className="h-4 w-4 mr-2" />
           {t('cart.backToDetails')}
         </Button>
@@ -312,44 +312,45 @@ export default function Cart() {
   );
 
   const renderPaymentMethod = () => (
-    <Card className="p-6">
-      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <CreditCard className="h-6 w-6 text-primary" />
+    <Card className="p-4 sm:p-6">
+      <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+        <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
         {t('cart.selectPaymentMethod')}
       </h3>
       
       <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
-        <div className="space-y-3">
-          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+        <div className="space-y-2 sm:space-y-3">
+          <Label className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
             <RadioGroupItem value="card" />
-            <CreditCard className="h-5 w-5" />
-            <span className="font-medium">{t('cart.creditCard')}</span>
+            <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="font-medium text-sm sm:text-base">{t('cart.creditCard')}</span>
           </Label>
           
-          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+          <Label className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
             <RadioGroupItem value="transfer" />
-            <Building className="h-5 w-5" />
-            <span className="font-medium">{t('cart.bankTransfer')}</span>
+            <Building className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="font-medium text-sm sm:text-base">{t('cart.bankTransfer')}</span>
           </Label>
           
-          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+          <Label className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
             <RadioGroupItem value="apple" />
             <span className="font-semibold">🍎</span>
-            <span className="font-medium">{t('cart.applePay')}</span>
+            <span className="font-medium text-sm sm:text-base">{t('cart.applePay')}</span>
           </Label>
           
-          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+          <Label className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
             <RadioGroupItem value="google" />
             <span className="font-semibold">G</span>
-            <span className="font-medium">{t('cart.googlePay')}</span>
+            <span className="font-medium text-sm sm:text-base">{t('cart.googlePay')}</span>
           </Label>
         </div>
       </RadioGroup>
 
-      <div className="flex gap-4 mt-6">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
         <Button 
           variant="outline" 
           onClick={() => setCheckoutStep(deliveryType === 'digital' ? 1 : 2)}
+          className="w-full sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           {deliveryType === 'digital' ? t('cart.backToDetails') : t('cart.backToAddress')}
@@ -388,28 +389,28 @@ export default function Cart() {
     const totalSteps = steps.length;
 
     return (
-      <div className="mb-6">
+      <div className="mb-6 overflow-hidden">
         <div className="flex items-center justify-between mb-2">
           {steps.map((step, index) => (
-            <div key={step} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+            <div key={step} className="flex items-center flex-1 last:flex-none">
+              <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-colors shrink-0 ${
                 index <= currentStep 
                   ? 'bg-primary text-primary-foreground' 
                   : 'bg-muted text-muted-foreground'
               }`}>
-                {index < currentStep ? <Check className="h-4 w-4" /> : index + 1}
+                {index < currentStep ? <Check className="h-3 w-3 sm:h-4 sm:w-4" /> : index + 1}
               </div>
               {index < totalSteps - 1 && (
-                <div className={`w-full h-1 mx-2 rounded ${
+                <div className={`flex-1 h-0.5 sm:h-1 mx-1 sm:mx-2 rounded min-w-[20px] ${
                   index < currentStep ? 'bg-primary' : 'bg-muted'
-                }`} style={{ minWidth: '40px' }} />
+                }`} />
               )}
             </div>
           ))}
         </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="flex justify-between text-[10px] sm:text-xs text-muted-foreground">
           {steps.map((step, index) => (
-            <span key={step} className={index <= currentStep ? 'text-primary font-medium' : ''}>
+            <span key={step} className={`text-center flex-1 last:flex-none ${index <= currentStep ? 'text-primary font-medium' : ''}`}>
               {step}
             </span>
           ))}
@@ -419,25 +420,25 @@ export default function Cart() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16 bg-background">
-      <div className="container max-w-6xl">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-12 sm:pb-16 bg-background overflow-x-hidden">
+      <div className="container max-w-6xl px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => checkoutStep > 0 ? setCheckoutStep(0) : navigate('/')}
-              className="shrink-0"
+              className="shrink-0 h-8 w-8 sm:h-10 sm:w-10"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <div className="flex items-center gap-3">
-              <ShoppingBag className="h-8 w-8 text-primary" />
-              <h1 className="text-4xl font-bold text-foreground">{t('cart.title')}</h1>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <ShoppingBag className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <h1 className="text-2xl sm:text-4xl font-bold text-foreground">{t('cart.title')}</h1>
             </div>
           </div>
 
@@ -460,52 +461,52 @@ export default function Cart() {
               <div className="lg:col-span-2 space-y-4">
                 {/* Cart Items - always visible */}
                 {items.map((item) => (
-                  <Card key={item.id} className="p-4">
-                    <div className="flex gap-4">
+                  <Card key={item.id} className="p-3 sm:p-4">
+                    <div className="flex gap-3 sm:gap-4">
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-24 h-24 rounded-lg object-cover"
+                        className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0"
                       />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm sm:text-lg mb-1 truncate">{item.title}</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 truncate">
                           {item.location}
                         </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex items-center gap-2 sm:gap-3">
                             <Button 
                               variant="outline" 
                               size="icon" 
-                              className="h-8 w-8"
+                              className="h-7 w-7 sm:h-8 sm:w-8"
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               disabled={checkoutStep > 0}
                             >
-                              <Minus className="h-4 w-4" />
+                              <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
-                            <span className="font-medium w-8 text-center">
+                            <span className="font-medium w-6 sm:w-8 text-center text-sm sm:text-base">
                               {item.quantity}
                             </span>
                             <Button 
                               variant="outline" 
                               size="icon" 
-                              className="h-8 w-8"
+                              className="h-7 w-7 sm:h-8 sm:w-8"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               disabled={checkoutStep > 0}
                             >
-                              <Plus className="h-4 w-4" />
+                              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           </div>
-                          <div className="flex items-center gap-4">
-                            <span className="font-bold text-lg">{item.price} {t('common.lei')}</span>
+                          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4">
+                            <span className="font-bold text-sm sm:text-lg">{item.price} {t('common.lei')}</span>
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-8 w-8"
+                              className="h-7 w-7 sm:h-8 sm:w-8"
                               onClick={() => handleRemoveItem(item.id)}
                               disabled={checkoutStep > 0}
                             >
-                              <X className="h-4 w-4" />
+                              <X className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           </div>
                         </div>
@@ -535,8 +536,8 @@ export default function Cart() {
 
               {/* Order Summary */}
               <div className="lg:col-span-1">
-                <Card className="p-6 sticky top-24">
-                  <h2 className="text-xl font-bold mb-4">{t('cart.orderSummary')}</h2>
+                <Card className="p-4 sm:p-6 sticky top-20 sm:top-24">
+                  <h2 className="text-lg sm:text-xl font-bold mb-4">{t('cart.orderSummary')}</h2>
                   
                   {/* Delivery type badge */}
                   {deliveryType && (
