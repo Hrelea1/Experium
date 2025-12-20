@@ -1,46 +1,58 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { ShoppingBag, X, Plus, Minus, ArrowRight, ArrowLeft, Gift, MapPin, Phone, FileText, CreditCard } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  ShoppingBag, 
+  X, 
+  Plus, 
+  Minus, 
+  ArrowRight, 
+  ArrowLeft, 
+  Gift, 
+  MapPin, 
+  Phone, 
+  CreditCard,
+  Package,
+  Mail,
+  User,
+  Check,
+  Building
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
-import { useCart } from "@/contexts/CartContext";
+import { useCart, DeliveryType } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface GiftDetails {
-  country: string;
-  county: string;
-  city: string;
-  address: string;
-  postcode: string;
-  phone: string;
-  instructions: string;
-}
+type PaymentMethod = 'card' | 'transfer' | 'apple' | 'google';
 
 export default function Cart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { items, removeItem, updateQuantity, toggleGift, subtotal, clearCart } = useCart();
+  const { 
+    items, 
+    removeItem, 
+    updateQuantity, 
+    totalWithVat, 
+    clearCart,
+    deliveryType,
+    setDeliveryType,
+    personalDetails,
+    setPersonalDetails,
+    deliveryAddress,
+    setDeliveryAddress,
+    checkoutStep,
+    setCheckoutStep
+  } = useCart();
   const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const [giftDetails, setGiftDetails] = useState<GiftDetails>({
-    country: "România",
-    county: "",
-    city: "",
-    address: "",
-    postcode: "",
-    phone: "",
-    instructions: "",
-  });
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
 
   const handleRemoveItem = (id: string) => {
     removeItem(id);
@@ -50,10 +62,43 @@ export default function Cart() {
     });
   };
 
-  const hasGiftItems = items.some(item => item.isGift);
   const isEmpty = items.length === 0;
-  const tax = subtotal * 0.19;
-  const total = subtotal + tax;
+
+  const handleSelectDeliveryType = (type: DeliveryType) => {
+    setDeliveryType(type);
+    setCheckoutStep(1);
+  };
+
+  const handlePersonalDetailsSubmit = () => {
+    if (!personalDetails.fullName || !personalDetails.email) {
+      toast({
+        title: "Date incomplete",
+        description: "Te rugăm să completezi toate câmpurile obligatorii",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (deliveryType === 'digital') {
+      // Skip to payment for digital
+      setCheckoutStep(3);
+    } else {
+      // Go to address for physical
+      setCheckoutStep(2);
+    }
+  };
+
+  const handleAddressSubmit = () => {
+    if (!deliveryAddress.county || !deliveryAddress.city || !deliveryAddress.address) {
+      toast({
+        title: "Adresă incompletă",
+        description: "Te rugăm să completezi toate câmpurile obligatorii",
+        variant: "destructive",
+      });
+      return;
+    }
+    setCheckoutStep(3);
+  };
 
   const handleCheckout = () => {
     if (!user) {
@@ -68,17 +113,309 @@ export default function Cart() {
 
     setIsProcessing(true);
     
-    // Simulate payment processing
     setTimeout(() => {
       navigate("/order-confirmation", {
         state: {
           cartItems: items,
+          deliveryType,
+          personalDetails,
+          deliveryAddress: deliveryType === 'physical' ? deliveryAddress : null,
         },
       });
       
       clearCart();
       setIsProcessing(false);
     }, 1500);
+  };
+
+  const getStepTitle = () => {
+    switch (checkoutStep) {
+      case 0: return t('cart.chooseDeliveryType');
+      case 1: return t('cart.personalDetails');
+      case 2: return t('cart.deliveryAddress');
+      case 3: return t('cart.paymentMethod');
+      default: return t('cart.title');
+    }
+  };
+
+  const renderDeliveryTypeSelection = () => (
+    <Card className="p-6">
+      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+        <Package className="h-6 w-6 text-primary" />
+        {t('cart.chooseDeliveryType')}
+      </h3>
+      
+      <div className="grid sm:grid-cols-2 gap-4">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => handleSelectDeliveryType('physical')}
+          className="p-6 rounded-xl border-2 border-border hover:border-primary transition-colors text-left group"
+        >
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+            <Gift className="h-6 w-6 text-primary" />
+          </div>
+          <h4 className="font-semibold text-lg mb-2">{t('cart.physicalBox')}</h4>
+          <p className="text-sm text-muted-foreground">{t('cart.physicalBoxDesc')}</p>
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => handleSelectDeliveryType('digital')}
+          className="p-6 rounded-xl border-2 border-border hover:border-primary transition-colors text-left group"
+        >
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+            <Mail className="h-6 w-6 text-primary" />
+          </div>
+          <h4 className="font-semibold text-lg mb-2">{t('cart.digitalBox')}</h4>
+          <p className="text-sm text-muted-foreground">{t('cart.digitalBoxDesc')}</p>
+        </motion.button>
+      </div>
+    </Card>
+  );
+
+  const renderPersonalDetails = () => (
+    <Card className="p-6">
+      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+        <User className="h-6 w-6 text-primary" />
+        {t('cart.personalDetails')}
+      </h3>
+      
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="fullName">{t('cart.fullName')} *</Label>
+          <Input
+            id="fullName"
+            value={personalDetails.fullName}
+            onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })}
+            placeholder={t('cart.fullNamePlaceholder')}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">{t('cart.email')} *</Label>
+          <Input
+            id="email"
+            type="email"
+            value={personalDetails.email}
+            onChange={(e) => setPersonalDetails({ ...personalDetails, email: e.target.value })}
+            placeholder={t('cart.emailPlaceholder')}
+          />
+        </div>
+
+        {deliveryType === 'physical' && (
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="flex items-center gap-2">
+              <Phone className="h-4 w-4" />
+              {t('cart.phone')}
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={personalDetails.phone}
+              onChange={(e) => setPersonalDetails({ ...personalDetails, phone: e.target.value })}
+              placeholder="+40 7XX XXX XXX"
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-4 mt-6">
+        <Button variant="outline" onClick={() => setCheckoutStep(0)}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {t('cart.backToCart')}
+        </Button>
+        <Button onClick={handlePersonalDetailsSubmit} className="flex-1">
+          {deliveryType === 'digital' ? t('cart.continueToPayment') : t('cart.continueToAddress')}
+          <ArrowRight className="h-4 w-4 ml-2" />
+        </Button>
+      </div>
+    </Card>
+  );
+
+  const renderDeliveryAddress = () => (
+    <Card className="p-6">
+      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+        <MapPin className="h-6 w-6 text-primary" />
+        {t('cart.deliveryAddress')}
+      </h3>
+      
+      <div className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="country">{t('cart.country')}</Label>
+            <Input
+              id="country"
+              value={deliveryAddress.country}
+              onChange={(e) => setDeliveryAddress({ ...deliveryAddress, country: e.target.value })}
+              placeholder="România"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="county">{t('cart.county')} *</Label>
+            <Input
+              id="county"
+              value={deliveryAddress.county}
+              onChange={(e) => setDeliveryAddress({ ...deliveryAddress, county: e.target.value })}
+              placeholder={t('cart.countyPlaceholder')}
+            />
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="city">{t('cart.city')} *</Label>
+            <Input
+              id="city"
+              value={deliveryAddress.city}
+              onChange={(e) => setDeliveryAddress({ ...deliveryAddress, city: e.target.value })}
+              placeholder={t('cart.cityPlaceholder')}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="postcode">{t('cart.postcode')}</Label>
+            <Input
+              id="postcode"
+              value={deliveryAddress.postcode}
+              onChange={(e) => setDeliveryAddress({ ...deliveryAddress, postcode: e.target.value })}
+              placeholder="123456"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="address" className="flex items-center gap-2">
+            <Building className="h-4 w-4" />
+            {t('cart.address')} *
+          </Label>
+          <Input
+            id="address"
+            value={deliveryAddress.address}
+            onChange={(e) => setDeliveryAddress({ ...deliveryAddress, address: e.target.value })}
+            placeholder={t('cart.addressPlaceholder')}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-4 mt-6">
+        <Button variant="outline" onClick={() => setCheckoutStep(1)}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {t('cart.backToDetails')}
+        </Button>
+        <Button onClick={handleAddressSubmit} className="flex-1">
+          {t('cart.continueToPayment')}
+          <ArrowRight className="h-4 w-4 ml-2" />
+        </Button>
+      </div>
+    </Card>
+  );
+
+  const renderPaymentMethod = () => (
+    <Card className="p-6">
+      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+        <CreditCard className="h-6 w-6 text-primary" />
+        {t('cart.selectPaymentMethod')}
+      </h3>
+      
+      <RadioGroup value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
+        <div className="space-y-3">
+          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+            <RadioGroupItem value="card" />
+            <CreditCard className="h-5 w-5" />
+            <span className="font-medium">{t('cart.creditCard')}</span>
+          </Label>
+          
+          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+            <RadioGroupItem value="transfer" />
+            <Building className="h-5 w-5" />
+            <span className="font-medium">{t('cart.bankTransfer')}</span>
+          </Label>
+          
+          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+            <RadioGroupItem value="apple" />
+            <span className="font-semibold">🍎</span>
+            <span className="font-medium">{t('cart.applePay')}</span>
+          </Label>
+          
+          <Label className="flex items-center gap-4 p-4 rounded-xl border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+            <RadioGroupItem value="google" />
+            <span className="font-semibold">G</span>
+            <span className="font-medium">{t('cart.googlePay')}</span>
+          </Label>
+        </div>
+      </RadioGroup>
+
+      <div className="flex gap-4 mt-6">
+        <Button 
+          variant="outline" 
+          onClick={() => setCheckoutStep(deliveryType === 'digital' ? 1 : 2)}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {deliveryType === 'digital' ? t('cart.backToDetails') : t('cart.backToAddress')}
+        </Button>
+        <Button 
+          onClick={handleCheckout} 
+          disabled={isProcessing}
+          className="flex-1"
+        >
+          {isProcessing ? (
+            <>
+              <motion.span
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full mr-2"
+              />
+              {t('cart.processing')}
+            </>
+          ) : (
+            <>
+              <Check className="mr-2 h-5 w-5" />
+              {t('cart.checkout')}
+            </>
+          )}
+        </Button>
+      </div>
+    </Card>
+  );
+
+  const renderCheckoutProgress = () => {
+    const steps = deliveryType === 'digital' 
+      ? ['Tip livrare', 'Date personale', 'Plată']
+      : ['Tip livrare', 'Date personale', 'Adresă', 'Plată'];
+    
+    const currentStep = deliveryType === 'digital' && checkoutStep === 3 ? 2 : checkoutStep;
+    const totalSteps = steps.length;
+
+    return (
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          {steps.map((step, index) => (
+            <div key={step} className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                index <= currentStep 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted text-muted-foreground'
+              }`}>
+                {index < currentStep ? <Check className="h-4 w-4" /> : index + 1}
+              </div>
+              {index < totalSteps - 1 && (
+                <div className={`w-full h-1 mx-2 rounded ${
+                  index < currentStep ? 'bg-primary' : 'bg-muted'
+                }`} style={{ minWidth: '40px' }} />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground">
+          {steps.map((step, index) => (
+            <span key={step} className={index <= currentStep ? 'text-primary font-medium' : ''}>
+              {step}
+            </span>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -93,7 +430,7 @@ export default function Cart() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/')}
+              onClick={() => checkoutStep > 0 ? setCheckoutStep(0) : navigate('/')}
               className="shrink-0"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -119,8 +456,9 @@ export default function Cart() {
             </Card>
           ) : (
             <div className="grid lg:grid-cols-3 gap-8">
-              {/* Cart Items */}
+              {/* Cart Items & Checkout Flow */}
               <div className="lg:col-span-2 space-y-4">
+                {/* Cart Items - always visible */}
                 {items.map((item) => (
                   <Card key={item.id} className="p-4">
                     <div className="flex gap-4">
@@ -141,6 +479,7 @@ export default function Cart() {
                               size="icon" 
                               className="h-8 w-8"
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              disabled={checkoutStep > 0}
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
@@ -152,6 +491,7 @@ export default function Cart() {
                               size="icon" 
                               className="h-8 w-8"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              disabled={checkoutStep > 0}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -163,6 +503,7 @@ export default function Cart() {
                               size="icon" 
                               className="h-8 w-8"
                               onClick={() => handleRemoveItem(item.id)}
+                              disabled={checkoutStep > 0}
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -170,122 +511,26 @@ export default function Cart() {
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Gift Toggle */}
-                    <Separator className="my-4" />
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Gift className="h-5 w-5 text-primary" />
-                        <span className="font-medium">{t('cart.sendAsGift')}</span>
-                      </div>
-                      <Switch 
-                        checked={item.isGift}
-                        onCheckedChange={(checked) => toggleGift(item.id, checked)}
-                      />
-                    </div>
                   </Card>
                 ))}
 
-                {/* Gift Shipping Details */}
-                {hasGiftItems && (
+                {/* Checkout Flow */}
+                <AnimatePresence mode="wait">
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
+                    key={checkoutStep}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <Card className="p-6">
-                      <div className="flex items-center gap-2 mb-6">
-                        <Gift className="h-6 w-6 text-primary" />
-                        <h3 className="text-xl font-bold">{t('cart.giftDeliveryDetails')}</h3>
-                      </div>
-                      
-                      <div className="grid gap-4">
-                        <div className="grid sm:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="country">{t('cart.country')}</Label>
-                            <Input
-                              id="country"
-                              value={giftDetails.country}
-                              onChange={(e) => setGiftDetails({...giftDetails, country: e.target.value})}
-                              placeholder="România"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="county">{t('cart.county')}</Label>
-                            <Input
-                              id="county"
-                              value={giftDetails.county}
-                              onChange={(e) => setGiftDetails({...giftDetails, county: e.target.value})}
-                              placeholder={t('cart.countyPlaceholder')}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="grid sm:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="city">{t('cart.city')}</Label>
-                            <Input
-                              id="city"
-                              value={giftDetails.city}
-                              onChange={(e) => setGiftDetails({...giftDetails, city: e.target.value})}
-                              placeholder={t('cart.cityPlaceholder')}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="postcode">{t('cart.postcode')}</Label>
-                            <Input
-                              id="postcode"
-                              value={giftDetails.postcode}
-                              onChange={(e) => setGiftDetails({...giftDetails, postcode: e.target.value})}
-                              placeholder="123456"
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="address" className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            {t('cart.address')}
-                          </Label>
-                          <Input
-                            id="address"
-                            value={giftDetails.address}
-                            onChange={(e) => setGiftDetails({...giftDetails, address: e.target.value})}
-                            placeholder={t('cart.addressPlaceholder')}
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="phone" className="flex items-center gap-2">
-                            <Phone className="h-4 w-4" />
-                            {t('cart.phone')}
-                          </Label>
-                          <Input
-                            id="phone"
-                            type="tel"
-                            value={giftDetails.phone}
-                            onChange={(e) => setGiftDetails({...giftDetails, phone: e.target.value})}
-                            placeholder="+40 7XX XXX XXX"
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="instructions" className="flex items-center gap-2">
-                            <FileText className="h-4 w-4" />
-                            {t('cart.deliveryInstructions')}
-                          </Label>
-                          <Textarea
-                            id="instructions"
-                            value={giftDetails.instructions}
-                            onChange={(e) => setGiftDetails({...giftDetails, instructions: e.target.value})}
-                            placeholder={t('cart.instructionsPlaceholder')}
-                            rows={3}
-                          />
-                        </div>
-                      </div>
-                    </Card>
+                    {checkoutStep > 0 && renderCheckoutProgress()}
+                    
+                    {checkoutStep === 0 && renderDeliveryTypeSelection()}
+                    {checkoutStep === 1 && renderPersonalDetails()}
+                    {checkoutStep === 2 && renderDeliveryAddress()}
+                    {checkoutStep === 3 && renderPaymentMethod()}
                   </motion.div>
-                )}
+                </AnimatePresence>
               </div>
 
               {/* Order Summary */}
@@ -293,48 +538,28 @@ export default function Cart() {
                 <Card className="p-6 sticky top-24">
                   <h2 className="text-xl font-bold mb-4">{t('cart.orderSummary')}</h2>
                   
-                  <div className="space-y-3 mb-4">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>{t('cart.subtotal')}</span>
-                      <span>{subtotal} {t('common.lei')}</span>
+                  {/* Delivery type badge */}
+                  {deliveryType && (
+                    <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-muted/50">
+                      {deliveryType === 'physical' ? (
+                        <Gift className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Mail className="h-5 w-5 text-primary" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {deliveryType === 'physical' ? t('cart.physicalBox') : t('cart.digitalBox')}
+                      </span>
                     </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>{t('cart.vat')}</span>
-                      <span>{tax.toFixed(2)} {t('common.lei')}</span>
-                    </div>
-                  </div>
+                  )}
 
                   <Separator className="my-4" />
 
                   <div className="flex justify-between text-lg font-bold mb-6">
-                    <span>{t('cart.total')}</span>
-                    <span>{total.toFixed(2)} {t('common.lei')}</span>
+                    <span>{t('cart.totalWithVat')}</span>
+                    <span>{totalWithVat.toFixed(2)} {t('common.lei')}</span>
                   </div>
 
-                  <Button 
-                    className="w-full" 
-                    size="lg" 
-                    onClick={handleCheckout}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <motion.span
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full mr-2"
-                        />
-                        {t('cart.processing')}
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="mr-2 h-5 w-5" />
-                        {t('cart.checkout')}
-                      </>
-                    )}
-                  </Button>
-
-                  <p className="text-xs text-muted-foreground text-center mt-4">
+                  <p className="text-xs text-muted-foreground text-center">
                     🔒 {t('cart.securePayment')}
                   </p>
                 </Card>

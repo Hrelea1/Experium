@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+export type DeliveryType = 'physical' | 'digital' | null;
+
 export interface CartItem {
   id: string;
   title: string;
@@ -8,6 +10,20 @@ export interface CartItem {
   quantity: number;
   image: string;
   isGift: boolean;
+}
+
+export interface PersonalDetails {
+  fullName: string;
+  email: string;
+  phone: string;
+}
+
+export interface DeliveryAddress {
+  country: string;
+  county: string;
+  city: string;
+  address: string;
+  postcode: string;
 }
 
 interface CartContextType {
@@ -19,11 +35,34 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   subtotal: number;
+  totalWithVat: number;
+  deliveryType: DeliveryType;
+  setDeliveryType: (type: DeliveryType) => void;
+  personalDetails: PersonalDetails;
+  setPersonalDetails: (details: PersonalDetails) => void;
+  deliveryAddress: DeliveryAddress;
+  setDeliveryAddress: (address: DeliveryAddress) => void;
+  checkoutStep: number;
+  setCheckoutStep: (step: number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'experium_cart';
+
+const initialPersonalDetails: PersonalDetails = {
+  fullName: '',
+  email: '',
+  phone: '',
+};
+
+const initialDeliveryAddress: DeliveryAddress = {
+  country: 'România',
+  county: '',
+  city: '',
+  address: '',
+  postcode: '',
+};
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(() => {
@@ -31,6 +70,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem(CART_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   });
+  const [deliveryType, setDeliveryType] = useState<DeliveryType>(null);
+  const [personalDetails, setPersonalDetails] = useState<PersonalDetails>(initialPersonalDetails);
+  const [deliveryAddress, setDeliveryAddress] = useState<DeliveryAddress>(initialDeliveryAddress);
+  const [checkoutStep, setCheckoutStep] = useState(0);
 
   // Persist to localStorage
   useEffect(() => {
@@ -72,10 +115,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
+    setDeliveryType(null);
+    setPersonalDetails(initialPersonalDetails);
+    setDeliveryAddress(initialDeliveryAddress);
+    setCheckoutStep(0);
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Price already includes VAT - no separate calculation needed
+  const totalWithVat = subtotal;
 
   return (
     <CartContext.Provider value={{
@@ -87,6 +136,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       clearCart,
       totalItems,
       subtotal,
+      totalWithVat,
+      deliveryType,
+      setDeliveryType,
+      personalDetails,
+      setPersonalDetails,
+      deliveryAddress,
+      setDeliveryAddress,
+      checkoutStep,
+      setCheckoutStep,
     }}>
       {children}
     </CartContext.Provider>
