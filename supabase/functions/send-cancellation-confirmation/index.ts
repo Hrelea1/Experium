@@ -4,19 +4,80 @@ import { Resend } from "https://esm.sh/resend@4.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  "https://822cb615-8c38-4524-bedf-f2603ff01820.lovableproject.com",
+  "http://localhost:5173",
+  "http://localhost:3000"
+];
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) 
+    ? origin 
+    : ALLOWED_ORIGINS[0];
+  
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return String(text || '').replace(/[&<>"']/g, (m) => map[m]);
+}
 
 interface CancellationConfirmationRequest {
   bookingId: string;
   refundEligible: boolean;
 }
 
+// Input validation
+function validateInput(data: unknown): CancellationConfirmationRequest {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid request body');
+  }
+  
+  const { bookingId, refundEligible } = data as Record<string, unknown>;
+  
+  // Validate bookingId - must be UUID format
+  if (!bookingId || typeof bookingId !== 'string') {
+    throw new Error('bookingId is required');
+  }
+  
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(bookingId)) {
+    throw new Error('bookingId must be a valid UUID');
+  }
+  
+  if (typeof refundEligible !== 'boolean') {
+    throw new Error('refundEligible must be a boolean');
+  }
+  
+  return { bookingId, refundEligible };
+}
+
 const handler = async (req: Request): Promise<Response> => {
+  const origin = req.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  if (req.method !== "POST") {
+    return new Response(
+      JSON.stringify({ error: "Method not allowed" }),
+      { status: 405, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
   }
 
   try {
@@ -30,24 +91,60 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { bookingId, refundEligible }: CancellationConfirmationRequest = await req.json();
+    // Verify user authentication
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.getUser();
 
-    // Fetch booking details
-    const { data: booking, error: bookingError } = await supabaseClient
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate input
+    const rawBody = await req.json();
+    const { bookingId, refundEligible } = validateInput(rawBody);
+
+    interface BookingWithExperience {
+      id: string;
+      booking_date: string;
+      participants: number;
+      total_price: number;
+      cancellation_reason: string | null;
+      user_id: string;
+      experiences: { title: string; location_name: string } | null;
+    }
+
+    // Fetch booking details - only for user's own bookings
+    const { data: bookingData, error: bookingError } = await supabaseClient
       .from("bookings")
       .select(`
-        *,
+        id,
+        booking_date,
+        participants,
+        total_price,
+        cancellation_reason,
+        user_id,
         experiences (
           title,
           location_name
         )
       `)
       .eq("id", bookingId)
+      .eq("user_id", user.id)
       .single();
 
-    if (bookingError || !booking) {
-      throw new Error("Booking not found");
+    if (bookingError || !bookingData) {
+      return new Response(
+        JSON.stringify({ error: "Booking not found" }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
+
+    const booking = bookingData as unknown as BookingWithExperience;
 
     // Fetch user profile
     const { data: profile } = await supabaseClient
@@ -55,6 +152,13 @@ const handler = async (req: Request): Promise<Response> => {
       .select("full_name, email")
       .eq("id", booking.user_id)
       .single();
+
+    if (!profile?.email) {
+      return new Response(
+        JSON.stringify({ error: "User email not found" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     const bookingDate = new Date(booking.booking_date);
     const formattedDate = bookingDate.toLocaleDateString("ro-RO", {
@@ -65,6 +169,12 @@ const handler = async (req: Request): Promise<Response> => {
       hour: "2-digit",
       minute: "2-digit",
     });
+
+    // Sanitize user-generated content
+    const safeName = escapeHtml(profile.full_name || "");
+    const safeTitle = escapeHtml(booking.experiences?.title || "Experiență");
+    const safeLocation = escapeHtml(booking.experiences?.location_name || "");
+    const safeCancellationReason = escapeHtml(booking.cancellation_reason || "");
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -88,7 +198,7 @@ const handler = async (req: Request): Promise<Response> => {
               <h1>❌ Rezervare anulată</h1>
             </div>
             <div class="content">
-              <p>Bună ${profile?.full_name || ""},</p>
+              <p>Bună ${safeName},</p>
               <p>Rezervarea ta a fost anulată cu succes.</p>
               
               <div class="booking-details">
@@ -96,12 +206,12 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <div class="detail-row">
                   <span class="detail-label">Experiență:</span>
-                  <span>${booking.experiences.title}</span>
+                  <span>${safeTitle}</span>
                 </div>
                 
                 <div class="detail-row">
                   <span class="detail-label">Locație:</span>
-                  <span>${booking.experiences.location_name}</span>
+                  <span>${safeLocation}</span>
                 </div>
                 
                 <div class="detail-row">
@@ -129,10 +239,10 @@ const handler = async (req: Request): Promise<Response> => {
                 </p>
               </div>
 
-              ${booking.cancellation_reason ? `
+              ${safeCancellationReason ? `
                 <div style="background: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
                   <strong>Motiv anulare:</strong>
-                  <p style="margin: 10px 0 0 0; color: #666;">${booking.cancellation_reason}</p>
+                  <p style="margin: 10px 0 0 0; color: #666;">${safeCancellationReason}</p>
                 </div>
               ` : ""}
 
@@ -148,30 +258,26 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    const emailResponse = await resend.emails.send({
+    await resend.emails.send({
       from: "Experium <onboarding@resend.dev>",
-      to: [profile?.email || ""],
-      subject: `Rezervare anulată - ${booking.experiences.title}`,
+      to: [profile.email],
+      subject: `Rezervare anulată - ${safeTitle}`,
       html: emailHtml,
     });
 
-    console.log("Cancellation confirmation email sent:", emailResponse);
+    console.log("Cancellation confirmation email sent successfully");
 
     return new Response(
-      JSON.stringify({ success: true, emailResponse }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      JSON.stringify({ success: true }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (error: any) {
-    console.error("Error sending cancellation confirmation:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
+    console.error("Error sending cancellation confirmation:", errorMessage);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      JSON.stringify({ error: "Failed to send confirmation" }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 };

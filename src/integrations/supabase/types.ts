@@ -408,6 +408,36 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action_type: string
+          attempt_count: number
+          blocked_until: string | null
+          first_attempt_at: string
+          id: string
+          identifier: string
+          last_attempt_at: string
+        }
+        Insert: {
+          action_type: string
+          attempt_count?: number
+          blocked_until?: string | null
+          first_attempt_at?: string
+          id?: string
+          identifier: string
+          last_attempt_at?: string
+        }
+        Update: {
+          action_type?: string
+          attempt_count?: number
+          blocked_until?: string | null
+          first_attempt_at?: string
+          id?: string
+          identifier?: string
+          last_attempt_at?: string
+        }
+        Relationships: []
+      }
       regions: {
         Row: {
           created_at: string | null
@@ -531,14 +561,26 @@ export type Database = {
           success: boolean
         }[]
       }
-      check_rate_limit: {
-        Args: {
-          identifier: string
-          max_attempts?: number
-          window_minutes?: number
-        }
-        Returns: boolean
-      }
+      check_rate_limit:
+        | {
+            Args: {
+              identifier: string
+              max_attempts?: number
+              window_minutes?: number
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              p_action_type?: string
+              p_block_minutes?: number
+              p_identifier: string
+              p_max_attempts?: number
+              p_window_minutes?: number
+            }
+            Returns: boolean
+          }
+      cleanup_rate_limits: { Args: never; Returns: undefined }
       generate_voucher_code: { Args: never; Returns: string }
       get_user_role: { Args: { _user_id: string }; Returns: string }
       has_role: {
