@@ -12,6 +12,8 @@ import { TwoFactorChallenge } from '@/components/auth/TwoFactorChallenge';
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { signupSchema } from '@/lib/validations';
+import { z } from 'zod';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -142,16 +144,19 @@ const Auth = () => {
     e.preventDefault();
     setPasswordError('');
     
-    // Validate password match
-    if (signupPassword !== signupConfirmPassword) {
-      setPasswordError('Parolele nu se potrivesc');
-      return;
-    }
-    
-    // Validate password length
-    if (signupPassword.length < 6) {
-      setPasswordError('Parola trebuie să aibă cel puțin 6 caractere');
-      return;
+    // Validate with zod schema
+    try {
+      signupSchema.parse({
+        fullName: signupFullName,
+        email: signupEmail,
+        password: signupPassword,
+        confirmPassword: signupConfirmPassword,
+      });
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        setPasswordError(validationError.errors[0]?.message || 'Date invalide');
+        return;
+      }
     }
     
     setLoading(true);
@@ -395,9 +400,9 @@ const Auth = () => {
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                     />
-                    <p className="text-xs text-muted-foreground">Minim 6 caractere</p>
+                    <p className="text-xs text-muted-foreground">Min. 8 caractere, literă mare, mică, cifră și caracter special</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-confirm-password">Confirmă parola</Label>
