@@ -181,8 +181,13 @@ const ManageRoles = () => {
     }
   };
 
-  const revokeRole = async (roleId: string, userEmail: string) => {
-    if (userEmail === 'hrelea001@gmail.com') {
+  const revokeRole = async (roleId: string, userId: string) => {
+    // Check if user is primary admin via server-side function
+    const { data: isTargetPrimaryAdmin } = await supabase.rpc('is_primary_admin', {
+      _user_id: userId,
+    });
+    
+    if (isTargetPrimaryAdmin) {
       toast({
         title: 'Acțiune Interzisă',
         description: 'Nu poți revoca rolul administratorului principal',
@@ -245,7 +250,7 @@ const ManageRoles = () => {
             <CardContent className="pt-6 text-center">
               <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
-                Doar administratorul principal (hrelea001@gmail.com) poate gestiona rolurile
+                Doar administratorul principal poate gestiona rolurile
               </p>
             </CardContent>
           </Card>
@@ -291,7 +296,8 @@ const ManageRoles = () => {
                 <TableBody>
                   {allProfiles.map((profile) => {
                     const roles = getUserRoles(profile.id);
-                    const isPrimary = profile.email === 'hrelea001@gmail.com';
+                    // Check if this user has admin role (primary admin is the first admin)
+                    const hasAdminRole = roles.includes('admin');
                     return (
                       <TableRow key={profile.id}>
                         <TableCell className="font-medium">
@@ -301,8 +307,8 @@ const ManageRoles = () => {
                           <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4 text-muted-foreground" />
                             {profile.email}
-                            {isPrimary && (
-                              <Badge variant="outline" className="ml-2">Primary</Badge>
+                            {hasAdminRole && (
+                              <Badge variant="outline" className="ml-2">Admin</Badge>
                             )}
                           </div>
                         </TableCell>
@@ -321,11 +327,10 @@ const ManageRoles = () => {
                           {new Date(profile.created_at).toLocaleDateString('ro-RO')}
                         </TableCell>
                         <TableCell className="text-right">
-                          {!isPrimary && (
-                            <div className="flex items-center justify-end gap-2">
-                              <Select 
-                                value={selectedUserId === profile.id ? newUserRole : ''} 
-                                onValueChange={(v: 'admin' | 'moderator') => {
+                          <div className="flex items-center justify-end gap-2">
+                            <Select 
+                              value={selectedUserId === profile.id ? newUserRole : ''} 
+                              onValueChange={(v: 'admin' | 'moderator') => {
                                   setSelectedUserId(profile.id);
                                   setNewUserRole(v);
                                 }}
@@ -355,12 +360,11 @@ const ManageRoles = () => {
                                     });
                                   }
                                 }}
-                                disabled={granting || selectedUserId !== profile.id}
-                              >
-                                <UserPlus className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          )}
+                              disabled={granting || selectedUserId !== profile.id}
+                            >
+                              <UserPlus className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
@@ -394,7 +398,6 @@ const ManageRoles = () => {
                 <TableBody>
                   {userRoles.map((userRole) => {
                     const profile = getProfileById(userRole.user_id);
-                    const isPrimary = profile?.email === 'hrelea001@gmail.com';
                     return (
                       <TableRow key={userRole.id}>
                         <TableCell className="font-medium">
@@ -411,8 +414,7 @@ const ManageRoles = () => {
                           {new Date(userRole.created_at).toLocaleDateString('ro-RO')}
                         </TableCell>
                         <TableCell className="text-right">
-                          {!isPrimary && (
-                            <AlertDialog>
+                          <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <Button variant="ghost" size="sm">
                                   <Trash2 className="h-4 w-4 text-destructive" />
@@ -429,14 +431,13 @@ const ManageRoles = () => {
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Anulează</AlertDialogCancel>
                                   <AlertDialogAction
-                                    onClick={() => revokeRole(userRole.id, profile?.email || '')}
+                                    onClick={() => revokeRole(userRole.id, userRole.user_id)}
                                   >
                                     Revocă Rol
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
-                          )}
                         </TableCell>
                       </TableRow>
                     );
