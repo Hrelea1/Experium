@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Users, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "@/contexts/CartContext";
+import { useCart, CartItemService } from "@/contexts/CartContext";
 import { useTranslation } from "react-i18next";
+import { ServiceSelector, SelectedService } from "./ServiceSelector";
 
 interface BookingFormProps {
   experience: {
@@ -25,14 +26,31 @@ export function BookingForm({ experience }: BookingFormProps) {
   const { addItem } = useCart();
   const { t } = useTranslation();
   const [participants, setParticipants] = useState(1);
+  const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
 
-  const totalPrice = experience.price * participants;
+  const servicesTotal = selectedServices.reduce(
+    (sum, s) => sum + s.price * s.quantity,
+    0
+  );
+  const totalPrice = (experience.price * participants) + servicesTotal;
   const savings = experience.originalPrice 
     ? (experience.originalPrice - experience.price) * participants 
     : 0;
 
+  const handleServicesChange = useCallback((services: SelectedService[]) => {
+    setSelectedServices(services);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Convert selected services to cart format
+    const cartServices: CartItemService[] = selectedServices.map(s => ({
+      serviceId: s.serviceId,
+      name: s.name,
+      price: s.price,
+      quantity: s.quantity,
+    }));
     
     // Add to cart for each participant
     for (let i = 0; i < participants; i++) {
@@ -42,7 +60,7 @@ export function BookingForm({ experience }: BookingFormProps) {
         location: experience.location,
         price: experience.price,
         image: experience.image || "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=200&h=200&fit=crop",
-      });
+      }, cartServices);
     }
 
     toast({
@@ -110,10 +128,16 @@ export function BookingForm({ experience }: BookingFormProps) {
           </div>
         </div>
 
+        {/* Service Selector */}
+        <ServiceSelector
+          experienceId={experience.id}
+          onServicesChange={handleServicesChange}
+        />
+
         {/* Info about VAT included */}
         <div className="bg-muted/50 rounded-xl p-4">
           <p className="text-sm text-muted-foreground">
-            💰 {t('booking.priceIncludesVat')}
+            {t('booking.priceIncludesVat')}
           </p>
         </div>
 

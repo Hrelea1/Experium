@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Wand2, Upload, Plus, X } from 'lucide-react';
+import { Wand2, Plus, X, Package } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -16,6 +17,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
+interface ServiceInput {
+  name: string;
+  description: string;
+  price: string;
+  maxQuantity: string;
+  isRequired: boolean;
+}
+
+const emptyService: ServiceInput = {
+  name: '',
+  description: '',
+  price: '',
+  maxQuantity: '1',
+  isRequired: false,
+};
 
 const ExperienceBuilder = () => {
   const navigate = useNavigate();
@@ -37,6 +54,7 @@ const ExperienceBuilder = () => {
   const [maxParticipants, setMaxParticipants] = useState('10');
   const [minAge, setMinAge] = useState('');
   const [images, setImages] = useState<string[]>(['']);
+  const [services, setServices] = useState<ServiceInput[]>([]);
 
   useEffect(() => {
     fetchCategories();
@@ -65,6 +83,21 @@ const ExperienceBuilder = () => {
     const newImages = [...images];
     newImages[index] = value;
     setImages(newImages);
+  };
+
+  // Service functions
+  const addService = () => {
+    setServices([...services, { ...emptyService }]);
+  };
+
+  const removeService = (index: number) => {
+    setServices(services.filter((_, i) => i !== index));
+  };
+
+  const updateService = (index: number, field: keyof ServiceInput, value: string | boolean) => {
+    const newServices = [...services];
+    newServices[index] = { ...newServices[index], [field]: value };
+    setServices(newServices);
   };
 
   const createExperience = async () => {
@@ -118,6 +151,27 @@ const ExperienceBuilder = () => {
           .insert(imageRecords);
 
         if (imgError) console.error('Error adding images:', imgError);
+      }
+
+      // Add services
+      const validServices = services.filter(s => s.name.trim() && s.price);
+      if (validServices.length > 0) {
+        const serviceRecords = validServices.map((s, index) => ({
+          experience_id: experience.id,
+          name: s.name.trim(),
+          description: s.description.trim() || null,
+          price: parseFloat(s.price),
+          max_quantity: parseInt(s.maxQuantity) || 1,
+          is_required: s.isRequired,
+          display_order: index,
+          is_active: true,
+        }));
+
+        const { error: svcError } = await supabase
+          .from('experience_services')
+          .insert(serviceRecords);
+
+        if (svcError) console.error('Error adding services:', svcError);
       }
 
       toast({
@@ -335,6 +389,116 @@ const ExperienceBuilder = () => {
                   )}
                 </div>
               ))}
+            </div>
+
+            {/* Services Section */}
+            <div className="space-y-4 pt-6 border-t">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  <div>
+                    <Label className="text-base font-semibold">Servicii Aditionale</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Adaugă opțiuni extra pe care clienții le pot selecta
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addService}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adaugă Serviciu
+                </Button>
+              </div>
+
+              {services.length === 0 ? (
+                <div className="text-center py-8 border-2 border-dashed rounded-xl">
+                  <Package className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">
+                    Nu ai adăugat niciun serviciu. Clienții vor putea doar să cumpere experiența de bază.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {services.map((service, index) => (
+                    <Card key={index} className="p-4">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          Serviciu #{index + 1}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeService(index)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Șterge
+                        </Button>
+                      </div>
+
+                      <div className="grid gap-4">
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Nume serviciu *</Label>
+                            <Input
+                              value={service.name}
+                              onChange={(e) => updateService(index, 'name', e.target.value)}
+                              placeholder="Ex: Fotografii profesionale"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Preț (RON) *</Label>
+                            <Input
+                              type="number"
+                              value={service.price}
+                              onChange={(e) => updateService(index, 'price', e.target.value)}
+                              placeholder="150"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Descriere</Label>
+                          <Input
+                            value={service.description}
+                            onChange={(e) => updateService(index, 'description', e.target.value)}
+                            placeholder="Ex: Primești 50+ poze editate profesional"
+                          />
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Cantitate maximă</Label>
+                            <Input
+                              type="number"
+                              value={service.maxQuantity}
+                              onChange={(e) => updateService(index, 'maxQuantity', e.target.value)}
+                              placeholder="1"
+                              min="1"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2 pt-6">
+                            <Checkbox
+                              id={`required-${index}`}
+                              checked={service.isRequired}
+                              onCheckedChange={(checked) => updateService(index, 'isRequired', !!checked)}
+                            />
+                            <Label htmlFor={`required-${index}`} className="cursor-pointer">
+                              Obligatoriu (inclus automat)
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Submit */}

@@ -215,6 +215,56 @@ export type Database = {
           },
         ]
       }
+      experience_services: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          experience_id: string
+          id: string
+          is_active: boolean
+          is_required: boolean
+          max_quantity: number
+          name: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          experience_id: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          max_quantity?: number
+          name: string
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          experience_id?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          max_quantity?: number
+          name?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_services_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       experiences: {
         Row: {
           avg_rating: number | null

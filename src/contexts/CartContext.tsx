@@ -2,6 +2,13 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 
 export type DeliveryType = 'physical' | 'digital' | null;
 
+export interface CartItemService {
+  serviceId: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
 export interface CartItem {
   id: string;
   title: string;
@@ -10,6 +17,7 @@ export interface CartItem {
   quantity: number;
   image: string;
   isGift: boolean;
+  services: CartItemService[];
 }
 
 export interface PersonalDetails {
@@ -28,7 +36,7 @@ export interface DeliveryAddress {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity' | 'isGift'>) => void;
+  addItem: (item: Omit<CartItem, 'quantity' | 'isGift' | 'services'>, services?: CartItemService[]) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   toggleGift: (id: string, isGift: boolean) => void;
@@ -80,15 +88,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addItem = (item: Omit<CartItem, 'quantity' | 'isGift'>) => {
+  const addItem = (item: Omit<CartItem, 'quantity' | 'isGift' | 'services'>, services: CartItemService[] = []) => {
     setItems(current => {
-      const existing = current.find(i => i.id === item.id);
-      if (existing) {
-        return current.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...current, { ...item, quantity: 1, isGift: false }];
+      // Each item is unique (includes timestamp in id), so no need to find existing
+      return [...current, { ...item, quantity: 1, isGift: false, services }];
     });
   };
 
@@ -122,7 +125,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => {
+    const itemPrice = item.price * item.quantity;
+    const servicesPrice = item.services.reduce((s, svc) => s + svc.price * svc.quantity, 0);
+    return sum + itemPrice + servicesPrice;
+  }, 0);
   // Price already includes VAT - no separate calculation needed
   const totalWithVat = subtotal;
 

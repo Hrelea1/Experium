@@ -367,6 +367,13 @@
     "securityNote": "Plată securizată • Voucher valabil 12 luni",
     "priceIncludesVat": "Preț cu TVA inclus"
   },
+  "services": {
+    "title": "Personalizeaza experienta",
+    "subtitle": "Adauga servicii extra pentru o experienta completa",
+    "required": "Obligatoriu",
+    "quantity": "Cantitate",
+    "subtotal": "Subtotal servicii"
+  },
   "experience": {
     "recommended": "Experiențe Recomandate",
     "addToCart": "Adaugă în Coș",
