@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Check, Square } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export interface ExperienceService {
@@ -30,91 +29,82 @@ interface ServiceSelectorProps {
 export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelectorProps) {
   const { t } = useTranslation();
   const [services, setServices] = useState<ExperienceService[]>([]);
-  const [selectedServices, setSelectedServices] = useState<Map<string, SelectedService>>(new Map());
+  const [selectedIds, setSelectedIds] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  // Use ref to store callback to avoid infinite loop
-  const onServicesChangeRef = useRef(onServicesChange);
-  
-  useEffect(() => {
-    onServicesChangeRef.current = onServicesChange;
-  });
 
   useEffect(() => {
+    const fetchServices = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('experience_services')
+        .select('*')
+        .eq('experience_id', experienceId)
+        .eq('is_active', true)
+        .order('display_order');
+
+      if (!error && data) {
+        setServices(data);
+        // Auto-select required services
+        const initialIds: Record<string, number> = {};
+        data.forEach(service => {
+          if (service.is_required) {
+            initialIds[service.id] = 1;
+          }
+        });
+        setSelectedIds(initialIds);
+      }
+      setLoading(false);
+    };
+
     fetchServices();
   }, [experienceId]);
 
-  // Notify parent when selections change, only after initialization
-  useEffect(() => {
-    if (isInitialized) {
-      onServicesChangeRef.current(Array.from(selectedServices.values()));
-    }
-  }, [selectedServices, isInitialized]);
-
-  const fetchServices = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('experience_services')
-      .select('*')
-      .eq('experience_id', experienceId)
-      .eq('is_active', true)
-      .order('display_order');
-
-    if (!error && data) {
-      setServices(data);
-      // Auto-select required services
-      const initialSelected = new Map<string, SelectedService>();
-      data.forEach(service => {
-        if (service.is_required) {
-          initialSelected.set(service.id, {
-            serviceId: service.id,
-            name: service.name,
-            price: service.price,
-            quantity: 1,
-          });
-        }
-      });
-      setSelectedServices(initialSelected);
-      // Notify parent of initial required services
-      onServicesChangeRef.current(Array.from(initialSelected.values()));
-    }
-    setLoading(false);
-    setIsInitialized(true);
-  };
-
-  const toggleService = (service: ExperienceService) => {
-    if (service.is_required) return;
-
-    setSelectedServices(prev => {
-      const newMap = new Map(prev);
-      if (newMap.has(service.id)) {
-        newMap.delete(service.id);
-      } else {
-        newMap.set(service.id, {
+  // Compute selected services from IDs and services list
+  const selectedServices = useMemo(() => {
+    return Object.entries(selectedIds)
+      .map(([id, quantity]) => {
+        const service = services.find(s => s.id === id);
+        if (!service) return null;
+        return {
           serviceId: service.id,
           name: service.name,
           price: service.price,
-          quantity: 1,
-        });
+          quantity,
+        };
+      })
+      .filter((s): s is SelectedService => s !== null);
+  }, [selectedIds, services]);
+
+  // Notify parent whenever selected services change
+  useEffect(() => {
+    onServicesChange(selectedServices);
+  }, [selectedServices, onServicesChange]);
+
+  const toggleService = useCallback((service: ExperienceService) => {
+    if (service.is_required) return;
+
+    setSelectedIds(prev => {
+      const newIds = { ...prev };
+      if (newIds[service.id]) {
+        delete newIds[service.id];
+      } else {
+        newIds[service.id] = 1;
       }
-      return newMap;
+      return newIds;
     });
-  };
+  }, []);
 
-  const updateQuantity = (service: ExperienceService, delta: number) => {
-    setSelectedServices(prev => {
-      const newMap = new Map(prev);
-      const current = newMap.get(service.id);
-      if (!current) return prev;
+  const updateQuantity = useCallback((service: ExperienceService, delta: number) => {
+    setSelectedIds(prev => {
+      const currentQty = prev[service.id];
+      if (!currentQty) return prev;
 
-      const newQuantity = Math.max(1, Math.min(service.max_quantity, current.quantity + delta));
-      newMap.set(service.id, { ...current, quantity: newQuantity });
-      return newMap;
+      const newQuantity = Math.max(1, Math.min(service.max_quantity, currentQty + delta));
+      return { ...prev, [service.id]: newQuantity };
     });
-  };
+  }, []);
 
-  const subtotal = Array.from(selectedServices.values()).reduce(
+  const subtotal = selectedServices.reduce(
     (sum, s) => sum + s.price * s.quantity,
     0
   );
@@ -146,8 +136,8 @@ export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelec
 
       <div className="space-y-2">
         {services.map((service) => {
-          const isSelected = selectedServices.has(service.id);
-          const selectedData = selectedServices.get(service.id);
+          const isSelected = !!selectedIds[service.id];
+          const quantity = selectedIds[service.id] || 1;
 
           return (
             <motion.div
@@ -165,12 +155,14 @@ export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelec
               onClick={() => toggleService(service)}
             >
               <div className="flex items-start gap-3">
-                <div className="pt-0.5">
-                  <Checkbox
-                    checked={isSelected}
-                    disabled={service.is_required}
-                    className="pointer-events-none"
-                  />
+                <div className="pt-0.5 flex-shrink-0">
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                    isSelected 
+                      ? 'bg-primary border-primary' 
+                      : 'border-muted-foreground/50'
+                  } ${service.is_required ? 'opacity-60' : ''}`}>
+                    {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+                  </div>
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -217,7 +209,7 @@ export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelec
                             <Minus className="w-3 h-3" />
                           </button>
                           <span className="w-8 text-center font-medium">
-                            {selectedData?.quantity || 1}
+                            {quantity}
                           </span>
                           <button
                             type="button"
