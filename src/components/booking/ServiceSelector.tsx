@@ -156,7 +156,7 @@ export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelec
             >
               <div className="flex items-start gap-3">
                 <div className="pt-0.5 flex-shrink-0">
-                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
                     isSelected 
                       ? 'bg-primary border-primary' 
                       : 'border-muted-foreground/50'
