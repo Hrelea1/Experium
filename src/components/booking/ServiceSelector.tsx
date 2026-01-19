@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, Check } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,14 +32,19 @@ export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelec
   const [services, setServices] = useState<ExperienceService[]>([]);
   const [selectedServices, setSelectedServices] = useState<Map<string, SelectedService>>(new Map());
   const [loading, setLoading] = useState(true);
+  
+  // Use ref to store callback to avoid infinite loop
+  const onServicesChangeRef = useRef(onServicesChange);
+  onServicesChangeRef.current = onServicesChange;
 
   useEffect(() => {
     fetchServices();
   }, [experienceId]);
 
+  // Notify parent when selections change, using ref to avoid dependency issues
   useEffect(() => {
-    onServicesChange(Array.from(selectedServices.values()));
-  }, [selectedServices, onServicesChange]);
+    onServicesChangeRef.current(Array.from(selectedServices.values()));
+  }, [selectedServices]);
 
   const fetchServices = async () => {
     setLoading(true);
