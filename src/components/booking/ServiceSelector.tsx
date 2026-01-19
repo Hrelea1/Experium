@@ -32,19 +32,25 @@ export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelec
   const [services, setServices] = useState<ExperienceService[]>([]);
   const [selectedServices, setSelectedServices] = useState<Map<string, SelectedService>>(new Map());
   const [loading, setLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Use ref to store callback to avoid infinite loop
   const onServicesChangeRef = useRef(onServicesChange);
-  onServicesChangeRef.current = onServicesChange;
+  
+  useEffect(() => {
+    onServicesChangeRef.current = onServicesChange;
+  });
 
   useEffect(() => {
     fetchServices();
   }, [experienceId]);
 
-  // Notify parent when selections change, using ref to avoid dependency issues
+  // Notify parent when selections change, only after initialization
   useEffect(() => {
-    onServicesChangeRef.current(Array.from(selectedServices.values()));
-  }, [selectedServices]);
+    if (isInitialized) {
+      onServicesChangeRef.current(Array.from(selectedServices.values()));
+    }
+  }, [selectedServices, isInitialized]);
 
   const fetchServices = async () => {
     setLoading(true);
@@ -70,8 +76,11 @@ export function ServiceSelector({ experienceId, onServicesChange }: ServiceSelec
         }
       });
       setSelectedServices(initialSelected);
+      // Notify parent of initial required services
+      onServicesChangeRef.current(Array.from(initialSelected.values()));
     }
     setLoading(false);
+    setIsInitialized(true);
   };
 
   const toggleService = (service: ExperienceService) => {
