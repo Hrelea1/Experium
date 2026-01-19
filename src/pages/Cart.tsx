@@ -459,60 +459,86 @@ export default function Cart() {
               {/* Cart Items & Checkout Flow */}
               <div className="lg:col-span-2 space-y-4">
                 {/* Cart Items - always visible */}
-                {items.map((item) => (
-                  <Card key={item.id} className="p-3 sm:p-4">
-                    <div className="flex gap-3 sm:gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm sm:text-lg mb-1 truncate">{item.title}</h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 truncate">
-                          {item.location}
-                        </p>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <Button 
-                              variant="outline" 
-                              size="icon" 
-                              className="h-7 w-7 sm:h-8 sm:w-8"
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              disabled={checkoutStep > 0}
-                            >
-                              <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </Button>
-                            <span className="font-medium w-6 sm:w-8 text-center text-sm sm:text-base">
-                              {item.quantity}
-                            </span>
-                            <Button 
-                              variant="outline" 
-                              size="icon" 
-                              className="h-7 w-7 sm:h-8 sm:w-8"
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              disabled={checkoutStep > 0}
-                            >
-                              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </Button>
+                {items.map((item) => {
+                  const servicesTotal = item.services?.reduce((sum, s) => sum + s.price * s.quantity, 0) || 0;
+                  const itemTotal = (item.price * item.quantity) + servicesTotal;
+                  
+                  return (
+                    <Card key={item.id} className="p-3 sm:p-4">
+                      <div className="flex gap-3 sm:gap-4">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm sm:text-lg mb-1 truncate">{item.title}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 truncate">
+                            {item.location}
+                          </p>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="h-7 w-7 sm:h-8 sm:w-8"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={checkoutStep > 0}
+                              >
+                                <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                              <span className="font-medium w-6 sm:w-8 text-center text-sm sm:text-base">
+                                {item.quantity}
+                              </span>
+                              <Button 
+                                variant="outline" 
+                                size="icon" 
+                                className="h-7 w-7 sm:h-8 sm:w-8"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                disabled={checkoutStep > 0}
+                              >
+                                <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4">
+                              <span className="font-bold text-sm sm:text-lg">{item.price} {t('common.lei')}</span>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7 sm:h-8 sm:w-8"
+                                onClick={() => handleRemoveItem(item.id)}
+                                disabled={checkoutStep > 0}
+                              >
+                                <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4">
-                            <span className="font-bold text-sm sm:text-lg">{item.price} {t('common.lei')}</span>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-7 w-7 sm:h-8 sm:w-8"
-                              onClick={() => handleRemoveItem(item.id)}
-                              disabled={checkoutStep > 0}
-                            >
-                              <X className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </Button>
-                          </div>
+                          
+                          {/* Display selected services */}
+                          {item.services && item.services.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-border space-y-1">
+                              {item.services.map((service) => (
+                                <div key={service.serviceId} className="flex justify-between text-sm">
+                                  <span className="text-muted-foreground">
+                                    + {service.name}
+                                    {service.quantity > 1 && ` x${service.quantity}`}
+                                  </span>
+                                  <span className="text-foreground">
+                                    {service.price * service.quantity} {t('common.lei')}
+                                  </span>
+                                </div>
+                              ))}
+                              <div className="flex justify-between text-sm font-medium pt-1">
+                                <span>{t('cart.total')}</span>
+                                <span>{itemTotal} {t('common.lei')}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  );
+                })}
 
                 {/* Checkout Flow */}
                 <AnimatePresence mode="wait">

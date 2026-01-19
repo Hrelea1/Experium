@@ -367,6 +367,13 @@
     "securityNote": "Secure payment • Voucher valid for 12 months",
     "priceIncludesVat": "Price includes VAT"
   },
+  "services": {
+    "title": "Customize your experience",
+    "subtitle": "Add extra services for a complete experience",
+    "required": "Required",
+    "quantity": "Quantity",
+    "subtotal": "Services subtotal"
+  },
   "experience": {
     "recommended": "Recommended Experiences",
     "addToCart": "Add to Cart",
