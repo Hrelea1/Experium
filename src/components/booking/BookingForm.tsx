@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Users, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,26 +26,25 @@ export function BookingForm({ experience }: BookingFormProps) {
   const { addItem } = useCart();
   const { t } = useTranslation();
   const [participants, setParticipants] = useState(1);
-  const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
+  const selectedServicesRef = useRef<SelectedService[]>([]);
+  const [servicesTotal, setServicesTotal] = useState(0);
 
-  const servicesTotal = selectedServices.reduce(
-    (sum, s) => sum + s.price * s.quantity,
-    0
-  );
   const totalPrice = (experience.price * participants) + servicesTotal;
   const savings = experience.originalPrice 
     ? (experience.originalPrice - experience.price) * participants 
     : 0;
 
   const handleServicesChange = useCallback((services: SelectedService[]) => {
-    setSelectedServices(services);
+    selectedServicesRef.current = services;
+    const total = services.reduce((sum, s) => sum + s.price * s.quantity, 0);
+    setServicesTotal(total);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Convert selected services to cart format
-    const cartServices: CartItemService[] = selectedServices.map(s => ({
+    const cartServices: CartItemService[] = selectedServicesRef.current.map(s => ({
       serviceId: s.serviceId,
       name: s.name,
       price: s.price,
