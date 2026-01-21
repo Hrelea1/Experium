@@ -194,7 +194,11 @@ const ManageExperiences = () => {
                               <Eye className="h-4 w-4" />
                             )}
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/admin/experiences/${exp.id}/edit`)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                         </div>
