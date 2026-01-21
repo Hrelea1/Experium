@@ -107,6 +107,23 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Authorization: only admins can create vouchers
+    const { data: isAdmin, error: isAdminError } = await supabaseClient.rpc('is_admin');
+    if (isAdminError) {
+      console.error('Error checking admin status:', isAdminError);
+      return new Response(
+        JSON.stringify({ error: 'Authorization check failed' }),
+        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!isAdmin) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     // Validate and parse input
     const rawBody = await req.json();
     const { experienceId, notes, validityMonths } = validateInput(rawBody);

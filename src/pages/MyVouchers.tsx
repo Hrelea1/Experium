@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Download, QrCode, Gift, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
 import QRCode from 'qrcode';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 
 interface Voucher {
   id: string;
