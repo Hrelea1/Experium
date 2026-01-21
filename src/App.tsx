@@ -30,6 +30,7 @@ import ExperienceBuilder from "./pages/admin/ExperienceBuilder";
 import VoucherBuilder from "./pages/admin/VoucherBuilder";
 import ContentEditor from "./pages/admin/ContentEditor";
 import ContentAudit from "./pages/admin/ContentAudit";
+import EditExperience from "./pages/admin/EditExperience";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="/admin/content/audit" element={<ContentAudit />} />
               <Route path="/admin/experiences" element={<ManageExperiences />} />
               <Route path="/admin/experiences/create" element={<ExperienceBuilder />} />
+               <Route path="/admin/experiences/:id/edit" element={<EditExperience />} />
               <Route path="/admin/bookings" element={<ManageBookings />} />
               <Route path="/admin/orders" element={<ManageOrders />} />
               <Route path="/admin/orders/create" element={<VoucherBuilder />} />
