@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Wand2, Plus, X, Package } from 'lucide-react';
+import { Wand2, Plus, X, Package, Upload } from 'lucide-react';
+import { uploadExperienceImageFile } from '@/lib/experienceImages';
 import {
   Select,
   SelectContent,
@@ -53,7 +54,9 @@ const ExperienceBuilder = () => {
   const [duration, setDuration] = useState('');
   const [maxParticipants, setMaxParticipants] = useState('10');
   const [minAge, setMinAge] = useState('');
-  const [images, setImages] = useState<string[]>(['']);
+  const [images, setImages] = useState<Array<{ url: string; file?: File | null }>>([
+    { url: '' },
+  ]);
   const [services, setServices] = useState<ServiceInput[]>([]);
 
   useEffect(() => {
@@ -72,17 +75,21 @@ const ExperienceBuilder = () => {
   };
 
   const addImageField = () => {
-    setImages([...images, '']);
+    setImages([...images, { url: '' }]);
   };
 
   const removeImageField = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const updateImage = (index: number, value: string) => {
-    const newImages = [...images];
-    newImages[index] = value;
-    setImages(newImages);
+  const updateImageUrl = (index: number, value: string) => {
+    setImages((prev) => prev.map((img, i) => (i === index ? { ...img, url: value } : img)));
+  };
+
+  const updateImageFile = (index: number, file: File | null) => {
+    setImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, file, url: img.url } : img))
+    );
   };
 
   // Service functions
@@ -137,19 +144,28 @@ const ExperienceBuilder = () => {
       if (expError) throw expError;
 
       // Add images
-      const validImages = images.filter(img => img.trim());
-      if (validImages.length > 0) {
-        const imageRecords = validImages.map((url, index) => ({
+      const uploadedOrUrls: string[] = [];
+      for (const img of images) {
+        if (img.file) {
+          const url = await uploadExperienceImageFile({
+            experienceId: experience.id,
+            file: img.file,
+          });
+          uploadedOrUrls.push(url);
+        } else if (img.url.trim()) {
+          uploadedOrUrls.push(img.url.trim());
+        }
+      }
+
+      if (uploadedOrUrls.length > 0) {
+        const imageRecords = uploadedOrUrls.map((url, index) => ({
           experience_id: experience.id,
           image_url: url,
           is_primary: index === 0,
           display_order: index,
         }));
 
-        const { error: imgError } = await supabase
-          .from('experience_images')
-          .insert(imageRecords);
-
+        const { error: imgError } = await supabase.from('experience_images').insert(imageRecords);
         if (imgError) console.error('Error adding images:', imgError);
       }
 
@@ -373,10 +389,28 @@ const ExperienceBuilder = () => {
               {images.map((img, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
-                    value={img}
-                    onChange={(e) => updateImage(index, e.target.value)}
+                    value={img.url}
+                    onChange={(e) => updateImageUrl(index, e.target.value)}
                     placeholder="URL imagine (ex: https://...)"
                   />
+
+                  <div className="flex items-center gap-2">
+                    <Label
+                      className="inline-flex items-center gap-2 cursor-pointer rounded-md border px-3 py-2 text-sm hover:bg-accent"
+                      htmlFor={`img-file-${index}`}
+                    >
+                      <Upload className="h-4 w-4" />
+                      Încarcă
+                    </Label>
+                    <input
+                      id={`img-file-${index}`}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => updateImageFile(index, e.target.files?.[0] ?? null)}
+                    />
+                  </div>
+
                   {images.length > 1 && (
                     <Button
                       type="button"

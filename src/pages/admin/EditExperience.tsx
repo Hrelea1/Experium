@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { uploadExperienceImageFile } from "@/lib/experienceImages";
 import {
   ArrowDown,
   ArrowUp,
@@ -268,6 +269,29 @@ export default function EditExperience() {
       ];
       return next;
     });
+  };
+
+  const uploadAndSetImage = async (clientId: string, file: File) => {
+    if (!id) return;
+    try {
+      setSaving(true);
+      const url = await uploadExperienceImageFile({ experienceId: id, file });
+      setImages((prev) =>
+        prev.map((x) => (x.clientId === clientId ? { ...x, image_url: url } : x))
+      );
+      toast({
+        title: "Imagine încărcată",
+        description: "Am încărcat fișierul și am setat URL-ul automat.",
+      });
+    } catch (e: any) {
+      toast({
+        title: "Eroare upload",
+        description: e?.message ?? "Nu am putut încărca imaginea",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const removeImage = (clientId: string) => {
@@ -808,6 +832,28 @@ export default function EditExperience() {
                               }
                               placeholder="https://..."
                             />
+
+                            <div className="flex items-center gap-2">
+                              <Label
+                                className="inline-flex items-center gap-2 cursor-pointer rounded-md border px-3 py-2 text-sm hover:bg-accent w-fit"
+                                htmlFor={`img-upload-${img.clientId}`}
+                              >
+                                Încarcă fișier
+                              </Label>
+                              <input
+                                id={`img-upload-${img.clientId}`}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) uploadAndSetImage(img.clientId, file);
+                                }}
+                              />
+                              <span className="text-xs text-muted-foreground">
+                                Acceptă PNG/JPEG/WebP etc.
+                              </span>
+                            </div>
                           </div>
                           <div className="flex items-end">
                             <Button
