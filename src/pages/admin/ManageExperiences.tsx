@@ -194,13 +194,17 @@ const ManageExperiences = () => {
                               <Eye className="h-4 w-4" />
                             )}
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => navigate(`/admin/experiences/${exp.id}/edit`)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          {exp.is_active && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/admin/experiences/${exp.id}/edit`)}
+                              aria-label="Editează experiența"
+                              title="Editează"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
