@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ExperienceImage } from "@/components/ExperienceImage";
 
 interface Experience {
   id: string;
@@ -21,7 +22,7 @@ interface Experience {
   duration_minutes?: number;
   categories: { name: string; slug: string } | null;
   regions: { name: string; slug: string } | null;
-  experience_images: { image_url: string; is_primary: boolean }[];
+  experience_images: { image_url: string; is_primary: boolean; focal_x: number; focal_y: number }[];
 }
 
 const categoryTitles: Record<string, string> = {
@@ -68,7 +69,7 @@ export default function CategorySearch() {
             duration_minutes,
             categories (name, slug),
             regions (name, slug),
-            experience_images (image_url, is_primary)
+            experience_images (image_url, is_primary, focal_x, focal_y)
           `)
           .eq('is_active', true);
 
@@ -134,10 +135,14 @@ export default function CategorySearch() {
   };
 
   const getExperienceImage = (exp: Experience) => {
-    const primaryImage = exp.experience_images?.find(img => img.is_primary);
-    if (primaryImage) return primaryImage.image_url;
-    if (exp.experience_images?.length > 0) return exp.experience_images[0].image_url;
-    return "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop";
+    const primary = exp.experience_images?.find((img) => img.is_primary) || exp.experience_images?.[0];
+    return {
+      url:
+        primary?.image_url ||
+        "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop",
+      focal_x: primary?.focal_x ?? 50,
+      focal_y: primary?.focal_y ?? 50,
+    };
   };
 
   return (
@@ -213,11 +218,19 @@ export default function CategorySearch() {
                 >
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={getExperienceImage(exp)}
-                      alt={exp.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                    {(() => {
+                      const img = getExperienceImage(exp);
+                      return (
+                        <ExperienceImage
+                          src={img.url}
+                          alt={exp.title}
+                          focalX={img.focal_x}
+                          focalY={img.focal_y}
+                          className="h-full w-full"
+                          imgClassName="group-hover:scale-110 transition-transform duration-500"
+                        />
+                      );
+                    })()}
                     
                     {/* Wishlist Button */}
                     <button 

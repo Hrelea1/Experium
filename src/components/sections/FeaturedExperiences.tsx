@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 import { supabase } from "@/integrations/supabase/client";
+import { ExperienceImage } from "@/components/ExperienceImage";
 
 const experiences = [
   {
@@ -118,7 +119,7 @@ export function FeaturedExperiences() {
           .select(`
             *,
             categories(name),
-            experience_images(image_url, is_primary)
+             experience_images(image_url, is_primary, focal_x, focal_y)
           `)
           .eq('is_active', true)
           .eq('is_featured', true)
@@ -128,9 +129,11 @@ export function FeaturedExperiences() {
         if (error) throw error;
 
         const formattedExperiences = data?.map((exp: any) => {
-          const primaryImage = exp.experience_images?.find((img: any) => img.is_primary)?.image_url 
-            || exp.experience_images?.[0]?.image_url
-            || "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop";
+          const primary =
+            exp.experience_images?.find((img: any) => img.is_primary) || exp.experience_images?.[0];
+          const primaryImageUrl =
+            primary?.image_url ||
+            "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop";
 
           return {
             id: exp.id,
@@ -141,7 +144,9 @@ export function FeaturedExperiences() {
             rating: exp.avg_rating || 4.5,
             reviews: exp.total_reviews || 0,
             duration: exp.duration_minutes ? `${Math.floor(exp.duration_minutes / 60)} ore` : "Variabil",
-            image: primaryImage,
+            image: primaryImageUrl,
+            focal_x: primary?.focal_x ?? 50,
+            focal_y: primary?.focal_y ?? 50,
             badge: exp.categories?.name || null,
             badgeColor: "bg-primary"
           };
@@ -214,10 +219,13 @@ export function FeaturedExperiences() {
             >
               {/* Image */}
               <div className="relative h-52 overflow-hidden">
-                <img
+                <ExperienceImage
                   src={exp.image}
                   alt={exp.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  focalX={exp.focal_x}
+                  focalY={exp.focal_y}
+                  className="h-full w-full"
+                  imgClassName="group-hover:scale-110 transition-transform duration-500"
                 />
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

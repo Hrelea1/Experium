@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BookingForm } from "@/components/booking/BookingForm";
+import { ExperienceImage } from "@/components/ExperienceImage";
 
 interface RecommendedExperience {
   id: string;
@@ -26,8 +27,10 @@ interface RecommendedExperience {
   location_name: string;
   price: number;
   avg_rating: number;
-  experience_images: { image_url: string; is_primary: boolean }[];
+  experience_images: { image_url: string; is_primary: boolean; focal_x: number; focal_y: number }[];
 }
+
+type GalleryImage = { url: string; focal_x: number; focal_y: number };
 
 // Mock data - in production this would come from an API
 const experiencesData: Record<string, {
@@ -177,7 +180,7 @@ export default function ExperienceDetail() {
           .select(`
             *,
             categories(name),
-            experience_images(image_url, is_primary, display_order)
+             experience_images(image_url, is_primary, display_order, focal_x, focal_y)
           `)
           .eq('id', id)
           .eq('is_active', true)
@@ -189,7 +192,11 @@ export default function ExperienceDetail() {
           // Transform database data to match expected format
           const images = data.experience_images
             ?.sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
-            .map((img: any) => img.image_url) || [];
+            .map((img: any) => ({
+              url: img.image_url,
+              focal_x: img.focal_x ?? 50,
+              focal_y: img.focal_y ?? 50,
+            })) || [];
 
           setExperience({
             id: data.id,
@@ -200,13 +207,26 @@ export default function ExperienceDetail() {
             rating: data.avg_rating || 4.5,
             reviews: data.total_reviews || 0,
             duration: data.duration_minutes ? `${Math.floor(data.duration_minutes / 60)} ore` : "Variabil",
-            image: images[0] || "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&h=800&fit=crop",
-            gallery: images.length > 0 ? images : [
-              "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop",
-              "https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=600&h=400&fit=crop",
-            ],
+            image:
+              images[0]?.url ||
+              "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&h=800&fit=crop",
+            gallery:
+              (images.length > 0
+                ? images
+                : ([
+                    {
+                      url: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop",
+                      focal_x: 50,
+                      focal_y: 50,
+                    },
+                    {
+                      url: "https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=600&h=400&fit=crop",
+                      focal_x: 50,
+                      focal_y: 50,
+                    },
+                  ] as GalleryImage[])),
             description: data.description,
-            includes: ["Echipament complet", "Instructor profesionist", "Asigurare", "Fotografii"],
+            includes: Array.isArray(data.includes) ? data.includes : [],
             maxParticipants: data.max_participants || 10,
           });
         }
@@ -232,7 +252,7 @@ export default function ExperienceDetail() {
             location_name,
             price,
             avg_rating,
-            experience_images (image_url, is_primary)
+             experience_images (image_url, is_primary, focal_x, focal_y)
           `)
           .eq('is_active', true)
           .neq('id', id)
@@ -301,11 +321,13 @@ export default function ExperienceDetail() {
               transition={{ duration: 0.5 }}
             >
               {/* Main Image */}
-              <div className="relative rounded-2xl overflow-hidden mb-4">
-                <img
-                  src={experience.gallery[selectedImage]}
+              <div className="relative h-[400px] rounded-2xl overflow-hidden mb-4">
+                <ExperienceImage
+                  src={(experience.gallery as GalleryImage[])[selectedImage]?.url}
                   alt={experience.title}
-                  className="w-full h-[400px] object-cover"
+                  focalX={(experience.gallery as GalleryImage[])[selectedImage]?.focal_x}
+                  focalY={(experience.gallery as GalleryImage[])[selectedImage]?.focal_y}
+                  className="h-full w-full"
                 />
                 
                 {/* Action Buttons */}
@@ -339,7 +361,13 @@ export default function ExperienceDetail() {
                       selectedImage === index ? "ring-2 ring-primary" : ""
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <ExperienceImage
+                      src={(img as any).url ?? img}
+                      alt=""
+                      focalX={(img as any).focal_x}
+                      focalY={(img as any).focal_y}
+                      className="h-full w-full"
+                    />
                   </button>
                 ))}
               </div>
@@ -430,10 +458,12 @@ export default function ExperienceDetail() {
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {recommendedExperiences.map((rec) => {
-                  const primaryImage = rec.experience_images?.find(img => img.is_primary);
-                  const imageUrl = primaryImage?.image_url || 
-                    rec.experience_images?.[0]?.image_url || 
+                  const primary = rec.experience_images?.find((img) => img.is_primary) || rec.experience_images?.[0];
+                  const imageUrl =
+                    primary?.image_url ||
                     "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop";
+                  const focalX = primary?.focal_x ?? 50;
+                  const focalY = primary?.focal_y ?? 50;
                   
                   return (
                     <Link
@@ -442,10 +472,13 @@ export default function ExperienceDetail() {
                       className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 border border-border/50"
                     >
                       <div className="relative h-40 overflow-hidden">
-                        <img
+                        <ExperienceImage
                           src={imageUrl}
                           alt={rec.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          focalX={focalX}
+                          focalY={focalY}
+                          className="h-full w-full"
+                          imgClassName="group-hover:scale-110 transition-transform duration-500"
                         />
                       </div>
                       <div className="p-4">
