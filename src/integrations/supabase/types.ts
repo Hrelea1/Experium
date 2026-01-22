@@ -185,6 +185,8 @@ export type Database = {
           created_at: string | null
           display_order: number | null
           experience_id: string
+          focal_x: number
+          focal_y: number
           id: string
           image_url: string
           is_primary: boolean | null
@@ -193,6 +195,8 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           experience_id: string
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_url: string
           is_primary?: boolean | null
@@ -201,6 +205,8 @@ export type Database = {
           created_at?: string | null
           display_order?: number | null
           experience_id?: string
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_url?: string
           is_primary?: boolean | null
@@ -275,6 +281,7 @@ export type Database = {
           description: string
           duration_minutes: number | null
           id: string
+          includes: string[]
           is_active: boolean | null
           is_featured: boolean | null
           location_name: string
@@ -297,6 +304,7 @@ export type Database = {
           description: string
           duration_minutes?: number | null
           id?: string
+          includes?: string[]
           is_active?: boolean | null
           is_featured?: boolean | null
           location_name: string
@@ -319,6 +327,7 @@ export type Database = {
           description?: string
           duration_minutes?: number | null
           id?: string
+          includes?: string[]
           is_active?: boolean | null
           is_featured?: boolean | null
           location_name?: string
