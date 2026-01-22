@@ -18,6 +18,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { uploadExperienceImageFile } from "@/lib/experienceImages";
 import { FocalPointPicker } from "@/components/admin/FocalPointPicker";
+import { ExperienceImage } from "@/components/ExperienceImage";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   ArrowDown,
   ArrowUp,
@@ -149,6 +152,20 @@ export default function EditExperience() {
   const [isFeatured, setIsFeatured] = useState(false);
 
   const [includes, setIncludes] = useState<string[]>([]);
+
+  const [thumbPreset, setThumbPreset] = useState<"square" | "wide" | "classic">("wide");
+
+  const thumbRatio = useMemo(() => {
+    switch (thumbPreset) {
+      case "square":
+        return 1;
+      case "classic":
+        return 4 / 3;
+      case "wide":
+      default:
+        return 16 / 9;
+    }
+  }, [thumbPreset]);
 
   const [images, setImages] = useState<ImageDraft[]>([]);
   const [services, setServices] = useState<ServiceDraft[]>([]);
@@ -881,6 +898,64 @@ export default function EditExperience() {
                 </Button>
               </CardHeader>
               <CardContent className="space-y-3">
+                <div className="rounded-md border bg-card p-4 space-y-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="text-sm font-medium">Preview thumbnails (încadrare)</div>
+                      <p className="text-xs text-muted-foreground">
+                        Verifică rapid cum arată punctul de focus pe diverse formate.
+                      </p>
+                    </div>
+
+                    <ToggleGroup
+                      type="single"
+                      value={thumbPreset}
+                      onValueChange={(v) => {
+                        if (v === "square" || v === "wide" || v === "classic") setThumbPreset(v);
+                      }}
+                      className="justify-start sm:justify-end"
+                    >
+                      <ToggleGroupItem value="square" aria-label="Pătrat">
+                        1:1
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="wide" aria-label="Wide">
+                        16:9
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="classic" aria-label="Clasic">
+                        4:3
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
+
+                  {images.filter((i) => i.image_url.trim().length > 0).length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Adaugă un URL / încarcă o imagine ca să vezi thumbnails.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                      {images
+                        .filter((i) => i.image_url.trim().length > 0)
+                        .map((img, idx) => (
+                          <div key={`thumb-${img.clientId}`} className="space-y-2">
+                            <AspectRatio ratio={thumbRatio} className="overflow-hidden rounded-md border bg-muted">
+                              <ExperienceImage
+                                src={img.image_url}
+                                alt={`Thumbnail ${idx + 1}`}
+                                focalX={img.focal_x}
+                                focalY={img.focal_y}
+                                className="h-full w-full"
+                              />
+
+                              <div className="pointer-events-none absolute left-2 top-2 rounded bg-background/70 px-2 py-0.5 text-[11px] text-foreground backdrop-blur-sm">
+                                #{idx + 1}{img.is_primary ? " • principală" : ""}
+                              </div>
+                            </AspectRatio>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
                 {images.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nu există imagini.</p>
                 ) : (
