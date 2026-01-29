@@ -28,6 +28,7 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { useCart, DeliveryType } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCheckout } from "@/hooks/useCheckout";
 
 type PaymentMethod = 'card' | 'transfer' | 'apple' | 'google';
 
@@ -51,7 +52,7 @@ export default function Cart() {
     setCheckoutStep
   } = useCart();
   const { user } = useAuth();
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { processCheckout, isProcessing } = useCheckout();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
 
   const handleRemoveItem = (id: string) => {
@@ -100,7 +101,7 @@ export default function Cart() {
     setCheckoutStep(3);
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!user) {
       toast({
         title: t('cart.loginRequired'),
@@ -111,11 +112,17 @@ export default function Cart() {
       return;
     }
 
-    setIsProcessing(true);
-    
-    setTimeout(() => {
+    const result = await processCheckout(
+      items,
+      deliveryType,
+      personalDetails,
+      deliveryType === 'physical' ? deliveryAddress : null
+    );
+
+    if (result?.success) {
       navigate("/order-confirmation", {
         state: {
+          orderData: result,
           cartItems: items,
           deliveryType,
           personalDetails,
@@ -124,8 +131,7 @@ export default function Cart() {
       });
       
       clearCart();
-      setIsProcessing(false);
-    }, 1500);
+    }
   };
 
   const getStepTitle = () => {

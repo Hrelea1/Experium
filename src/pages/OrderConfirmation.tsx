@@ -48,25 +48,44 @@ export default function OrderConfirmation() {
   const [orderData, setOrderData] = useState<OrderData | null>(null);
 
   useEffect(() => {
-    // Get order data from navigation state or generate mock data
+    // Get order data from navigation state
     if (location.state?.orderData) {
-      setOrderData(location.state.orderData);
+      const data = location.state.orderData;
+      const items = data.vouchers?.map((v: any) => ({
+        id: v.id,
+        title: v.experienceTitle,
+        location: '',
+        price: v.price,
+        quantity: 1,
+        image: '/placeholder.svg',
+        voucherCode: v.code,
+      })) || [];
+      
+      const subtotal = items.reduce((sum: number, item: OrderItem) => sum + item.price, 0);
+      
+      setOrderData({
+        orderId: data.orderId,
+        items,
+        subtotal,
+        tax: 0, // TVA already included
+        total: subtotal,
+        createdAt: new Date().toISOString(),
+      });
     } else if (location.state?.cartItems) {
-      // Generate order from cart items
+      // Fallback for old flow (should not happen with new checkout)
       const items = location.state.cartItems.map((item: any) => ({
         ...item,
         voucherCode: generateVoucherCode(),
       }));
       
       const subtotal = items.reduce((sum: number, item: OrderItem) => sum + item.price * item.quantity, 0);
-      const tax = subtotal * 0.19;
       
       setOrderData({
         orderId: `ORD-${Date.now().toString(36).toUpperCase()}`,
         items,
         subtotal,
-        tax,
-        total: subtotal + tax,
+        tax: 0,
+        total: subtotal,
         createdAt: new Date().toISOString(),
       });
     } else {
@@ -223,7 +242,7 @@ export default function OrderConfirmation() {
             ))}
           </motion.div>
 
-          {/* Order Summary */}
+          {/* Order Summary - No separate VAT display */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -233,19 +252,13 @@ export default function OrderConfirmation() {
               <h2 className="text-lg font-bold mb-4">{t('orderConfirmation.orderSummary')}</h2>
               
               <div className="space-y-2">
-                <div className="flex justify-between text-muted-foreground">
-                  <span>{t('cart.subtotal')}</span>
-                  <span>{orderData.subtotal.toFixed(2)} {t('common.lei')}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>{t('cart.vat')}</span>
-                  <span>{orderData.tax.toFixed(2)} {t('common.lei')}</span>
-                </div>
-                <Separator className="my-3" />
                 <div className="flex justify-between text-lg font-bold">
-                  <span>{t('cart.total')}</span>
+                  <span>{t('cart.totalWithVat')}</span>
                   <span>{orderData.total.toFixed(2)} {t('common.lei')}</span>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  TVA inclus în preț
+                </p>
               </div>
             </Card>
           </motion.div>

@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      availability_slots: {
+        Row: {
+          booked_participants: number | null
+          created_at: string | null
+          end_time: string
+          experience_id: string
+          id: string
+          is_available: boolean | null
+          max_participants: number | null
+          provider_user_id: string
+          slot_date: string
+          start_time: string
+          updated_at: string | null
+        }
+        Insert: {
+          booked_participants?: number | null
+          created_at?: string | null
+          end_time: string
+          experience_id: string
+          id?: string
+          is_available?: boolean | null
+          max_participants?: number | null
+          provider_user_id: string
+          slot_date: string
+          start_time: string
+          updated_at?: string | null
+        }
+        Update: {
+          booked_participants?: number | null
+          created_at?: string | null
+          end_time?: string
+          experience_id?: string
+          id?: string
+          is_available?: boolean | null
+          max_participants?: number | null
+          provider_user_id?: string
+          slot_date?: string
+          start_time?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availability_slots_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           booking_date: string
@@ -180,6 +230,35 @@ export type Database = {
           },
         ]
       }
+      experience_ambassadors: {
+        Row: {
+          ambassador_user_id: string
+          created_at: string | null
+          experience_id: string
+          id: string
+        }
+        Insert: {
+          ambassador_user_id: string
+          created_at?: string | null
+          experience_id: string
+          id?: string
+        }
+        Update: {
+          ambassador_user_id?: string
+          created_at?: string | null
+          experience_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_ambassadors_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: true
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       experience_images: {
         Row: {
           created_at: string | null
@@ -214,6 +293,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "experience_images_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experience_providers: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          experience_id: string
+          id: string
+          is_active: boolean | null
+          provider_user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          experience_id: string
+          id?: string
+          is_active?: boolean | null
+          provider_user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          experience_id?: string
+          id?: string
+          is_active?: boolean | null
+          provider_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_providers_experience_id_fkey"
             columns: ["experience_id"]
             isOneToOne: false
             referencedRelation: "experiences"
@@ -273,6 +387,7 @@ export type Database = {
       }
       experiences: {
         Row: {
+          ambassador_id: string | null
           avg_rating: number | null
           category_id: string
           city_id: string | null
@@ -296,6 +411,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          ambassador_id?: string | null
           avg_rating?: number | null
           category_id: string
           city_id?: string | null
@@ -319,6 +435,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          ambassador_id?: string | null
           avg_rating?: number | null
           category_id?: string
           city_id?: string | null
@@ -547,6 +664,7 @@ export type Database = {
       }
       vouchers: {
         Row: {
+          ambassador_id: string | null
           code: string
           created_at: string
           experience_id: string | null
@@ -564,6 +682,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          ambassador_id?: string | null
           code: string
           created_at?: string
           experience_id?: string | null
@@ -581,6 +700,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          ambassador_id?: string | null
           code?: string
           created_at?: string
           experience_id?: string | null
@@ -641,6 +761,14 @@ export type Database = {
           }
       cleanup_rate_limits: { Args: never; Returns: undefined }
       generate_voucher_code: { Args: never; Returns: string }
+      get_ambassador_stats: {
+        Args: { ambassador_user_id: string }
+        Returns: {
+          active_experiences_count: number
+          total_revenue: number
+          total_sales: number
+        }[]
+      }
       get_user_role: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -650,7 +778,9 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      is_ambassador: { Args: never; Returns: boolean }
       is_primary_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_provider: { Args: never; Returns: boolean }
       redeem_voucher: {
         Args: {
           p_booking_date: string
@@ -683,7 +813,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "provider" | "ambassador"
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
       voucher_status:
         | "active"
@@ -818,7 +948,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "provider", "ambassador"],
       booking_status: ["pending", "confirmed", "cancelled", "completed"],
       voucher_status: ["active", "used", "expired", "exchanged", "transferred"],
     },

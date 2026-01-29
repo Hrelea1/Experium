@@ -77,7 +77,7 @@ export function Regions() {
   const others = displayRegions.slice(1);
 
   return (
-    <section id="regions" className="py-20 lg:py-28 bg-background">
+    <section id="regions" className="py-12 lg:py-16 bg-background">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
