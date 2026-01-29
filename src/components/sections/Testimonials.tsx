@@ -41,7 +41,7 @@ export function Testimonials() {
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-cream">
+    <section className="py-12 lg:py-16 bg-cream">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

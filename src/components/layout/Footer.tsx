@@ -40,12 +40,13 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-3 lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-4">
+            <Link to="/" className="flex items-center gap-1 mb-4">
               <span 
-                className="font-bold text-2xl text-primary"
+                className="font-bold text-2xl flex items-baseline"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
-                experium
+                <span className="text-primary text-3xl font-extrabold">E</span>
+                <span className="text-primary">xperium</span>
               </span>
             </Link>
             <p className="text-secondary-foreground/70 mb-6 max-w-xs">

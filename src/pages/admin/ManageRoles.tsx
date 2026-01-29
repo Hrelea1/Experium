@@ -56,9 +56,10 @@ const ManageRoles = () => {
   const [allProfiles, setAllProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [newUserRole, setNewUserRole] = useState<'admin' | 'moderator'>('moderator');
+  const [newUserRole, setNewUserRole] = useState<'admin' | 'moderator' | 'provider' | 'ambassador'>('moderator');
   const [granting, setGranting] = useState(false);
   const [isPrimaryAdmin, setIsPrimaryAdmin] = useState(false);
+  const [ambassadorStats, setAmbassadorStats] = useState<Record<string, any>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -108,6 +109,19 @@ const ManageRoles = () => {
 
       if (rolesError) throw rolesError;
       setUserRoles(rolesData || []);
+
+      // Fetch ambassador stats for users with ambassador role
+      const ambassadorRoles = rolesData?.filter(r => r.role === 'ambassador') || [];
+      const statsMap: Record<string, any> = {};
+      
+      for (const role of ambassadorRoles) {
+        const { data: stats } = await supabase
+          .rpc('get_ambassador_stats', { ambassador_user_id: role.user_id });
+        if (stats && stats.length > 0) {
+          statsMap[role.user_id] = stats[0];
+        }
+      }
+      setAmbassadorStats(statsMap);
     } catch (error: any) {
       toast({
         title: 'Eroare',
@@ -236,11 +250,15 @@ const ManageRoles = () => {
     const variants: Record<string, any> = {
       admin: { variant: 'default', label: 'Admin' },
       moderator: { variant: 'secondary', label: 'Moderator' },
+      provider: { variant: 'outline', label: 'Furnizor', className: 'border-blue-500 text-blue-500' },
+      ambassador: { variant: 'outline', label: 'Ambasador', className: 'border-green-500 text-green-500' },
       user: { variant: 'outline', label: 'User' },
     };
     const config = variants[role] || variants.user;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
   };
+
+  const ambassadorUsers = userRoles.filter(r => r.role === 'ambassador');
 
   if (!isPrimaryAdmin) {
     return (
@@ -328,9 +346,9 @@ const ManageRoles = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <Select 
-                              value={selectedUserId === profile.id ? newUserRole : ''} 
-                              onValueChange={(v: 'admin' | 'moderator') => {
+                              <Select 
+                                value={selectedUserId === profile.id ? newUserRole : ''} 
+                                onValueChange={(v: 'admin' | 'moderator' | 'provider' | 'ambassador') => {
                                   setSelectedUserId(profile.id);
                                   setNewUserRole(v);
                                 }}
@@ -344,6 +362,12 @@ const ManageRoles = () => {
                                   </SelectItem>
                                   <SelectItem value="moderator" disabled={roles.includes('moderator')}>
                                     Moderator
+                                  </SelectItem>
+                                  <SelectItem value="provider" disabled={roles.includes('provider')}>
+                                    Furnizor
+                                  </SelectItem>
+                                  <SelectItem value="ambassador" disabled={roles.includes('ambassador')}>
+                                    Ambasador
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
@@ -438,6 +462,58 @@ const ManageRoles = () => {
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Ambassador List with Stats */}
+        {ambassadorUsers.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                🏆 Ambasadori ({ambassadorUsers.length})
+              </CardTitle>
+              <CardDescription>
+                Statistici vânzări per ambasador
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Ambasador</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Experiențe Active</TableHead>
+                    <TableHead>Vânzări</TableHead>
+                    <TableHead>Venituri Totale</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {ambassadorUsers.map((role) => {
+                    const profile = getProfileById(role.user_id);
+                    const stats = ambassadorStats[role.user_id];
+                    return (
+                      <TableRow key={role.id}>
+                        <TableCell className="font-medium">
+                          {profile?.full_name || 'N/A'}
+                        </TableCell>
+                        <TableCell>{profile?.email || 'N/A'}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            {stats?.active_experiences_count || 0} experiențe
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {stats?.total_sales || 0} vânzări
+                        </TableCell>
+                        <TableCell className="font-semibold text-green-600">
+                          {stats?.total_revenue?.toLocaleString() || 0} Lei
                         </TableCell>
                       </TableRow>
                     );

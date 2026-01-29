@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Globe } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Globe, Truck, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { useRoleCheck } from "@/hooks/useRoleCheck";
 import { useTranslation } from "react-i18next";
 import { SearchDialog } from "@/components/layout/SearchDialog";
 import {
@@ -24,6 +25,7 @@ export function Header() {
   const { user, signOut } = useAuth();
   const { totalItems } = useCart();
   const { isAdmin } = useAdminCheck();
+  const { isProvider, isAmbassador } = useRoleCheck();
   const { t, i18n } = useTranslation();
 
   const currentLanguage = i18n.language;
@@ -55,15 +57,16 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border/50 pt-[env(safe-area-inset-top)]">
       <div className="container">
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
-          {/* Logo - Wordmark */}
-          <Link to="/" className="flex items-center gap-2 group">
+          {/* Logo - Wordmark with E */}
+          <Link to="/" className="flex items-center gap-1 group">
             <motion.span 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="font-bold text-2xl sm:text-3xl text-primary tracking-tight"
+              className="font-bold text-2xl sm:text-3xl tracking-tight flex items-baseline"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
-              experium
+              <span className="text-primary text-3xl sm:text-4xl font-extrabold">E</span>
+              <span className="text-primary">xperium</span>
             </motion.span>
           </Link>
 
@@ -191,6 +194,22 @@ export function Header() {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                     </>
+                  )}
+                  {isAmbassador && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/ambassador" className="flex items-center gap-2">
+                        <Award className="h-4 w-4" />
+                        Dashboard Ambasador
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {isProvider && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/provider" className="flex items-center gap-2">
+                        <Truck className="h-4 w-4" />
+                        Dashboard Furnizor
+                      </Link>
+                    </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="flex items-center gap-2">

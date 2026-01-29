@@ -31,6 +31,9 @@ import VoucherBuilder from "./pages/admin/VoucherBuilder";
 import ContentEditor from "./pages/admin/ContentEditor";
 import ContentAudit from "./pages/admin/ContentAudit";
 import EditExperience from "./pages/admin/EditExperience";
+import About from "./pages/About";
+import ProviderDashboard from "./pages/provider/ProviderDashboard";
+import AmbassadorDashboard from "./pages/ambassador/AmbassadorDashboard";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 
@@ -60,6 +63,13 @@ const App = () => (
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/gift-ideas" element={<GiftIdeas />} />
               <Route path="/partners" element={<Partners />} />
+              <Route path="/about" element={<About />} />
+              
+              {/* Provider Routes */}
+              <Route path="/provider" element={<ProviderDashboard />} />
+              
+              {/* Ambassador Routes */}
+              <Route path="/ambassador" element={<AmbassadorDashboard />} />
               
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminDashboard />} />
