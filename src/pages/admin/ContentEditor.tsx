@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAllHomepageContent, useUpdateHomepageContent, useUploadHomepageImage } from "@/hooks/useHomepageContent";
 import { Loader2, Upload, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { RegionsEditor } from "@/components/admin/RegionsEditor";
 
 export default function ContentEditor() {
   const { data: sections, isLoading } = useAllHomepageContent();
@@ -276,13 +277,28 @@ export default function ContentEditor() {
           </TabsContent>
 
           <TabsContent value="regions">
-            <Card>
-              <CardHeader>
-                <CardTitle>Secțiunea Regiuni</CardTitle>
-                <CardDescription>Editează titlul și descrierea secțiunii de regiuni</CardDescription>
-              </CardHeader>
-              <CardContent>{renderSimpleSectionEditor("regions", "Regiuni")}</CardContent>
-            </Card>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Text Secțiune Regiuni</CardTitle>
+                  <CardDescription>Editează titlul și descrierea secțiunii de regiuni</CardDescription>
+                </CardHeader>
+                <CardContent>{renderSimpleSectionEditor("regions", "Regiuni")}</CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Imagini Regiuni</CardTitle>
+                  <CardDescription>
+                    Încarcă imagini personalizate pentru fiecare regiune. Dacă nu este setată o imagine,
+                    se va folosi imaginea implicită.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RegionsEditor />
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="how-it-works">
