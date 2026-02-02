@@ -64,36 +64,11 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
-            <button
-              onClick={() => handleNavClick("experiences")}
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
-            >
-              {t('nav.romanianExperiences')}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </button>
-
-            <button
-              onClick={() => handleNavClick("regions")}
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
-            >
-              {t('nav.regions')}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </button>
-
             <Link
               to="/about"
               className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
             >
               {t('nav.about')}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </Link>
-
-            <Link
-              to="/partners"
-              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group flex items-center gap-1"
-            >
-              <Handshake className="h-4 w-4" />
-              {t('nav.partners')}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
             </Link>
 
@@ -251,41 +226,12 @@ export function Header() {
             className="lg:hidden bg-card border-t border-border"
           >
             <nav className="container py-4 flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  handleNavClick("experiences");
-                  setIsMenuOpen(false);
-                }}
-                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors text-left"
-              >
-                {t('nav.romanianExperiences')}
-              </button>
-
-              <button
-                onClick={() => {
-                  handleNavClick("regions");
-                  setIsMenuOpen(false);
-                }}
-                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors text-left"
-              >
-                {t('nav.regions')}
-              </button>
-
               <Link
                 to="/about"
                 className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.about')}
-              </Link>
-
-              <Link
-                to="/partners"
-                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Handshake className="h-4 w-4" />
-                {t('nav.partners')}
               </Link>
 
               {isAdmin && (
