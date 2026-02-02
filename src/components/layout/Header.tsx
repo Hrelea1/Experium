@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Globe, Truck, Award } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Truck, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -26,15 +26,7 @@ export function Header() {
   const { totalItems } = useCart();
   const { isAdmin } = useAdminCheck();
   const { isProvider, isAmbassador } = useRoleCheck();
-  const { t, i18n } = useTranslation();
-
-  const currentLanguage = i18n.language;
-
-  const toggleLanguage = () => {
-    const newLang = currentLanguage === 'ro' ? 'en' : 'ro';
-    i18n.changeLanguage(newLang);
-    localStorage.setItem('i18nextLng', newLang);
-  };
+  const { t } = useTranslation();
 
   const handleNavClick = (sectionId: string) => {
     if (window.location.pathname !== '/') {
@@ -72,7 +64,6 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
-            {/* 100% Romanian Experiences Link */}
             <button
               onClick={() => handleNavClick("experiences")}
               className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
@@ -89,7 +80,14 @@ export function Header() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
             </button>
 
-            {/* Partners Link */}
+            <Link
+              to="/about"
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
+            >
+              {t('nav.about')}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+            </Link>
+
             <Link
               to="/partners"
               className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group flex items-center gap-1"
@@ -113,18 +111,6 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 lg:gap-4">
-            {/* Language Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleLanguage}
-              className="hidden sm:flex items-center gap-1 text-muted-foreground hover:text-foreground"
-              aria-label={t('nav.language')}
-            >
-              <Globe className="h-4 w-4" />
-              <span className="text-xs font-medium uppercase">{currentLanguage}</span>
-            </Button>
-
             <Button 
               variant="ghost" 
               size="icon" 
@@ -134,7 +120,7 @@ export function Header() {
                 e.stopPropagation();
                 setSearchOpen(true);
               }}
-              aria-label="Search"
+              aria-label="Căutare"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -286,6 +272,14 @@ export function Header() {
               </button>
 
               <Link
+                to="/about"
+                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {t('nav.about')}
+              </Link>
+
+              <Link
                 to="/partners"
                 className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
                 onClick={() => setIsMenuOpen(false)}
@@ -347,7 +341,7 @@ export function Header() {
                     setSearchOpen(true);
                     setIsMenuOpen(false);
                   }}
-                  aria-label="Search"
+                  aria-label="Căutare"
                 >
                   <Search className="h-5 w-5" />
                 </Button>
@@ -369,17 +363,6 @@ export function Header() {
                   <Link to="/cart" onClick={() => setIsMenuOpen(false)}>
                     <ShoppingBag className="h-5 w-5" />
                   </Link>
-                </Button>
-                {/* Language Toggle Mobile */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleLanguage}
-                  className="flex items-center gap-1"
-                  aria-label={t('nav.language')}
-                >
-                  <Globe className="h-4 w-4" />
-                  <span className="text-xs font-medium uppercase">{currentLanguage}</span>
                 </Button>
                 {user ? (
                   <Button 
