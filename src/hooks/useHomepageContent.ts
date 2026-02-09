@@ -87,8 +87,7 @@ export function useUpdateHomepageContent() {
 
       const { data, error } = await supabase
         .from("homepage_content")
-        .update({ content: sanitizedContent })
-        .eq("section_key", sectionKey)
+        .upsert({ section_key: sectionKey, content: sanitizedContent }, { onConflict: 'section_key' })
         .select()
         .single();
 

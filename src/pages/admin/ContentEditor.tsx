@@ -216,8 +216,8 @@ export default function ContentEditor() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Editor Conținut Homepage</h2>
-            <p className="text-muted-foreground">Editează text, imagini și linkuri pentru fiecare secțiune</p>
+          <h2 className="text-3xl font-bold">Editor Conținut</h2>
+            <p className="text-muted-foreground">Editează text, imagini și linkuri pentru paginile site-ului</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" asChild>
@@ -236,7 +236,7 @@ export default function ContentEditor() {
         </div>
 
         <Tabs defaultValue="hero" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="flex flex-wrap gap-1">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="categories">Categorii</TabsTrigger>
             <TabsTrigger value="featured">Featured</TabsTrigger>
@@ -244,6 +244,9 @@ export default function ContentEditor() {
             <TabsTrigger value="how-it-works">Cum Funcționează</TabsTrigger>
             <TabsTrigger value="testimonials">Testimoniale</TabsTrigger>
             <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
+            <TabsTrigger value="faq">FAQ</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
+            <TabsTrigger value="terms">Termeni</TabsTrigger>
           </TabsList>
 
           <TabsContent value="hero">
@@ -285,18 +288,12 @@ export default function ContentEditor() {
                 </CardHeader>
                 <CardContent>{renderSimpleSectionEditor("regions", "Regiuni")}</CardContent>
               </Card>
-
               <Card>
                 <CardHeader>
                   <CardTitle>Imagini Regiuni</CardTitle>
-                  <CardDescription>
-                    Încarcă imagini personalizate pentru fiecare regiune. Dacă nu este setată o imagine,
-                    se va folosi imaginea implicită.
-                  </CardDescription>
+                  <CardDescription>Încarcă imagini personalizate pentru fiecare regiune.</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <RegionsEditor />
-                </CardContent>
+                <CardContent><RegionsEditor /></CardContent>
               </Card>
             </div>
           </TabsContent>
@@ -305,7 +302,7 @@ export default function ContentEditor() {
             <Card>
               <CardHeader>
                 <CardTitle>Secțiunea Cum Funcționează</CardTitle>
-                <CardDescription>Editează titlul și descrierea secțiunii despre procesul de utilizare</CardDescription>
+                <CardDescription>Editează titlul și descrierea</CardDescription>
               </CardHeader>
               <CardContent>{renderSimpleSectionEditor("how-it-works", "Cum Funcționează")}</CardContent>
             </Card>
@@ -325,55 +322,195 @@ export default function ContentEditor() {
             <Card>
               <CardHeader>
                 <CardTitle>Secțiunea Newsletter</CardTitle>
-                <CardDescription>Editează conținutul secțiunii de abonare la newsletter</CardDescription>
+                <CardDescription>Editează conținutul secțiunii de abonare</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <Label>Title</Label>
-                    <Input
-                      value={getContent("newsletter").title || ""}
-                      onChange={(e) => handleContentChange("newsletter", "title", e.target.value)}
-                    />
+                    <Input value={getContent("newsletter").title || ""} onChange={(e) => handleContentChange("newsletter", "title", e.target.value)} />
                   </div>
-
                   <div className="space-y-2">
                     <Label>Subtitle</Label>
-                    <Textarea
-                      value={getContent("newsletter").subtitle || ""}
-                      onChange={(e) => handleContentChange("newsletter", "subtitle", e.target.value)}
-                      rows={3}
-                    />
+                    <Textarea value={getContent("newsletter").subtitle || ""} onChange={(e) => handleContentChange("newsletter", "subtitle", e.target.value)} rows={3} />
                   </div>
-
                   <div className="space-y-2">
                     <Label>Email Placeholder</Label>
-                    <Input
-                      value={getContent("newsletter").placeholder || ""}
-                      onChange={(e) => handleContentChange("newsletter", "placeholder", e.target.value)}
-                    />
+                    <Input value={getContent("newsletter").placeholder || ""} onChange={(e) => handleContentChange("newsletter", "placeholder", e.target.value)} />
                   </div>
-
                   <div className="space-y-2">
                     <Label>Button Text</Label>
-                    <Input
-                      value={getContent("newsletter").ctaText || ""}
-                      onChange={(e) => handleContentChange("newsletter", "ctaText", e.target.value)}
-                    />
+                    <Input value={getContent("newsletter").ctaText || ""} onChange={(e) => handleContentChange("newsletter", "ctaText", e.target.value)} />
                   </div>
-
                   <div className="space-y-2">
                     <Label>Disclaimer</Label>
-                    <Input
-                      value={getContent("newsletter").disclaimer || ""}
-                      onChange={(e) => handleContentChange("newsletter", "disclaimer", e.target.value)}
-                    />
+                    <Input value={getContent("newsletter").disclaimer || ""} onChange={(e) => handleContentChange("newsletter", "disclaimer", e.target.value)} />
                   </div>
-
                   <Button onClick={() => handleSave("newsletter")} disabled={updateContent.isPending}>
                     {updateContent.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                     Salvează Modificările
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* FAQ Editor */}
+          <TabsContent value="faq">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pagina FAQ</CardTitle>
+                <CardDescription>Editează întrebările și răspunsurile de pe pagina FAQ</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {(getContent("faq").items || []).map((item: any, idx: number) => (
+                    <div key={idx} className="p-4 border rounded-lg space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="font-semibold">Întrebarea {idx + 1}</Label>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => {
+                            const items = [...(getContent("faq").items || [])];
+                            items.splice(idx, 1);
+                            handleContentChange("faq", "items", items);
+                          }}
+                        >
+                          Șterge
+                        </Button>
+                      </div>
+                      <Input
+                        placeholder="Întrebare"
+                        value={item.q || ""}
+                        onChange={(e) => {
+                          const items = [...(getContent("faq").items || [])];
+                          items[idx] = { ...items[idx], q: e.target.value };
+                          handleContentChange("faq", "items", items);
+                        }}
+                      />
+                      <Textarea
+                        placeholder="Răspuns"
+                        value={item.a || ""}
+                        rows={2}
+                        onChange={(e) => {
+                          const items = [...(getContent("faq").items || [])];
+                          items[idx] = { ...items[idx], a: e.target.value };
+                          handleContentChange("faq", "items", items);
+                        }}
+                      />
+                    </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const items = [...(getContent("faq").items || []), { q: "", a: "" }];
+                      handleContentChange("faq", "items", items);
+                    }}
+                  >
+                    + Adaugă Întrebare
+                  </Button>
+                  <div>
+                    <Button onClick={() => handleSave("faq")} disabled={updateContent.isPending}>
+                      {updateContent.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                      Salvează FAQ
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Contact Editor */}
+          <TabsContent value="contact">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pagina Contact</CardTitle>
+                <CardDescription>Editează informațiile de contact</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="space-y-2"><Label>Titlu</Label><Input value={getContent("contact").title || ""} onChange={(e) => handleContentChange("contact", "title", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Subtitlu</Label><Input value={getContent("contact").subtitle || ""} onChange={(e) => handleContentChange("contact", "subtitle", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Telefon</Label><Input value={getContent("contact").phone || ""} onChange={(e) => handleContentChange("contact", "phone", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Email</Label><Input value={getContent("contact").email || ""} onChange={(e) => handleContentChange("contact", "email", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Adresă</Label><Input value={getContent("contact").address || ""} onChange={(e) => handleContentChange("contact", "address", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Program (o linie per rând)</Label><Textarea value={getContent("contact").schedule || ""} onChange={(e) => handleContentChange("contact", "schedule", e.target.value)} rows={3} /></div>
+                  <Button onClick={() => handleSave("contact")} disabled={updateContent.isPending}>
+                    {updateContent.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                    Salvează Contact
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Terms Editor */}
+          <TabsContent value="terms">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pagina Termeni și Condiții</CardTitle>
+                <CardDescription>Editează secțiunile din pagina de termeni</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="space-y-2"><Label>Titlu</Label><Input value={getContent("terms").title || ""} onChange={(e) => handleContentChange("terms", "title", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Ultima actualizare</Label><Input value={getContent("terms").lastUpdated || ""} onChange={(e) => handleContentChange("terms", "lastUpdated", e.target.value)} /></div>
+                  
+                  {(getContent("terms").sections || []).map((section: any, idx: number) => (
+                    <div key={idx} className="p-4 border rounded-lg space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="font-semibold">Secțiunea {idx + 1}</Label>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => {
+                            const sections = [...(getContent("terms").sections || [])];
+                            sections.splice(idx, 1);
+                            handleContentChange("terms", "sections", sections);
+                          }}
+                        >
+                          Șterge
+                        </Button>
+                      </div>
+                      <Input
+                        placeholder="Titlu secțiune"
+                        value={section.heading || ""}
+                        onChange={(e) => {
+                          const sections = [...(getContent("terms").sections || [])];
+                          sections[idx] = { ...sections[idx], heading: e.target.value };
+                          handleContentChange("terms", "sections", sections);
+                        }}
+                      />
+                      <Textarea
+                        placeholder="Conținut"
+                        value={section.text || ""}
+                        rows={3}
+                        onChange={(e) => {
+                          const sections = [...(getContent("terms").sections || [])];
+                          sections[idx] = { ...sections[idx], text: e.target.value };
+                          handleContentChange("terms", "sections", sections);
+                        }}
+                      />
+                    </div>
+                  ))}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const sections = [...(getContent("terms").sections || []), { heading: "", text: "" }];
+                      handleContentChange("terms", "sections", sections);
+                    }}
+                  >
+                    + Adaugă Secțiune
+                  </Button>
+                  <div>
+                    <Button onClick={() => handleSave("terms")} disabled={updateContent.isPending}>
+                      {updateContent.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                      Salvează Termeni
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
