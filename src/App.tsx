@@ -32,6 +32,14 @@ import ContentEditor from "./pages/admin/ContentEditor";
 import ContentAudit from "./pages/admin/ContentAudit";
 import EditExperience from "./pages/admin/EditExperience";
 import About from "./pages/About";
+import FAQ from "./pages/FAQ";
+import Contact from "./pages/Contact";
+import Terms from "./pages/Terms";
+import Careers from "./pages/Careers";
+import Blog from "./pages/Blog";
+import Privacy from "./pages/Privacy";
+import Cookies from "./pages/Cookies";
+import GDPR from "./pages/GDPR";
 import ProviderDashboard from "./pages/provider/ProviderDashboard";
 import AmbassadorDashboard from "./pages/ambassador/AmbassadorDashboard";
 import NotFound from "./pages/NotFound";
@@ -64,6 +72,14 @@ const App = () => (
               <Route path="/gift-ideas" element={<GiftIdeas />} />
               <Route path="/partners" element={<Partners />} />
               <Route path="/about" element={<About />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/cookies" element={<Cookies />} />
+              <Route path="/gdpr" element={<GDPR />} />
               
               {/* Provider Routes */}
               <Route path="/provider" element={<ProviderDashboard />} />

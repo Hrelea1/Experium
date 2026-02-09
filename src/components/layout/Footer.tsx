@@ -22,7 +22,7 @@ export function Footer() {
     suport: [
       { label: t('footer.faq'), href: "/faq" },
       { label: t('footer.contact'), href: "/contact" },
-      { label: t('footer.howItWorks'), href: "/#how-it-works" },
+      { label: t('footer.howItWorks'), href: "/" },
       { label: t('footer.termsConditions'), href: "/terms" },
     ],
     companie: [
