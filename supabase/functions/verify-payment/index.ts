@@ -61,6 +61,10 @@ serve(async (req) => {
 
     // Create vouchers for each item
     for (const item of items) {
+      // Use experienceId from metadata (already extracted in create-checkout)
+      const experienceId = item.experienceId || item.id;
+      const totalPrice = item.totalPrice || item.price;
+
       for (let i = 0; i < item.quantity; i++) {
         // Generate voucher code
         const { data: codeData, error: codeError } = await supabaseAdmin.rpc(
@@ -69,19 +73,11 @@ serve(async (req) => {
         if (codeError) throw codeError;
         const voucherCode = codeData as string;
 
-        // Calculate total price including services
-        const servicesTotal =
-          item.services?.reduce(
-            (sum: number, s: any) => sum + s.price * s.quantity,
-            0,
-          ) || 0;
-        const totalPrice = item.price + servicesTotal;
-
-        // Get experience ambassador_id
+        // Get experience details
         const { data: expData } = await supabaseAdmin
           .from("experiences")
-          .select("ambassador_id")
-          .eq("id", item.id.split("-")[0])
+          .select("ambassador_id, title, location_name")
+          .eq("id", experienceId)
           .single();
 
         // Create voucher
@@ -90,7 +86,7 @@ serve(async (req) => {
           .insert({
             code: voucherCode,
             user_id: user.id,
-            experience_id: item.id.split("-")[0],
+            experience_id: experienceId,
             purchase_price: totalPrice,
             expiry_date: new Date(
               Date.now() + 365 * 24 * 60 * 60 * 1000,
@@ -107,11 +103,10 @@ serve(async (req) => {
         vouchers.push({
           id: voucherData.id,
           code: voucherCode,
-          experienceId: item.id.split("-")[0],
-          experienceTitle: item.title,
+          experienceId,
+          experienceTitle: item.title || expData?.title || "",
           price: totalPrice,
-          image: item.image || "/placeholder.svg",
-          location: item.location || "",
+          location: expData?.location_name || "",
         });
       }
     }

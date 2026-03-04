@@ -89,13 +89,21 @@ serve(async (req) => {
         supabase_user_id: user.id,
         delivery_type: deliveryType || "digital",
         items_json: JSON.stringify(
-          items.map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            price: item.price,
-            quantity: item.quantity,
-            isGift: item.isGift,
-          })),
+          items.map((item: any) => {
+            // Extract original UUID from cart item ID format: uuid-timestamp-index
+            const idParts = item.id.split("-");
+            const experienceId = idParts.slice(0, 5).join("-");
+            const servicesTotal = item.services?.reduce(
+              (sum: number, s: any) => sum + s.price * s.quantity, 0
+            ) || 0;
+            return {
+              experienceId,
+              title: item.title,
+              totalPrice: item.price + servicesTotal,
+              quantity: item.quantity,
+              isGift: item.isGift,
+            };
+          }),
         ).slice(0, 500),
         personal_details_json: JSON.stringify(personalDetails || {}).slice(0, 500),
         delivery_address_json: deliveryAddress ? JSON.stringify(deliveryAddress).slice(0, 500) : "",
