@@ -205,29 +205,36 @@ export default function CreateExperience() {
                   <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ex: 250" min={1} step={0.01} />
                 </div>
 
-                {/* Category & Region */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Categorie *</Label>
-                    <Select value={categoryId} onValueChange={setCategoryId}>
-                      <SelectTrigger><SelectValue placeholder="Selectează" /></SelectTrigger>
-                      <SelectContent>
-                        {categories.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {categories.length > 0 ? (
+                      <Select value={categoryId || undefined} onValueChange={setCategoryId}>
+                        <SelectTrigger><SelectValue placeholder="Selectează" /></SelectTrigger>
+                        <SelectContent>
+                          {categories.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input disabled placeholder="Se încarcă..." />
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label>Regiune *</Label>
-                    <Select value={regionId} onValueChange={setRegionId}>
-                      <SelectTrigger><SelectValue placeholder="Selectează" /></SelectTrigger>
-                      <SelectContent>
-                        {regions.map((r) => (
-                          <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {regions.length > 0 ? (
+                      <Select value={regionId || undefined} onValueChange={setRegionId}>
+                        <SelectTrigger><SelectValue placeholder="Selectează" /></SelectTrigger>
+                        <SelectContent>
+                          {regions.map((r) => (
+                            <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input disabled placeholder="Se încarcă..." />
+                    )}
                   </div>
                 </div>
 
