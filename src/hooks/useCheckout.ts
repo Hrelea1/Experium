@@ -39,8 +39,13 @@ export function useCheckout() {
       if (error) throw error;
       if (!data?.url) throw new Error('No checkout URL received');
 
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
+      // Open Stripe Checkout in a new tab (iframe redirects are blocked)
+      const stripeWindow = window.open(data.url, '_blank');
+      if (!stripeWindow) {
+        // Fallback: try direct redirect if popup blocked
+        window.location.href = data.url;
+      }
+      setIsProcessing(false);
       return true;
     } catch (error: any) {
       console.error('Checkout error:', error);
