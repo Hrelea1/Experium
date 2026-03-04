@@ -76,6 +76,86 @@ export type Database = {
           },
         ]
       }
+      blog_categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author: string | null
+          category_id: string | null
+          content: string | null
+          created_at: string | null
+          featured_image: string | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          published_at: string | null
+          slug: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author?: string | null
+          category_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          featured_image?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          slug: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author?: string | null
+          category_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          featured_image?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          slug?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           booking_date: string
@@ -734,6 +814,60 @@ export type Database = {
           sms_booking_reminder?: boolean
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      partner_applications: {
+        Row: {
+          admin_notes: string | null
+          business_name: string
+          city: string
+          created_at: string | null
+          description: string
+          email: string
+          experience_type: string
+          full_name: string
+          gdpr_consent: boolean
+          id: string
+          phone: string
+          status: string
+          terms_accepted: boolean
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          business_name: string
+          city: string
+          created_at?: string | null
+          description: string
+          email: string
+          experience_type: string
+          full_name: string
+          gdpr_consent?: boolean
+          id?: string
+          phone: string
+          status?: string
+          terms_accepted?: boolean
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          business_name?: string
+          city?: string
+          created_at?: string | null
+          description?: string
+          email?: string
+          experience_type?: string
+          full_name?: string
+          gdpr_consent?: boolean
+          id?: string
+          phone?: string
+          status?: string
+          terms_accepted?: boolean
+          updated_at?: string | null
+          website?: string | null
         }
         Relationships: []
       }

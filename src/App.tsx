@@ -26,6 +26,9 @@ import ManageExperiences from "./pages/admin/ManageExperiences";
 import ManageBookings from "./pages/admin/ManageBookings";
 import ManageOrders from "./pages/admin/ManageOrders";
 import ManageRoles from "./pages/admin/ManageRoles";
+import ManageBlog from "./pages/admin/ManageBlog";
+import BlogEditor from "./pages/admin/BlogEditor";
+import ManagePartnerApplications from "./pages/admin/ManagePartnerApplications";
 import ExperienceBuilder from "./pages/admin/ExperienceBuilder";
 import VoucherBuilder from "./pages/admin/VoucherBuilder";
 import ContentEditor from "./pages/admin/ContentEditor";
@@ -37,6 +40,7 @@ import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Careers from "./pages/Careers";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import GDPR from "./pages/GDPR";
@@ -78,6 +82,7 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/cookies" element={<Cookies />} />
               <Route path="/gdpr" element={<GDPR />} />
@@ -95,11 +100,15 @@ const App = () => (
               <Route path="/admin/content/audit" element={<ContentAudit />} />
               <Route path="/admin/experiences" element={<ManageExperiences />} />
               <Route path="/admin/experiences/create" element={<ExperienceBuilder />} />
-               <Route path="/admin/experiences/:id/edit" element={<EditExperience />} />
+              <Route path="/admin/experiences/:id/edit" element={<EditExperience />} />
               <Route path="/admin/bookings" element={<ManageBookings />} />
               <Route path="/admin/orders" element={<ManageOrders />} />
               <Route path="/admin/orders/create" element={<VoucherBuilder />} />
               <Route path="/admin/roles" element={<ManageRoles />} />
+              <Route path="/admin/blog" element={<ManageBlog />} />
+              <Route path="/admin/blog/create" element={<BlogEditor />} />
+              <Route path="/admin/blog/:id/edit" element={<BlogEditor />} />
+              <Route path="/admin/partner-applications" element={<ManagePartnerApplications />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
