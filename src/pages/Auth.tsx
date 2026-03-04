@@ -163,7 +163,14 @@ const Auth = () => {
     const { error } = await signUp(signupEmail, signupPassword, signupFullName);
     setLoading(false);
     if (!error) {
-      navigate('/');
+      // Don't navigate immediately - wait for auth state to update
+      // If auto-confirm is on, onAuthStateChange will redirect via useEffect
+      // If email confirmation is needed, show a clear message
+      toast({
+        title: "Cont creat cu succes!",
+        description: "Verifică-ți email-ul pentru a confirma contul, apoi te poți autentifica.",
+        duration: 8000,
+      });
     } else {
       if (error.message.includes('already registered')) {
         setPasswordError('Acest email este deja înregistrat');
