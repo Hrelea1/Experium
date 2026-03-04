@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ReviewForm } from '@/components/booking/ReviewForm';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, MapPin, Users, CheckCircle, XCircle, Clock, Gift, Ban, Edit } from 'lucide-react';
@@ -300,6 +301,7 @@ const MyBookings = () => {
                 getStatusBadge={getStatusBadge}
                 onCancelClick={handleCancelClick}
                 onChangeDateClick={handleChangeDateClick}
+                onRefresh={fetchBookings}
               />
             </TabsContent>
 
@@ -309,6 +311,7 @@ const MyBookings = () => {
                 getStatusBadge={getStatusBadge}
                 onCancelClick={handleCancelClick}
                 onChangeDateClick={handleChangeDateClick}
+                onRefresh={fetchBookings}
               />
             </TabsContent>
 
@@ -318,6 +321,7 @@ const MyBookings = () => {
                 getStatusBadge={getStatusBadge}
                 onCancelClick={handleCancelClick}
                 onChangeDateClick={handleChangeDateClick}
+                onRefresh={fetchBookings}
               />
             </TabsContent>
 
@@ -327,6 +331,7 @@ const MyBookings = () => {
                 getStatusBadge={getStatusBadge}
                 onCancelClick={handleCancelClick}
                 onChangeDateClick={handleChangeDateClick}
+                onRefresh={fetchBookings}
               />
             </TabsContent>
           </Tabs>
@@ -413,9 +418,10 @@ interface BookingGridProps {
   getStatusBadge: (status: string) => React.ReactNode;
   onCancelClick?: (bookingId: string) => void;
   onChangeDateClick?: (bookingId: string) => void;
+  onRefresh?: () => void;
 }
 
-const BookingGrid = ({ bookings, getStatusBadge, onCancelClick, onChangeDateClick }: BookingGridProps) => {
+const BookingGrid = ({ bookings, getStatusBadge, onCancelClick, onChangeDateClick, onRefresh }: BookingGridProps) => {
   if (bookings.length === 0) {
     return (
       <Card>
@@ -498,6 +504,15 @@ const BookingGrid = ({ bookings, getStatusBadge, onCancelClick, onChangeDateClic
                     <Edit className="h-4 w-4" />
                     Schimbă Data
                   </Button>
+                )}
+
+                {/* Review Form for completed bookings past date */}
+                {booking.status === 'completed' && new Date(booking.booking_date) < new Date() && (
+                  <ReviewForm
+                    bookingId={booking.id}
+                    experienceId={booking.experience_id}
+                    onReviewSubmitted={() => onRefresh?.()}
+                  />
                 )}
               </div>
             </div>
