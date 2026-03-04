@@ -22,9 +22,13 @@ export type Database = {
           experience_id: string
           id: string
           is_available: boolean | null
+          is_locked: boolean | null
+          locked_by: string | null
+          locked_until: string | null
           max_participants: number | null
           provider_user_id: string
           slot_date: string
+          slot_type: Database["public"]["Enums"]["provider_type"]
           start_time: string
           updated_at: string | null
         }
@@ -35,9 +39,13 @@ export type Database = {
           experience_id: string
           id?: string
           is_available?: boolean | null
+          is_locked?: boolean | null
+          locked_by?: string | null
+          locked_until?: string | null
           max_participants?: number | null
           provider_user_id: string
           slot_date: string
+          slot_type?: Database["public"]["Enums"]["provider_type"]
           start_time: string
           updated_at?: string | null
         }
@@ -48,9 +56,13 @@ export type Database = {
           experience_id?: string
           id?: string
           is_available?: boolean | null
+          is_locked?: boolean | null
+          locked_by?: string | null
+          locked_until?: string | null
           max_participants?: number | null
           provider_user_id?: string
           slot_date?: string
+          slot_type?: Database["public"]["Enums"]["provider_type"]
           start_time?: string
           updated_at?: string | null
         }
@@ -389,6 +401,7 @@ export type Database = {
         Row: {
           ambassador_id: string | null
           avg_rating: number | null
+          cancellation_policy: string | null
           category_id: string
           city_id: string | null
           county_id: string | null
@@ -404,6 +417,7 @@ export type Database = {
           min_age: number | null
           original_price: number | null
           price: number
+          provider_type: Database["public"]["Enums"]["provider_type"]
           region_id: string
           short_description: string | null
           title: string
@@ -413,6 +427,7 @@ export type Database = {
         Insert: {
           ambassador_id?: string | null
           avg_rating?: number | null
+          cancellation_policy?: string | null
           category_id: string
           city_id?: string | null
           county_id?: string | null
@@ -428,6 +443,7 @@ export type Database = {
           min_age?: number | null
           original_price?: number | null
           price: number
+          provider_type?: Database["public"]["Enums"]["provider_type"]
           region_id: string
           short_description?: string | null
           title: string
@@ -437,6 +453,7 @@ export type Database = {
         Update: {
           ambassador_id?: string | null
           avg_rating?: number | null
+          cancellation_policy?: string | null
           category_id?: string
           city_id?: string | null
           county_id?: string | null
@@ -452,6 +469,7 @@ export type Database = {
           min_age?: number | null
           original_price?: number | null
           price?: number
+          provider_type?: Database["public"]["Enums"]["provider_type"]
           region_id?: string
           short_description?: string | null
           title?: string
@@ -583,6 +601,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      provider_recurring_availability: {
+        Row: {
+          created_at: string | null
+          day_of_week: number
+          end_time: string
+          experience_id: string
+          id: string
+          is_active: boolean | null
+          max_participants: number | null
+          provider_user_id: string
+          start_time: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week: number
+          end_time: string
+          experience_id: string
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          provider_user_id: string
+          start_time: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: number
+          end_time?: string
+          experience_id?: string
+          id?: string
+          is_active?: boolean | null
+          max_participants?: number | null
+          provider_user_id?: string
+          start_time?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_recurring_availability_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rate_limits: {
         Row: {
@@ -760,6 +825,15 @@ export type Database = {
             Returns: boolean
           }
       cleanup_rate_limits: { Args: never; Returns: undefined }
+      generate_slots_from_recurring: {
+        Args: {
+          p_end_date: string
+          p_experience_id: string
+          p_provider_user_id: string
+          p_start_date: string
+        }
+        Returns: number
+      }
       generate_voucher_code: { Args: never; Returns: string }
       get_ambassador_stats: {
         Args: { ambassador_user_id: string }
@@ -815,6 +889,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "moderator" | "user" | "provider" | "ambassador"
       booking_status: "pending" | "confirmed" | "cancelled" | "completed"
+      provider_type: "accommodation" | "service"
       voucher_status:
         | "active"
         | "used"
@@ -950,6 +1025,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "moderator", "user", "provider", "ambassador"],
       booking_status: ["pending", "confirmed", "cancelled", "completed"],
+      provider_type: ["accommodation", "service"],
       voucher_status: ["active", "used", "expired", "exchanged", "transferred"],
     },
   },

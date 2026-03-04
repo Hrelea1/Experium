@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,23 +10,13 @@ import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays, Clock, Users, Plus, Trash2, Image } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { CalendarDays, Clock, Users, Plus, Trash2, PlusCircle, Building2, Wrench } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { RecurringAvailability } from '@/components/provider/RecurringAvailability';
+import { ProviderBookings } from '@/components/provider/ProviderBookings';
 
 interface AssignedExperience {
   id: string;
@@ -35,6 +26,9 @@ interface AssignedExperience {
     title: string;
     location_name: string;
     price: number;
+    provider_type: 'accommodation' | 'service';
+    duration_minutes: number | null;
+    is_active: boolean | null;
   };
 }
 
@@ -52,6 +46,7 @@ interface AvailabilitySlot {
 export default function ProviderDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [assignedExperiences, setAssignedExperiences] = useState<AssignedExperience[]>([]);
   const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]);
   const [selectedExperience, setSelectedExperience] = useState<string>('');
@@ -63,9 +58,17 @@ export default function ProviderDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      fetchData();
-    }
+    if (user) fetchData();
+  }, [user]);
+
+  // Realtime subscription for availability
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('provider-availability')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'availability_slots' }, () => fetchData())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [user]);
 
   const fetchData = async () => {
@@ -73,18 +76,11 @@ export default function ProviderDashboard() {
     setLoading(true);
 
     try {
-      // Fetch assigned experiences
       const { data: expData, error: expError } = await supabase
         .from('experience_providers')
         .select(`
-          id,
-          experience_id,
-          experience:experiences (
-            id,
-            title,
-            location_name,
-            price
-          )
+          id, experience_id,
+          experience:experiences (id, title, location_name, price, provider_type, duration_minutes, is_active)
         `)
         .eq('provider_user_id', user.id)
         .eq('is_active', true);
@@ -92,7 +88,6 @@ export default function ProviderDashboard() {
       if (expError) throw expError;
       setAssignedExperiences(expData || []);
 
-      // Fetch availability slots
       const { data: slotsData, error: slotsError } = await supabase
         .from('availability_slots')
         .select('*')
@@ -103,11 +98,7 @@ export default function ProviderDashboard() {
       if (slotsError) throw slotsError;
       setAvailabilitySlots(slotsData || []);
     } catch (error: any) {
-      toast({
-        title: 'Eroare',
-        description: 'Nu am putut încărca datele',
-        variant: 'destructive',
-      });
+      toast({ title: 'Eroare', description: 'Nu am putut încărca datele', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -115,15 +106,12 @@ export default function ProviderDashboard() {
 
   const addAvailabilitySlot = async () => {
     if (!user || !selectedExperience || !selectedDate) {
-      toast({
-        title: 'Date incomplete',
-        description: 'Selectează experiența și data',
-        variant: 'destructive',
-      });
+      toast({ title: 'Date incomplete', description: 'Selectează experiența și data', variant: 'destructive' });
       return;
     }
 
     try {
+      const exp = assignedExperiences.find(e => e.experience_id === selectedExperience);
       const { error } = await supabase
         .from('availability_slots')
         .insert({
@@ -134,47 +122,26 @@ export default function ProviderDashboard() {
           end_time: endTime,
           max_participants: maxParticipants,
           is_available: true,
+          slot_type: exp?.experience?.provider_type || 'service',
         });
 
       if (error) throw error;
-
-      toast({
-        title: 'Succes',
-        description: 'Disponibilitatea a fost adăugată',
-      });
-
+      toast({ title: 'Succes', description: 'Disponibilitatea a fost adăugată' });
       setDialogOpen(false);
       fetchData();
     } catch (error: any) {
-      toast({
-        title: 'Eroare',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Eroare', description: error.message, variant: 'destructive' });
     }
   };
 
   const deleteSlot = async (slotId: string) => {
     try {
-      const { error } = await supabase
-        .from('availability_slots')
-        .delete()
-        .eq('id', slotId);
-
+      const { error } = await supabase.from('availability_slots').delete().eq('id', slotId);
       if (error) throw error;
-
-      toast({
-        title: 'Șters',
-        description: 'Disponibilitatea a fost ștearsă',
-      });
-
+      toast({ title: 'Șters', description: 'Disponibilitatea a fost ștearsă' });
       fetchData();
     } catch (error: any) {
-      toast({
-        title: 'Eroare',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Eroare', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -189,7 +156,7 @@ export default function ProviderDashboard() {
         <Header />
         <main className="pt-24 pb-16 container">
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
           </div>
         </main>
         <Footer />
@@ -200,190 +167,202 @@ export default function ProviderDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
       <main className="pt-24 pb-16">
         <div className="container">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold">Dashboard Furnizor</h1>
-            <p className="text-muted-foreground">
-              Gestionează disponibilitatea și experiențele tale
-            </p>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold">Dashboard Furnizor</h1>
+              <p className="text-muted-foreground">Gestionează experiențele, disponibilitatea și rezervările</p>
+            </div>
+            <Button onClick={() => navigate('/provider/create')}>
+              <PlusCircle className="h-4 w-4 mr-2" />
+              Experiență Nouă
+            </Button>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Assigned Experiences */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CalendarDays className="h-5 w-5" />
-                  Experiențe Asignate
-                </CardTitle>
-                <CardDescription>
-                  Experiențele pe care le gestionezi
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+          <Tabs defaultValue="experiences" className="space-y-6">
+            <TabsList>
+              <TabsTrigger value="experiences">Experiențe</TabsTrigger>
+              <TabsTrigger value="availability">Disponibilitate</TabsTrigger>
+              <TabsTrigger value="recurring">Program Recurent</TabsTrigger>
+              <TabsTrigger value="bookings">Rezervări</TabsTrigger>
+            </TabsList>
+
+            {/* Experiences Tab */}
+            <TabsContent value="experiences">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {assignedExperiences.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">
-                    Nu ai experiențe asignate încă.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {assignedExperiences.map((exp) => (
-                      <div key={exp.id} className="p-3 rounded-lg border">
-                        <h4 className="font-medium">{exp.experience?.title}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {exp.experience?.location_name}
-                        </p>
-                        <p className="text-sm font-medium text-primary">
-                          {exp.experience?.price} Lei
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Availability Management */}
-            <Card className="lg:col-span-2">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    Disponibilitate
-                  </CardTitle>
-                  <CardDescription>
-                    Programul tău de disponibilitate
-                  </CardDescription>
-                </div>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" disabled={assignedExperiences.length === 0}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Adaugă Slot
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Adaugă Disponibilitate</DialogTitle>
-                      <DialogDescription>
-                        Setează un nou slot de disponibilitate
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div className="space-y-2">
-                        <Label>Experiență</Label>
-                        <Select value={selectedExperience} onValueChange={setSelectedExperience}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selectează experiența" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {assignedExperiences.map((exp) => (
-                              <SelectItem key={exp.experience_id} value={exp.experience_id}>
-                                {exp.experience?.title}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label>Data</Label>
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={setSelectedDate}
-                          disabled={(date) => date < new Date()}
-                          className="rounded-md border"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Ora început</Label>
-                          <Input
-                            type="time"
-                            value={startTime}
-                            onChange={(e) => setStartTime(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Ora sfârșit</Label>
-                          <Input
-                            type="time"
-                            value={endTime}
-                            onChange={(e) => setEndTime(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Participanți maximi</Label>
-                        <Input
-                          type="number"
-                          value={maxParticipants}
-                          onChange={(e) => setMaxParticipants(parseInt(e.target.value))}
-                          min={1}
-                          max={100}
-                        />
-                      </div>
-
-                      <Button onClick={addAvailabilitySlot} className="w-full">
-                        Adaugă Disponibilitate
+                  <Card className="col-span-full">
+                    <CardContent className="pt-6 text-center">
+                      <p className="text-muted-foreground mb-4">Nu ai experiențe încă.</p>
+                      <Button onClick={() => navigate('/provider/create')}>
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Creează Prima Experiență
                       </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardHeader>
-              <CardContent>
-                {availabilitySlots.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    Nu ai setat disponibilități încă.
-                  </p>
+                    </CardContent>
+                  </Card>
                 ) : (
-                  <div className="space-y-3">
-                    {availabilitySlots.map((slot) => (
-                      <div key={slot.id} className="flex items-center justify-between p-4 rounded-lg border">
-                        <div>
-                          <h4 className="font-medium">{getExperienceTitle(slot.experience_id)}</h4>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                            <span className="flex items-center gap-1">
-                              <CalendarDays className="h-4 w-4" />
-                              {new Date(slot.slot_date).toLocaleDateString('ro-RO')}
+                  assignedExperiences.map((exp) => (
+                    <Card key={exp.id}>
+                      <CardContent className="pt-6">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold">{exp.experience?.title}</h4>
+                          <Badge variant={exp.experience?.is_active ? 'default' : 'secondary'}>
+                            {exp.experience?.is_active ? 'Activ' : 'Inactiv'}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{exp.experience?.location_name}</p>
+                        <div className="flex items-center gap-3 mt-3">
+                          <Badge variant="outline" className="flex items-center gap-1">
+                            {exp.experience?.provider_type === 'accommodation' ? (
+                              <><Building2 className="h-3 w-3" /> Cazare</>
+                            ) : (
+                              <><Wrench className="h-3 w-3" /> Serviciu</>
+                            )}
+                          </Badge>
+                          {exp.experience?.duration_minutes && (
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {Math.floor(exp.experience.duration_minutes / 60)}h {exp.experience.duration_minutes % 60}m
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {slot.start_time} - {slot.end_time}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Users className="h-4 w-4" />
-                              {slot.booked_participants}/{slot.max_participants}
-                            </span>
+                          )}
+                        </div>
+                        <p className="text-lg font-bold text-primary mt-3">{exp.experience?.price} Lei</p>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Availability Tab */}
+            <TabsContent value="availability">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      Disponibilitate
+                    </CardTitle>
+                    <CardDescription>Sloturi individuale de disponibilitate</CardDescription>
+                  </div>
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" disabled={assignedExperiences.length === 0}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adaugă Slot
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Adaugă Disponibilitate</DialogTitle>
+                        <DialogDescription>Setează un nou slot de disponibilitate</DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                          <Label>Experiență</Label>
+                          <Select value={selectedExperience} onValueChange={setSelectedExperience}>
+                            <SelectTrigger><SelectValue placeholder="Selectează experiența" /></SelectTrigger>
+                            <SelectContent>
+                              {assignedExperiences.map((exp) => (
+                                <SelectItem key={exp.experience_id} value={exp.experience_id}>
+                                  {exp.experience?.title}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Data</Label>
+                          <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={(date) => date < new Date()} className="rounded-md border" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Ora început</Label>
+                            <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Ora sfârșit</Label>
+                            <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={slot.is_available ? 'default' : 'secondary'}>
-                            {slot.is_available ? 'Disponibil' : 'Plin'}
-                          </Badge>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteSlot(slot.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
+                        <div className="space-y-2">
+                          <Label>Participanți maximi</Label>
+                          <Input type="number" value={maxParticipants} onChange={(e) => setMaxParticipants(parseInt(e.target.value))} min={1} max={100} />
                         </div>
+                        <Button onClick={addAvailabilitySlot} className="w-full">Adaugă Disponibilitate</Button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                    </DialogContent>
+                  </Dialog>
+                </CardHeader>
+                <CardContent>
+                  {availabilitySlots.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">Nu ai setat disponibilități încă.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {availabilitySlots.map((slot) => (
+                        <div key={slot.id} className="flex items-center justify-between p-4 rounded-lg border">
+                          <div>
+                            <h4 className="font-medium">{getExperienceTitle(slot.experience_id)}</h4>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                              <span className="flex items-center gap-1">
+                                <CalendarDays className="h-4 w-4" />
+                                {new Date(slot.slot_date).toLocaleDateString('ro-RO')}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {slot.start_time} - {slot.end_time}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Users className="h-4 w-4" />
+                                {slot.booked_participants}/{slot.max_participants}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={slot.is_available ? 'default' : 'secondary'}>
+                              {slot.is_available ? 'Disponibil' : 'Plin'}
+                            </Badge>
+                            <Button variant="ghost" size="icon" onClick={() => deleteSlot(slot.id)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Recurring Tab */}
+            <TabsContent value="recurring">
+              {assignedExperiences.length === 0 ? (
+                <Card>
+                  <CardContent className="pt-6 text-center">
+                    <p className="text-muted-foreground">Creează o experiență mai întâi pentru a seta recurența.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {assignedExperiences.map((exp) => (
+                    <RecurringAvailability
+                      key={exp.experience_id}
+                      experienceId={exp.experience_id}
+                      experienceTitle={exp.experience?.title || ''}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Bookings Tab */}
+            <TabsContent value="bookings">
+              <ProviderBookings />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
-
       <Footer />
     </div>
   );
