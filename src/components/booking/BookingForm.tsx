@@ -1,12 +1,16 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
-import { Users, ShoppingBag } from "lucide-react";
+import { Users, ShoppingBag, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useCart, CartItemService } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { ServiceSelector, SelectedService } from "./ServiceSelector";
+import { SlotPicker } from "./SlotPicker";
+import { AvailabilitySlot } from "@/hooks/useAvailabilitySlots";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BookingFormProps {
   experience: {
@@ -24,10 +28,14 @@ export function BookingForm({ experience }: BookingFormProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { user } = useAuth();
   const { t } = useTranslation();
   const [participants, setParticipants] = useState(1);
   const selectedServicesRef = useRef<SelectedService[]>([]);
   const [servicesTotal, setServicesTotal] = useState(0);
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
+  const [bookingMode, setBookingMode] = useState<'slot' | 'cart'>('slot');
+  const [confirming, setConfirming] = useState(false);
 
   const totalPrice = (experience.price * participants) + servicesTotal;
   const savings = experience.originalPrice 
@@ -40,10 +48,42 @@ export function BookingForm({ experience }: BookingFormProps) {
     setServicesTotal(total);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSlotSelected = useCallback((slot: AvailabilitySlot | null) => {
+    setSelectedSlot(slot);
+  }, []);
+
+  // Direct booking with slot
+  const handleDirectBooking = async () => {
+    if (!user) {
+      toast({ title: "Autentificare necesară", description: "Trebuie să fii autentificat.", variant: "destructive" });
+      navigate("/auth");
+      return;
+    }
+    if (!selectedSlot) return;
+
+    setConfirming(true);
+    const { data, error } = await supabase.rpc("confirm_slot_booking", {
+      p_slot_id: selectedSlot.id,
+      p_user_id: user.id,
+      p_participants: participants,
+      p_total_price: totalPrice,
+    });
+    setConfirming(false);
+
+    if (error || !data || !data[0]?.success) {
+      const msg = data?.[0]?.error_message || error?.message || "Eroare la confirmare.";
+      toast({ title: "Eroare rezervare", description: msg, variant: "destructive" });
+      return;
+    }
+
+    toast({ title: "Rezervare confirmată! 🎉", description: `${experience.title} - rezervarea ta a fost confirmată.` });
+    navigate("/my-bookings");
+  };
+
+  // Add to cart (no slot)
+  const handleAddToCart = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Convert selected services to cart format
     const cartServices: CartItemService[] = selectedServicesRef.current.map(s => ({
       serviceId: s.serviceId,
       name: s.name,
@@ -51,7 +91,6 @@ export function BookingForm({ experience }: BookingFormProps) {
       quantity: s.quantity,
     }));
     
-    // Add to cart for each participant
     for (let i = 0; i < participants; i++) {
       addItem({
         id: `${experience.id}-${Date.now()}-${i}`,
@@ -66,7 +105,6 @@ export function BookingForm({ experience }: BookingFormProps) {
       title: t('cart.addedToCart'),
       description: `${experience.title} ${t('cart.addedToCartDesc')}`,
     });
-
     navigate("/cart");
   };
 
@@ -96,7 +134,7 @@ export function BookingForm({ experience }: BookingFormProps) {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
+      <form onSubmit={handleAddToCart} className="p-6 space-y-5">
         {/* Participants */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
@@ -127,6 +165,13 @@ export function BookingForm({ experience }: BookingFormProps) {
           </div>
         </div>
 
+        {/* Slot Picker - real-time availability */}
+        <SlotPicker
+          experienceId={experience.id}
+          participants={participants}
+          onSlotSelected={handleSlotSelected}
+        />
+
         {/* Service Selector */}
         <ServiceSelector
           experienceId={experience.id}
@@ -148,15 +193,30 @@ export function BookingForm({ experience }: BookingFormProps) {
           </div>
         </div>
 
-        {/* Submit Button */}
-        <Button 
-          type="submit" 
-          size="xl" 
-          className="w-full"
-        >
-          <ShoppingBag className="w-5 h-5 mr-2" />
-          {t('experience.addToCart')}
-        </Button>
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          {selectedSlot ? (
+            <Button
+              type="button"
+              size="xl"
+              className="w-full"
+              onClick={handleDirectBooking}
+              disabled={confirming}
+            >
+              <CalendarCheck className="w-5 h-5 mr-2" />
+              {confirming ? "Se confirmă..." : "Rezervă acum"}
+            </Button>
+          ) : (
+            <Button 
+              type="submit" 
+              size="xl" 
+              className="w-full"
+            >
+              <ShoppingBag className="w-5 h-5 mr-2" />
+              {t('experience.addToCart')}
+            </Button>
+          )}
+        </div>
 
         {/* Security Note */}
         <p className="text-center text-xs text-muted-foreground">

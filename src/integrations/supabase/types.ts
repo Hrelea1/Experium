@@ -825,6 +825,21 @@ export type Database = {
             Returns: boolean
           }
       cleanup_rate_limits: { Args: never; Returns: undefined }
+      confirm_slot_booking: {
+        Args: {
+          p_participants: number
+          p_payment_method?: string
+          p_slot_id: string
+          p_special_requests?: string
+          p_total_price: number
+          p_user_id: string
+        }
+        Returns: {
+          booking_id: string
+          error_message: string
+          success: boolean
+        }[]
+      }
       generate_slots_from_recurring: {
         Args: {
           p_end_date: string
@@ -855,6 +870,13 @@ export type Database = {
       is_ambassador: { Args: never; Returns: boolean }
       is_primary_admin: { Args: { _user_id: string }; Returns: boolean }
       is_provider: { Args: never; Returns: boolean }
+      lock_availability_slot: {
+        Args: { p_slot_id: string; p_user_id: string }
+        Returns: {
+          error_message: string
+          success: boolean
+        }[]
+      }
       redeem_voucher: {
         Args: {
           p_booking_date: string
@@ -874,6 +896,10 @@ export type Database = {
           error_message: string
           success: boolean
         }[]
+      }
+      unlock_availability_slot: {
+        Args: { p_slot_id: string; p_user_id: string }
+        Returns: undefined
       }
       update_expired_vouchers: { Args: never; Returns: undefined }
       validate_voucher_code: {
