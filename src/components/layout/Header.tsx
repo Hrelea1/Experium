@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Truck, Award, BookOpen } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Truck, Award, BookOpen, Bell } from "lucide-react";
+import { NotificationBell } from "@/components/provider/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -100,6 +101,7 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 lg:gap-4">
+            {isProvider && <NotificationBell />}
             <Button 
               variant="ghost" 
               size="icon" 
