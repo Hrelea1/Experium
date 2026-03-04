@@ -201,15 +201,29 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // User client for auth check
-    const supabaseUser = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: req.headers.get("Authorization")! } } }
-    );
-
-    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-    if (userError || !user) {
+    // Authenticate: accept user JWT, service role key, or cron secret
+    const authHeader = req.headers.get("Authorization") || "";
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const cronSecret = Deno.env.get("CRON_SECRET_TOKEN") ?? "";
+    const token = authHeader.replace("Bearer ", "");
+    
+    let authenticatedUserId: string | null = null;
+    
+    if (token === serviceRoleKey || token === cronSecret) {
+      authenticatedUserId = "service-role";
+    } else if (authHeader) {
+      const supabaseUser = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+      if (!userError && user) {
+        authenticatedUserId = user.id;
+      }
+    }
+    
+    if (!authenticatedUserId) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
