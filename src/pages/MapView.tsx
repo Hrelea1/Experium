@@ -6,114 +6,63 @@ import Map from '@/components/Map';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { allExperiences, type Experience } from '@/data/experiences';
+import { supabase } from '@/integrations/supabase/client';
 
-// Helper function to calculate distance between two coordinates
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Radius of Earth in km
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-// Romanian cities approximate coordinates for demo
-const cityCoordinates: Record<string, [number, number]> = {
-  'București': [26.1025, 44.4268],
-  'Cluj-Napoca': [23.5886, 46.7712],
-  'Brașov': [25.5887, 45.6577],
-  'Timișoara': [21.2272, 45.7489],
-  'Sibiu': [24.1525, 45.7983],
-  'Constanța': [28.6348, 44.1598],
-  'Sinaia': [25.5508, 45.3497],
-  'Bran': [25.3673, 45.5145],
-};
-
-interface ExperienceWithCoords extends Experience {
-  coordinates?: [number, number];
+interface MapExperience {
+  id: string;
+  title: string;
+  location: string;
+  price: number;
+  coordinates: [number, number];
 }
 
 export default function MapView() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState<[number, number] | undefined>();
-  const [nearbyExperiences, setNearbyExperiences] = useState<ExperienceWithCoords[]>([]);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(true);
+  const [experiences, setExperiences] = useState<MapExperience[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get user's geolocation
+    // Fetch experiences with coordinates from DB
+    const fetchExperiences = async () => {
+      const { data } = await supabase
+        .from('experiences')
+        .select('id, title, location_name, price, latitude, longitude')
+        .eq('is_active', true)
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null);
+
+      if (data) {
+        setExperiences(
+          data
+            .filter((e: any) => e.latitude && e.longitude)
+            .map((e: any) => ({
+              id: e.id,
+              title: e.title,
+              location: e.location_name,
+              price: Number(e.price),
+              coordinates: [Number(e.longitude), Number(e.latitude)] as [number, number],
+            }))
+        );
+      }
+      setIsLoading(false);
+    };
+
+    fetchExperiences();
+
+    // Get user geolocation
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const coords: [number, number] = [
-            position.coords.longitude,
-            position.coords.latitude,
-          ];
-          setUserLocation(coords);
-          setIsLoadingLocation(false);
-          
-          // Filter experiences by proximity (within 50km)
-          const mappedExperiences = allExperiences.map(exp => {
-            // Try to match location with known coordinates
-            const cityMatch = Object.keys(cityCoordinates).find(city => 
-              exp.location.toLowerCase().includes(city.toLowerCase())
-            );
-            
-            if (cityMatch) {
-              return {
-                ...exp,
-                coordinates: cityCoordinates[cityMatch] as [number, number],
-              };
-            }
-            return null;
-          }).filter((exp): exp is NonNullable<typeof exp> => exp !== null);
-
-          const experiencesWithCoords = mappedExperiences.filter(exp => {
-            const distance = calculateDistance(
-              position.coords.latitude,
-              position.coords.longitude,
-              exp.coordinates[1],
-              exp.coordinates[0]
-            );
-            return distance <= 50; // Within 50km
-          });
-
-          setNearbyExperiences(experiencesWithCoords);
+          setUserLocation([position.coords.longitude, position.coords.latitude]);
         },
-        (error) => {
-          console.error('Error getting location:', error);
-          setIsLoadingLocation(false);
-          // Show all experiences if location access denied
-          const experiencesWithCoords = allExperiences
-            .map(exp => {
-              const cityMatch = Object.keys(cityCoordinates).find(city => 
-                exp.location.toLowerCase().includes(city.toLowerCase())
-              );
-              if (cityMatch) {
-                return {
-                  ...exp,
-                  coordinates: cityCoordinates[cityMatch] as [number, number],
-                };
-              }
-              return null;
-            })
-            .filter((exp): exp is NonNullable<typeof exp> => exp !== null);
-          
-          setNearbyExperiences(experiencesWithCoords);
-        }
+        () => {} // silently fail
       );
-    } else {
-      setIsLoadingLocation(false);
     }
   }, []);
 
-  const handleExperienceClick = (experienceId: number) => {
+  const handleExperienceClick = (experienceId: number | string) => {
     navigate(`/experience/${experienceId}`);
   };
 
@@ -125,11 +74,7 @@ export default function MapView() {
         <div className="container py-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => navigate(-1)}
-              >
+              <Button variant="outline" size="icon" onClick={() => navigate(-1)}>
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
@@ -138,11 +83,11 @@ export default function MapView() {
                   {t('hero.showOnMap')}
                 </h1>
                 <p className="text-muted-foreground mt-1">
-                  {isLoadingLocation
-                    ? 'Detecting your location...'
-                    : nearbyExperiences.length === 0
-                    ? 'No experiences found nearby'
-                    : `${nearbyExperiences.length} experiences near you`}
+                  {isLoading
+                    ? 'Se încarcă experiențele...'
+                    : experiences.length === 0
+                    ? 'Nu există experiențe cu coordonate'
+                    : `${experiences.length} experiențe pe hartă`}
                 </p>
               </div>
             </div>
@@ -150,7 +95,7 @@ export default function MapView() {
 
           <div className="h-[calc(100vh-200px)] rounded-lg overflow-hidden">
             <Map
-              experiences={nearbyExperiences}
+              experiences={experiences}
               userLocation={userLocation}
               onExperienceClick={handleExperienceClick}
             />

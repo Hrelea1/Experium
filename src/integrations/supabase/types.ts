@@ -158,14 +158,24 @@ export type Database = {
       }
       bookings: {
         Row: {
+          billing_address: string | null
+          billing_email: string | null
+          billing_first_name: string | null
+          billing_last_name: string | null
+          billing_phone: string | null
+          billing_type: string | null
           booking_date: string
           cancellation_date: string | null
           cancellation_reason: string | null
+          company_address: string | null
+          company_name: string | null
           created_at: string
+          cui: string | null
           experience_id: string
           id: string
           participants: number
           payment_method: string | null
+          registration_number: string | null
           rescheduled_count: number
           special_requests: string | null
           status: Database["public"]["Enums"]["booking_status"]
@@ -175,14 +185,24 @@ export type Database = {
           voucher_id: string | null
         }
         Insert: {
+          billing_address?: string | null
+          billing_email?: string | null
+          billing_first_name?: string | null
+          billing_last_name?: string | null
+          billing_phone?: string | null
+          billing_type?: string | null
           booking_date: string
           cancellation_date?: string | null
           cancellation_reason?: string | null
+          company_address?: string | null
+          company_name?: string | null
           created_at?: string
+          cui?: string | null
           experience_id: string
           id?: string
           participants?: number
           payment_method?: string | null
+          registration_number?: string | null
           rescheduled_count?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -192,14 +212,24 @@ export type Database = {
           voucher_id?: string | null
         }
         Update: {
+          billing_address?: string | null
+          billing_email?: string | null
+          billing_first_name?: string | null
+          billing_last_name?: string | null
+          billing_phone?: string | null
+          billing_type?: string | null
           booking_date?: string
           cancellation_date?: string | null
           cancellation_reason?: string | null
+          company_address?: string | null
+          company_name?: string | null
           created_at?: string
+          cui?: string | null
           experience_id?: string
           id?: string
           participants?: number
           payment_method?: string | null
+          registration_number?: string | null
           rescheduled_count?: number
           special_requests?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -479,6 +509,7 @@ export type Database = {
       }
       experiences: {
         Row: {
+          address: string | null
           ambassador_id: string | null
           avg_rating: number | null
           cancellation_policy: string | null
@@ -492,7 +523,9 @@ export type Database = {
           includes: string[]
           is_active: boolean | null
           is_featured: boolean | null
+          latitude: number | null
           location_name: string
+          longitude: number | null
           max_participants: number | null
           min_age: number | null
           original_price: number | null
@@ -505,6 +538,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          address?: string | null
           ambassador_id?: string | null
           avg_rating?: number | null
           cancellation_policy?: string | null
@@ -518,7 +552,9 @@ export type Database = {
           includes?: string[]
           is_active?: boolean | null
           is_featured?: boolean | null
+          latitude?: number | null
           location_name: string
+          longitude?: number | null
           max_participants?: number | null
           min_age?: number | null
           original_price?: number | null
@@ -531,6 +567,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          address?: string | null
           ambassador_id?: string | null
           avg_rating?: number | null
           cancellation_policy?: string | null
@@ -544,7 +581,9 @@ export type Database = {
           includes?: string[]
           is_active?: boolean | null
           is_featured?: boolean | null
+          latitude?: number | null
           location_name?: string
+          longitude?: number | null
           max_participants?: number | null
           min_age?: number | null
           original_price?: number | null
@@ -1093,6 +1132,51 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          booking_id: string
+          comment: string | null
+          created_at: string
+          experience_id: string
+          id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          comment?: string | null
+          created_at?: string
+          experience_id: string
+          id?: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          comment?: string | null
+          created_at?: string
+          experience_id?: string
+          id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

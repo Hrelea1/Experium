@@ -20,6 +20,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { ExperienceImage } from "@/components/ExperienceImage";
+import { ExperienceReviews } from "@/components/ExperienceReviews";
 
 interface RecommendedExperience {
   id: string;
@@ -426,6 +427,9 @@ export default function ExperienceDetail() {
                     ))}
                   </ul>
                 </div>
+
+                {/* Reviews */}
+                <ExperienceReviews experienceId={experience.id} />
               </div>
             </motion.div>
 

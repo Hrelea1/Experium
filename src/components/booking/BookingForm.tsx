@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { ServiceSelector, SelectedService } from "./ServiceSelector";
 import { SlotPicker } from "./SlotPicker";
 import { AvailabilitySlot } from "@/hooks/useAvailabilitySlots";
+import { BillingForm, BillingData } from "./BillingForm";
 
 interface BookingFormProps {
   experience: {
@@ -33,6 +34,11 @@ export function BookingForm({ experience }: BookingFormProps) {
   const selectedServicesRef = useRef<SelectedService[]>([]);
   const [servicesTotal, setServicesTotal] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
+  const billingDataRef = useRef<BillingData | null>(null);
+
+  const handleBillingChange = useCallback((data: BillingData) => {
+    billingDataRef.current = data;
+  }, []);
 
   const totalPrice = (experience.price * participants) + servicesTotal;
   const savings = experience.originalPrice 
@@ -138,6 +144,9 @@ export function BookingForm({ experience }: BookingFormProps) {
           experienceId={experience.id}
           onServicesChange={handleServicesChange}
         />
+
+        {/* Billing Form */}
+        <BillingForm onChange={handleBillingChange} />
 
         {/* VAT info */}
         <div className="bg-muted/50 rounded-xl p-4">
