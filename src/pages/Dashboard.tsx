@@ -23,18 +23,7 @@ import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTranslation } from 'react-i18next';
 
-interface Voucher {
-  id: string;
-  code: string;
-  status: string;
-  purchase_price: number;
-  expiry_date: string;
-  experience_id: string;
-  experiences: {
-    title: string;
-    location_name: string;
-  };
-}
+// Voucher interface removed - direct booking model
 
 interface Booking {
   id: string;
@@ -61,7 +50,7 @@ const Dashboard = () => {
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(true);
-  const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  // vouchers state removed - direct booking model
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [profile, setProfile] = useState<Profile>({ full_name: '', email: '', phone: '' });
   const [updatingProfile, setUpdatingProfile] = useState(false);
@@ -91,26 +80,6 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Fetch vouchers
-      const { data: vouchersData } = await supabase
-        .from('vouchers')
-        .select(`
-          id,
-          code,
-          status,
-          purchase_price,
-          expiry_date,
-          experience_id,
-          experiences (
-            title,
-            location_name
-          )
-        `)
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false });
-
-      if (vouchersData) setVouchers(vouchersData);
-
       // Fetch bookings
       const { data: bookingsData } = await supabase
         .from('bookings')
@@ -308,7 +277,7 @@ const Dashboard = () => {
     return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
   };
 
-  const activeVouchers = vouchers.filter(v => v.status === 'active');
+  const confirmedBookings = bookings.filter(b => b.status === 'confirmed' || b.status === 'completed');
   const upcomingBookings = bookings.filter(b => 
     b.status === 'confirmed' && new Date(b.booking_date) > new Date()
   );
@@ -340,17 +309,6 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t('dashboard.activeVouchers')}</CardTitle>
-                <Ticket className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{activeVouchers.length}</div>
-                <p className="text-xs text-muted-foreground">{t('dashboard.readyToUse')}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{t('dashboard.upcomingBookings')}</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -366,87 +324,35 @@ const Dashboard = () => {
                 <ShoppingBag className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{vouchers.length}</div>
-                <p className="text-xs text-muted-foreground">{t('dashboard.allVouchers')}</p>
+                <div className="text-2xl font-bold">{confirmedBookings.length}</div>
+                <p className="text-xs text-muted-foreground">Rezervări confirmate</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Cheltuit</CardTitle>
+                <Ticket className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{bookings.reduce((sum, b) => sum + b.total_price, 0)} RON</div>
+                <p className="text-xs text-muted-foreground">Toate rezervările</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Tabs Section */}
-          <Tabs defaultValue="vouchers" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="vouchers">
-                <Gift className="h-4 w-4 mr-2" />
-                {t('dashboard.vouchers')}
-              </TabsTrigger>
+          <Tabs defaultValue="bookings" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="bookings">
                 <Calendar className="h-4 w-4 mr-2" />
                 {t('dashboard.bookings')}
-              </TabsTrigger>
-              <TabsTrigger value="orders">
-                <ShoppingBag className="h-4 w-4 mr-2" />
-                {t('dashboard.orders')}
               </TabsTrigger>
               <TabsTrigger value="settings">
                 <Settings className="h-4 w-4 mr-2" />
                 {t('dashboard.settings')}
               </TabsTrigger>
             </TabsList>
-
-            {/* Vouchers Tab */}
-            <TabsContent value="vouchers" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t('dashboard.myVouchers')}</CardTitle>
-                  <CardDescription>{t('dashboard.allYourVouchers')}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {vouchers.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-8">{t('dashboard.noVouchersYet')}</p>
-                  ) : (
-                    vouchers.map((voucher) => (
-                      <div key={voucher.id} className="border rounded-lg p-4 space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <h3 className="font-semibold">{voucher.experiences?.title}</h3>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <MapPin className="h-4 w-4" />
-                              {voucher.experiences?.location_name}
-                            </div>
-                          </div>
-                          {getStatusBadge(voucher.status)}
-                        </div>
-                        <Separator />
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">{t('dashboard.voucherCode')}</p>
-                            <p className="font-mono font-semibold">{voucher.code}</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">{t('dashboard.value')}</p>
-                            <p className="font-semibold">{voucher.purchase_price} RON</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">{t('dashboard.validUntil')}</p>
-                            <p className="font-semibold">
-                              {format(new Date(voucher.expiry_date), 'dd MMMM yyyy', { locale: dateLocale })}
-                            </p>
-                          </div>
-                        </div>
-                        {voucher.status === 'active' && (
-                          <Button 
-                            className="w-full" 
-                            onClick={() => navigate('/redeem-voucher')}
-                          >
-                            {t('dashboard.useVoucher')}
-                          </Button>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
 
             {/* Bookings Tab */}
             <TabsContent value="bookings" className="space-y-4">
@@ -545,58 +451,6 @@ const Dashboard = () => {
               </Card>
             </TabsContent>
 
-            {/* Orders Tab */}
-            <TabsContent value="orders" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t('dashboard.orders')}</CardTitle>
-                  <CardDescription>{t('dashboard.orderHistoryDesc')}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {vouchers.length === 0 ? (
-                    <p className="text-center text-muted-foreground py-8">{t('dashboard.noOrdersYet')}</p>
-                  ) : (
-                    vouchers.map((voucher) => (
-                      <div key={voucher.id} className="border rounded-lg p-4">
-                        <div className="flex flex-col sm:flex-row gap-4">
-                          {/* Date Card - using issue_date as purchase date */}
-                          <DateCard date={voucher.expiry_date} />
-                          
-                          {/* Order Details */}
-                          <div className="flex-1 space-y-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-lg truncate">{voucher.experiences?.title}</h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                  <MapPin className="h-4 w-4 flex-shrink-0" />
-                                  <span className="truncate">{voucher.experiences?.location_name}</span>
-                                </div>
-                              </div>
-                              {getStatusBadge(voucher.status)}
-                            </div>
-                            
-                            <Separator />
-                            
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <p className="text-muted-foreground">{t('dashboard.voucherCode')}</p>
-                                <p className="font-mono font-semibold">{voucher.code}</p>
-                              </div>
-                              <div>
-                                <p className="text-muted-foreground">{t('dashboard.orderAmount')}</p>
-                                <p className="font-semibold">{voucher.purchase_price} RON</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Settings Tab */}
             <TabsContent value="settings" className="space-y-4">
               <Card>
                 <CardHeader>

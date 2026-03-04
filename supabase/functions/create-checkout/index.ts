@@ -19,20 +19,18 @@ serve(async (req) => {
   );
 
   try {
-    // Authenticate user
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
     const { data: authData } = await supabaseClient.auth.getUser(token);
     const user = authData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { items, deliveryType, personalDetails, deliveryAddress, returnUrl } = await req.json();
+    const { experienceId, slotId, participants, totalPrice, title, returnUrl } = await req.json();
 
-    if (!items || items.length === 0) {
-      throw new Error("No items in cart");
+    if (!experienceId || !slotId || !participants || !totalPrice) {
+      throw new Error("Missing required booking fields");
     }
 
-    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
@@ -45,68 +43,36 @@ serve(async (req) => {
     } else {
       const customer = await stripe.customers.create({
         email: user.email,
-        name: personalDetails?.fullName || user.email,
         metadata: { supabase_user_id: user.id },
       });
       customerId = customer.id;
     }
 
-    // Build line items from cart
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-
-    for (const item of items) {
-      const servicesTotal = item.services?.reduce(
-        (sum: number, s: any) => sum + s.price * s.quantity,
-        0,
-      ) || 0;
-      const unitAmount = Math.round((item.price + servicesTotal) * 100); // Convert to bani (cents)
-
-      for (let i = 0; i < item.quantity; i++) {
-        lineItems.push({
-          price_data: {
-            currency: "ron",
-            product_data: {
-              name: item.title,
-              description: item.location || undefined,
-            },
-            unit_amount: unitAmount,
-          },
-          quantity: 1,
-        });
-      }
-    }
+    const unitAmount = Math.round(totalPrice * 100); // Convert to bani
 
     const baseUrl = returnUrl || req.headers.get("origin") || "https://id-preview--822cb615-8c38-4524-bedf-f2603ff01820.lovable.app";
 
-    // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      line_items: lineItems,
+      line_items: [
+        {
+          price_data: {
+            currency: "ron",
+            product_data: { name: title || "Experiență" },
+            unit_amount: unitAmount,
+          },
+          quantity: 1,
+        },
+      ],
       mode: "payment",
       success_url: `${baseUrl}#/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}#/cart`,
+      cancel_url: `${baseUrl}#/experience/${experienceId}`,
       metadata: {
         supabase_user_id: user.id,
-        delivery_type: deliveryType || "digital",
-        items_json: JSON.stringify(
-          items.map((item: any) => {
-            // Extract original UUID from cart item ID format: uuid-timestamp-index
-            const idParts = item.id.split("-");
-            const experienceId = idParts.slice(0, 5).join("-");
-            const servicesTotal = item.services?.reduce(
-              (sum: number, s: any) => sum + s.price * s.quantity, 0
-            ) || 0;
-            return {
-              experienceId,
-              title: item.title,
-              totalPrice: item.price + servicesTotal,
-              quantity: item.quantity,
-              isGift: item.isGift,
-            };
-          }),
-        ).slice(0, 500),
-        personal_details_json: JSON.stringify(personalDetails || {}).slice(0, 500),
-        delivery_address_json: deliveryAddress ? JSON.stringify(deliveryAddress).slice(0, 500) : "",
+        experience_id: experienceId,
+        slot_id: slotId,
+        participants: String(participants),
+        total_price: String(totalPrice),
       },
     });
 

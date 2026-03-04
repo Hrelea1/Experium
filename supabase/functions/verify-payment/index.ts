@@ -18,14 +18,12 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_ANON_KEY") ?? "",
   );
 
-  // Service role client for creating vouchers
   const supabaseAdmin = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
 
   try {
-    // Authenticate user
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
     const { data: authData } = await supabaseClient.auth.getUser(token);
@@ -35,88 +33,81 @@ serve(async (req) => {
     const { session_id } = await req.json();
     if (!session_id) throw new Error("Missing session_id");
 
-    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Retrieve checkout session
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
     if (session.payment_status !== "paid") {
       throw new Error("Payment not completed");
     }
 
-    // Verify user matches
     if (session.metadata?.supabase_user_id !== user.id) {
       throw new Error("Session does not belong to this user");
     }
 
-    // Parse items from metadata
-    const items = JSON.parse(session.metadata?.items_json || "[]");
-    const personalDetails = JSON.parse(session.metadata?.personal_details_json || "{}");
+    const experienceId = session.metadata?.experience_id;
+    const slotId = session.metadata?.slot_id;
+    const participants = parseInt(session.metadata?.participants || "1");
+    const totalPrice = parseFloat(session.metadata?.total_price || "0");
 
-    const orderId = `ORD-${Date.now().toString(36).toUpperCase()}`;
-    const vouchers: any[] = [];
+    if (!experienceId || !slotId) {
+      throw new Error("Missing booking metadata");
+    }
 
-    // Create vouchers for each item
-    for (const item of items) {
-      // Use experienceId from metadata (already extracted in create-checkout)
-      const experienceId = item.experienceId || item.id;
-      const totalPrice = item.totalPrice || item.price;
+    // Confirm the slot booking using the RPC (uses service role to bypass RLS)
+    const { data: bookingResult, error: bookingError } = await supabaseAdmin.rpc(
+      "confirm_slot_booking",
+      {
+        p_slot_id: slotId,
+        p_user_id: user.id,
+        p_participants: participants,
+        p_total_price: totalPrice,
+        p_payment_method: "stripe",
+      },
+    );
 
-      for (let i = 0; i < item.quantity; i++) {
-        // Generate voucher code
-        const { data: codeData, error: codeError } = await supabaseAdmin.rpc(
-          "generate_voucher_code",
-        );
-        if (codeError) throw codeError;
-        const voucherCode = codeData as string;
+    if (bookingError) throw bookingError;
 
-        // Get experience details
-        const { data: expData } = await supabaseAdmin
-          .from("experiences")
-          .select("ambassador_id, title, location_name")
-          .eq("id", experienceId)
-          .single();
+    const result = bookingResult?.[0];
+    if (!result?.success) {
+      throw new Error(result?.error_message || "Failed to confirm booking");
+    }
 
-        // Create voucher
-        const { data: voucherData, error: voucherError } = await supabaseAdmin
-          .from("vouchers")
-          .insert({
-            code: voucherCode,
-            user_id: user.id,
-            experience_id: experienceId,
-            purchase_price: totalPrice,
-            expiry_date: new Date(
-              Date.now() + 365 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            status: "active",
-            notes: item.isGift ? "Gift voucher" : null,
-            ambassador_id: expData?.ambassador_id || null,
-          })
-          .select()
-          .single();
+    // Get experience details for the response
+    const { data: expData } = await supabaseAdmin
+      .from("experiences")
+      .select("title, location_name")
+      .eq("id", experienceId)
+      .single();
 
-        if (voucherError) throw voucherError;
+    // Send booking confirmation notification
+    try {
+      await supabaseAdmin.functions.invoke("send-notification", {
+        body: { event_type: "booking_confirmed", booking_id: result.booking_id },
+      });
+    } catch (notifErr) {
+      console.error("Notification error (non-fatal):", notifErr);
+    }
 
-        vouchers.push({
-          id: voucherData.id,
-          code: voucherCode,
-          experienceId,
-          experienceTitle: item.title || expData?.title || "",
-          price: totalPrice,
-          location: expData?.location_name || "",
-        });
-      }
+    // Notify provider
+    try {
+      await supabaseAdmin.functions.invoke("push-notifications", {
+        body: { action: "notify-booking", booking_id: result.booking_id, experience_id: experienceId },
+      });
+    } catch (notifErr) {
+      console.error("Provider notification error (non-fatal):", notifErr);
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        orderId,
-        vouchers,
-        stripeSessionId: session_id,
+        bookingId: result.booking_id,
+        experienceTitle: expData?.title || "",
+        experienceLocation: expData?.location_name || "",
+        totalPrice,
+        participants,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
