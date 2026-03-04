@@ -1,84 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
-import { Heart, Star, MapPin, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 import { supabase } from "@/integrations/supabase/client";
 import { ExperienceImage } from "@/components/ExperienceImage";
-
-const experiences = [
-  {
-    id: 1,
-    title: "Zbor cu Balonul în Transilvania",
-    location: "Brașov, Transilvania",
-    price: 899,
-    originalPrice: 1099,
-    rating: 4.9,
-    reviews: 127,
-    duration: "3 ore",
-    image: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop",
-    badge: "Bestseller",
-    badgeColor: "bg-primary",
-  },
-  {
-    id: 2,
-    title: "Degustare de Vinuri Premium",
-    location: "Dealu Mare, Muntenia",
-    price: 349,
-    rating: 4.8,
-    reviews: 89,
-    duration: "4 ore",
-    image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=600&h=400&fit=crop",
-    badge: "Popular",
-    badgeColor: "bg-accent",
-  },
-  {
-    id: 3,
-    title: "Retreat Spa & Wellness",
-    location: "Băile Felix, Bihor",
-    price: 599,
-    rating: 4.9,
-    reviews: 203,
-    duration: "1 zi",
-    image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&h=400&fit=crop",
-    badge: "Nou",
-    badgeColor: "bg-secondary",
-  },
-  {
-    id: 4,
-    title: "Curs de Gătit Tradițional",
-    location: "Sibiu, Transilvania",
-    price: 279,
-    rating: 4.7,
-    reviews: 56,
-    duration: "5 ore",
-    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&h=400&fit=crop",
-  },
-  {
-    id: 5,
-    title: "Rafting pe Olt",
-    location: "Călimănești, Vâlcea",
-    price: 199,
-    rating: 4.8,
-    reviews: 145,
-    duration: "2.5 ore",
-    image: "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=600&h=400&fit=crop",
-    badge: "Aventură",
-    badgeColor: "bg-coral-dark",
-  },
-  {
-    id: 6,
-    title: "Tur Ghidat Castelul Bran",
-    location: "Bran, Brașov",
-    price: 149,
-    rating: 4.6,
-    reviews: 312,
-    duration: "3 ore",
-    image: "https://images.unsplash.com/photo-1580213576896-f1e8d2f85d60?w=600&h=400&fit=crop",
-  },
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -186,8 +113,7 @@ export function FeaturedExperiences() {
           </div>
           <Button variant="outline" className="sm:w-auto" asChild>
             <Link to="/category/toate-categoriile">
-              {sectionContent.ctaText}
-              <ArrowRight className="w-4 h-4 ml-2" />
+              {sectionContent.ctaText} →
             </Link>
           </Button>
         </motion.div>
@@ -229,11 +155,6 @@ export function FeaturedExperiences() {
                 />
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-secondary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                {/* Wishlist Button */}
-                <button className="absolute top-3 right-3 w-10 h-10 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
-                  <Heart className="w-5 h-5 text-foreground hover:text-primary transition-colors" />
-                </button>
 
                 {/* Badge */}
                 {exp.badge && (
@@ -247,14 +168,8 @@ export function FeaturedExperiences() {
               <div className="p-5">
                 {/* Location & Duration */}
                 <div className="flex items-center gap-4 text-muted-foreground text-sm mb-3">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {exp.location}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {exp.duration}
-                  </span>
+                  <span>{exp.location}</span>
+                  <span>{exp.duration}</span>
                 </div>
 
                 {/* Title */}
@@ -264,10 +179,8 @@ export function FeaturedExperiences() {
 
                 {/* Rating */}
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-accent text-accent" />
-                    <span className="font-semibold text-foreground">{exp.rating}</span>
-                  </div>
+                  <span className="text-accent">★</span>
+                  <span className="font-semibold text-foreground">{exp.rating}</span>
                   <span className="text-muted-foreground text-sm">
                     ({exp.reviews} {t('featured.reviews')})
                   </span>

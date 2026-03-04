@@ -1,15 +1,14 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Star, MapPin, Clock, SlidersHorizontal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ExperienceImage } from "@/components/ExperienceImage";
+import { RegionNotificationSignup } from "@/components/RegionNotificationSignup";
 
 interface Experience {
   id: string;
@@ -42,7 +41,6 @@ export default function CategorySearch() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("recommended");
@@ -73,21 +71,17 @@ export default function CategorySearch() {
           `)
           .eq('is_active', true);
 
-        // Filter by category if not "toate-categoriile"
         if (categoryKey && categoryKey !== "toate-categoriile") {
           query = query.eq('categories.slug', categoryKey);
         }
 
         const { data, error } = await query;
-
         if (error) throw error;
 
-        // Filter out experiences without matching category (for join filtering)
         let filteredData = data || [];
         if (categoryKey && categoryKey !== "toate-categoriile") {
           filteredData = filteredData.filter(exp => exp.categories?.slug === categoryKey);
         }
-        // Filter by region if provided (match by slug or name)
         if (regionParam) {
           const regionLower = regionParam.toLowerCase();
           filteredData = filteredData.filter(exp => 
@@ -112,7 +106,6 @@ export default function CategorySearch() {
     fetchExperiences();
   }, [categoryKey, regionParam, toast]);
 
-  // Sort experiences
   const sortedExperiences = useMemo(() => {
     const sorted = [...experiences];
     switch (sortBy) {
@@ -137,13 +130,16 @@ export default function CategorySearch() {
   const getExperienceImage = (exp: Experience) => {
     const primary = exp.experience_images?.find((img) => img.is_primary) || exp.experience_images?.[0];
     return {
-      url:
-        primary?.image_url ||
-        "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop",
+      url: primary?.image_url || "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=600&h=400&fit=crop",
       focal_x: primary?.focal_x ?? 50,
       focal_y: primary?.focal_y ?? 50,
     };
   };
+
+  // Determine a friendly region name for display
+  const regionDisplayName = regionParam 
+    ? regionParam.charAt(0).toUpperCase() + regionParam.slice(1)
+    : "";
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,7 +154,7 @@ export default function CategorySearch() {
               animate={{ opacity: 1, y: 0 }}
               className="text-3xl lg:text-5xl font-bold text-primary-foreground mb-2"
             >
-              {regionParam ? `${categoryTitle} - ${regionParam}` : categoryTitle}
+              {regionParam ? `${categoryTitle} - ${regionDisplayName}` : categoryTitle}
             </motion.h1>
             <p className="text-primary-foreground/80 text-lg">
               {loading ? "Se încarcă..." : `${sortedExperiences.length} experiențe disponibile`}
@@ -189,17 +185,24 @@ export default function CategorySearch() {
           {/* Loading State */}
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : sortedExperiences.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg mb-4">
-                Nu am găsit experiențe în această categorie.
-              </p>
-              <Button onClick={() => navigate('/category/toate-categoriile')}>
-                Vezi toate experiențele
-              </Button>
-            </div>
+            regionParam ? (
+              <RegionNotificationSignup 
+                regionSlug={regionParam} 
+                regionName={regionDisplayName} 
+              />
+            ) : (
+              <div className="text-center py-20">
+                <p className="text-muted-foreground text-lg mb-4">
+                  Nu am găsit experiențe în această categorie.
+                </p>
+                <Button onClick={() => navigate('/category/toate-categoriile')}>
+                  Vezi toate experiențele
+                </Button>
+              </div>
+            )
           ) : (
             <motion.div 
               initial={{ opacity: 0 }}
@@ -231,14 +234,6 @@ export default function CategorySearch() {
                         />
                       );
                     })()}
-                    
-                    {/* Wishlist Button */}
-                    <button 
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute top-3 right-3 w-9 h-9 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md"
-                    >
-                      <Heart className="w-4 h-4 text-foreground hover:text-primary transition-colors" />
-                    </button>
 
                     {/* Discount Badge */}
                     {exp.original_price && (
@@ -252,14 +247,8 @@ export default function CategorySearch() {
                   <div className="p-4">
                     {/* Location & Duration */}
                     <div className="flex items-center gap-3 text-muted-foreground text-xs mb-2">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {exp.location_name}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {formatDuration(exp.duration_minutes)}
-                      </span>
+                      <span>{exp.location_name}</span>
+                      <span>{formatDuration(exp.duration_minutes)}</span>
                     </div>
 
                     {/* Title */}
@@ -269,7 +258,7 @@ export default function CategorySearch() {
 
                     {/* Rating */}
                     <div className="flex items-center gap-1 mb-3">
-                      <Star className="w-4 h-4 fill-accent text-accent" />
+                      <span className="text-accent">★</span>
                       <span className="font-semibold text-sm text-foreground">{exp.avg_rating?.toFixed(1) || "N/A"}</span>
                       <span className="text-muted-foreground text-xs">
                         ({exp.total_reviews || 0})

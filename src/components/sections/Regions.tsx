@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
@@ -29,7 +28,7 @@ const experienceCounts: Record<string, number> = {
   maramureș: 42,
   dobrogea: 67,
   banat: 54,
-  bucurești: 89,
+  crisana: 32,
   moldova: 35,
   muntenia: 45,
   oltenia: 28,
@@ -128,7 +127,6 @@ export function Regions() {
                 </p>
                 <div className="flex items-center gap-2 text-card font-medium group-hover:text-primary transition-colors">
                   {t("regions.explore")}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                 </div>
               </div>
             </motion.div>

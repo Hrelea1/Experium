@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, Gift, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
@@ -71,10 +70,6 @@ export function Newsletter() {
           transition={{ duration: 0.6 }}
           className="max-w-3xl mx-auto text-center"
         >
-          <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Gift className="w-8 h-8 text-primary" />
-          </div>
-
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4">
             {sectionContent.title}
           </h2>
@@ -100,17 +95,7 @@ export function Newsletter() {
                 disabled={isSubmitted || isLoading || !gdprConsent}
                 className="sm:w-auto"
               >
-                {isSubmitted ? (
-                  <>
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                    {t('newsletter.success')}
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 mr-2" />
-                    {isLoading ? "Se trimite..." : sectionContent.ctaText}
-                  </>
-                )}
+                {isSubmitted ? "✓ " + t('newsletter.success') : (isLoading ? "Se trimite..." : sectionContent.ctaText)}
               </Button>
             </div>
             <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">

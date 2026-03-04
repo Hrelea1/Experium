@@ -1,12 +1,11 @@
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const testimonials = [
   {
     name: "Maria Popescu",
-    location: "București",
+    location: "Craiova",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     text: "Am oferit soțului meu zborul cu balonul de ziua lui și a fost cea mai frumoasă surpriză! Recomand cu încredere.",
@@ -71,13 +70,10 @@ export function Testimonials() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="bg-card rounded-2xl p-6 lg:p-8 shadow-card border border-border/50 relative"
             >
-              {/* Quote Icon */}
-              <Quote className="absolute top-6 right-6 w-10 h-10 text-primary/10" />
-
-              {/* Stars */}
-              <div className="flex gap-1 mb-4">
+              {/* Stars as text */}
+              <div className="flex gap-1 mb-4 text-accent text-lg">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-accent text-accent" />
+                  <span key={i}>★</span>
                 ))}
               </div>
 
