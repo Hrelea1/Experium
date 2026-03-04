@@ -339,7 +339,23 @@ export default function ExperienceDetail() {
                   >
                     <Heart className={`w-5 h-5 ${isWishlisted ? "fill-primary text-primary" : "text-foreground"}`} />
                   </button>
-                  <button className="w-10 h-10 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (navigator.share) {
+                        navigator.share({
+                          title: experience.title,
+                          text: experience.description,
+                          url: window.location.href,
+                        }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(window.location.href).then(() => {
+                          toast({ title: "Link copiat!", description: "Link-ul a fost copiat în clipboard." });
+                        });
+                      }
+                    }}
+                    className="w-10 h-10 rounded-full bg-card/90 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors shadow-md"
+                  >
                     <Share2 className="w-5 h-5 text-foreground" />
                   </button>
                 </div>
