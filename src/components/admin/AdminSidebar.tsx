@@ -38,7 +38,6 @@ const mainItems = [
 
 const otherItems = [
   { title: "Setări", url: "/admin/settings", icon: Settings },
-  { title: "Înapoi la Site", url: "/", icon: Home, external: true },
 ];
 
 export function AdminSidebar() {
@@ -92,27 +91,28 @@ export function AdminSidebar() {
               {otherItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    {'external' in item && item.external ? (
-                      <a
-                        href={item.url}
-                        className="hover:bg-muted/50"
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {open && <span>{item.title}</span>}
-                      </a>
-                    ) : (
-                      <NavLink
-                        to={item.url}
-                        className="hover:bg-muted/50"
-                        activeClassName="bg-muted text-primary font-medium"
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {open && <span>{item.title}</span>}
-                      </NavLink>
-                    )}
+                    <NavLink
+                      to={item.url}
+                      className="hover:bg-muted/50"
+                      activeClassName="bg-muted text-primary font-medium"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {open && <span>{item.title}</span>}
+                    </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/"
+                    className="hover:bg-muted/50"
+                  >
+                    <Home className="h-4 w-4" />
+                    {open && <span>Înapoi la Site</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

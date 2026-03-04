@@ -150,9 +150,9 @@ const GiftIdeas = () => {
                 {t('giftIdeas.haveVoucherDesc')}
               </p>
               <Button asChild size="lg">
-                <Link to="/redeem-voucher">
+                <Link to="/category/toate-categoriile">
                   <Gift className="w-5 h-5 mr-2" />
-                  {t('giftIdeas.useVoucher')}
+                  {t('common.explore')}
                 </Link>
               </Button>
             </motion.div>

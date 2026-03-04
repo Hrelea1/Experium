@@ -120,7 +120,7 @@ export function Newsletter() {
                 onChange={(e) => setGdprConsent(e.target.checked)}
                 className="mt-1 rounded border-border"
               />
-              <span>Sunt de acord cu prelucrarea datelor personale conform <a href="/gdpr" className="text-primary underline">Politicii GDPR</a> și doresc să primesc newsletter.</span>
+              <span>Sunt de acord cu prelucrarea datelor personale conform <a href="/#/gdpr" className="text-primary underline">Politicii GDPR</a> și doresc să primesc newsletter.</span>
             </label>
           </form>
 
