@@ -30,13 +30,37 @@ serve(async (req) => {
       );
     }
 
-    // Send push notification to a provider
+    // Send push notification to a provider (requires service role auth)
     if (action === 'send-push') {
+      // SECURITY: Only allow service role or authenticated internal calls
+      const authHeader = req.headers.get('Authorization');
+      const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      if (!authHeader || !serviceRoleKey || authHeader !== `Bearer ${serviceRoleKey}`) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized: service role required' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       const { provider_user_id, title, message, url } = body;
+
+      // Input validation
+      if (!provider_user_id || typeof provider_user_id !== 'string') {
+        return new Response(
+          JSON.stringify({ error: 'Invalid provider_user_id' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (!title || typeof title !== 'string' || title.length > 200) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid title' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       
       const supabaseAdmin = createClient(
         Deno.env.get('SUPABASE_URL')!,
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        serviceRoleKey
       );
 
       // Get push subscriptions for this user
@@ -99,12 +123,31 @@ serve(async (req) => {
       );
     }
 
-    // Notify providers about a new booking (called internally)
+    // Notify providers about a new booking (called from authenticated client)
     if (action === 'notify-booking') {
+      // Verify caller is authenticated
       const authHeader = req.headers.get('Authorization');
-      const cronSecret = Deno.env.get('CRON_SECRET_TOKEN');
-      const isCron = req.headers.get('x-cron-secret') === cronSecret;
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       
+      // Verify the JWT is valid by creating a user-scoped client
+      const supabaseUser = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+      if (userError || !user) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       const supabaseAdmin = createClient(
         Deno.env.get('SUPABASE_URL')!,
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -178,8 +221,28 @@ serve(async (req) => {
       );
     }
 
-    // Notify providers about a cancellation
+    // Notify providers about a cancellation (called from authenticated client)
     if (action === 'notify-cancellation') {
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const supabaseUser = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user: cancelUser }, error: cancelUserError } = await supabaseUser.auth.getUser();
+      if (cancelUserError || !cancelUser) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       const supabaseAdmin = createClient(
         Deno.env.get('SUPABASE_URL')!,
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
