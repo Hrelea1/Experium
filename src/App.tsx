@@ -41,6 +41,7 @@ import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import GDPR from "./pages/GDPR";
 import ProviderDashboard from "./pages/provider/ProviderDashboard";
+import CreateExperience from "./pages/provider/CreateExperience";
 import AmbassadorDashboard from "./pages/ambassador/AmbassadorDashboard";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -83,6 +84,7 @@ const App = () => (
               
               {/* Provider Routes */}
               <Route path="/provider" element={<ProviderDashboard />} />
+              <Route path="/provider/create" element={<CreateExperience />} />
               
               {/* Ambassador Routes */}
               <Route path="/ambassador" element={<AmbassadorDashboard />} />
