@@ -1,8 +1,55 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import { encode as base64Encode } from "https://deno.land/std@0.190.0/encoding/base64.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+// ---------- TWILIO SMS ----------
+
+async function sendSms(to: string, body: string): Promise<boolean> {
+  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+  if (!accountSid || !authToken || !fromNumber) {
+    console.warn("Twilio credentials not configured, skipping SMS");
+    return false;
+  }
+
+  let normalizedTo = to.replace(/\s+/g, "");
+  if (normalizedTo.startsWith("0")) normalizedTo = "+40" + normalizedTo.substring(1);
+  if (!normalizedTo.startsWith("+")) normalizedTo = "+" + normalizedTo;
+
+  if (!/^\+[1-9]\d{6,14}$/.test(normalizedTo)) {
+    console.warn(`Invalid phone number format: ${normalizedTo}`);
+    return false;
+  }
+
+  try {
+    const credentials = base64Encode(`${accountSid}:${authToken}`);
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Basic ${credentials}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ To: normalizedTo, From: fromNumber, Body: body }),
+      }
+    );
+    if (!response.ok) {
+      console.error(`Twilio SMS failed [${response.status}]: ${await response.text()}`);
+      return false;
+    }
+    console.log(`SMS sent to ${normalizedTo}`);
+    return true;
+  } catch (err) {
+    console.error("Twilio SMS error:", err);
+    return false;
+  }
+}
 
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
@@ -121,13 +168,20 @@ const handler = async (req: Request): Promise<Response> => {
         // Fetch user profile
         const { data: profile } = await supabaseClient
           .from("profiles")
-          .select("full_name, email")
+          .select("full_name, email, phone")
           .eq("id", booking.user_id)
           .single();
 
         if (!profile?.email) {
           continue;
         }
+
+        // Check SMS preferences
+        const { data: prefs } = await supabaseClient
+          .from("notification_preferences")
+          .select("sms_booking_reminder, email_booking_reminder")
+          .eq("user_id", booking.user_id)
+          .single();
 
         const bookingDate = new Date(booking.booking_date);
         const hoursUntil = Math.round((bookingDate.getTime() - now.getTime()) / (1000 * 60 * 60));
@@ -222,12 +276,23 @@ const handler = async (req: Request): Promise<Response> => {
           </html>
         `;
 
-        await resend.emails.send({
-          from: "Experium <onboarding@resend.dev>",
-          to: [profile.email],
-          subject: `Reminder: ${safeTitle} - peste ${hoursUntil} ore!`,
-          html: emailHtml,
-        });
+        // Send email if preference allows
+        const shouldSendEmail = !prefs || prefs.email_booking_reminder !== false;
+        if (shouldSendEmail) {
+          await resend.emails.send({
+            from: "Experium <onboarding@resend.dev>",
+            to: [profile.email],
+            subject: `Reminder: ${safeTitle} - peste ${hoursUntil} ore!`,
+            html: emailHtml,
+          });
+        }
+
+        // Send SMS reminder
+        const shouldSendSms = profile.phone && (!prefs || prefs.sms_booking_reminder !== false);
+        if (shouldSendSms && profile.phone) {
+          const smsBody = `Experium: Reminder - experiența ${safeTitle} la ${safeLocation} este mâine, ${formattedDate}. Ajunge cu 10-15 min înainte!`;
+          await sendSms(profile.phone, smsBody);
+        }
 
         successCount++;
       } catch (error) {
