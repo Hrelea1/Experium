@@ -46,7 +46,7 @@ interface AmbassadorExperience {
   price: number;
   is_active: boolean;
   created_at: string;
-  voucher_count?: number;
+  booking_count?: number;
   revenue?: number;
 }
 
@@ -96,19 +96,20 @@ export default function AmbassadorDashboard() {
 
       if (expError) throw expError;
 
-      // Get voucher counts for each experience
+      // Get booking counts for each experience
       const experiencesWithStats = await Promise.all(
         (expData || []).map(async (exp) => {
-          const { count, data: voucherData } = await supabase
-            .from('vouchers')
-            .select('purchase_price', { count: 'exact' })
-            .eq('experience_id', exp.id);
+          const { count, data: bookingData } = await supabase
+            .from('bookings')
+            .select('total_price', { count: 'exact' })
+            .eq('experience_id', exp.id)
+            .in('status', ['confirmed', 'completed']);
 
-          const revenue = voucherData?.reduce((sum, v) => sum + (v.purchase_price || 0), 0) || 0;
+          const revenue = bookingData?.reduce((sum, b) => sum + (b.total_price || 0), 0) || 0;
 
           return {
             ...exp,
-            voucher_count: count || 0,
+            booking_count: count || 0,
             revenue,
           };
         })
@@ -368,7 +369,7 @@ export default function AmbassadorDashboard() {
                         <div className="flex items-center gap-4 mt-2 text-sm">
                           <span className="text-primary font-medium">{exp.price} Lei</span>
                           <span className="text-muted-foreground">
-                            {exp.voucher_count} vânzări
+                            {exp.booking_count} vânzări
                           </span>
                           <span className="text-green-600 font-medium">
                             {exp.revenue?.toLocaleString()} Lei venituri

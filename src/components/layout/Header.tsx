@@ -195,13 +195,7 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/my-vouchers">{t('nav.myVouchers')}</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
                     <Link to="/my-bookings">{t('nav.myBookings')}</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/redeem-voucher">{t('nav.useVoucher')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
@@ -291,20 +285,12 @@ export function Header() {
                     {t('nav.myProfile')}
                   </Link>
                   <Link
-                    to="/my-vouchers"
+                    to="/my-bookings"
                     className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <ShoppingBag className="h-4 w-4" />
-                    {t('nav.myVouchers')}
-                  </Link>
-                  <Link
-                    to="/redeem-voucher"
-                    className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Gift className="h-4 w-4" />
-                    {t('nav.useVoucher')}
+                    {t('nav.myBookings')}
                   </Link>
                 </>
               )}

@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays, Clock, Users, Plus, Trash2, PlusCircle, Building2, Wrench, Bell } from 'lucide-react';
+import { CalendarDays, Clock, Users, Plus, Trash2, PlusCircle, Building2, Wrench, Bell, TrendingUp, BarChart3, DollarSign } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RecurringAvailability } from '@/components/provider/RecurringAvailability';
@@ -20,8 +20,9 @@ import { ProviderBookings } from '@/components/provider/ProviderBookings';
 import { PushNotificationSettings } from '@/components/provider/PushNotificationSettings';
 import { useProviderNotifications } from '@/hooks/useProviderNotifications';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { ro } from 'date-fns/locale';
 
 interface AssignedExperience {
@@ -47,6 +48,17 @@ interface AvailabilitySlot {
   max_participants: number;
   booked_participants: number;
   is_available: boolean;
+}
+
+interface SalesBooking {
+  id: string;
+  booking_date: string;
+  participants: number;
+  total_price: number;
+  status: string;
+  created_at: string;
+  experiences?: { title: string; location_name: string };
+  user_id: string;
 }
 
 function NotificationsHistory() {
@@ -116,6 +128,9 @@ export default function ProviderDashboard() {
   const [maxParticipants, setMaxParticipants] = useState(10);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [salesBookings, setSalesBookings] = useState<SalesBooking[]>([]);
+  const [salesStats, setSalesStats] = useState({ totalSales: 0, totalRevenue: 0, totalBookings: 0 });
+  const [userProfiles, setUserProfiles] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (user) fetchData();
@@ -157,6 +172,39 @@ export default function ProviderDashboard() {
 
       if (slotsError) throw slotsError;
       setAvailabilitySlots(slotsData || []);
+
+      // Fetch sales data (bookings for provider's experiences)
+      const experienceIds = (expData || []).map(e => e.experience_id);
+      if (experienceIds.length > 0) {
+        const { data: bookingsData } = await supabase
+          .from('bookings')
+          .select('id, booking_date, participants, total_price, status, created_at, user_id, experiences(title, location_name)')
+          .in('experience_id', experienceIds)
+          .order('booking_date', { ascending: false })
+          .limit(100);
+
+        const bData = bookingsData || [];
+        setSalesBookings(bData as SalesBooking[]);
+
+        const confirmed = bData.filter(b => b.status === 'confirmed' || b.status === 'completed');
+        setSalesStats({
+          totalSales: confirmed.length,
+          totalRevenue: confirmed.reduce((sum, b) => sum + (b.total_price || 0), 0),
+          totalBookings: bData.length,
+        });
+
+        // Fetch client names
+        const clientIds = [...new Set(bData.map(b => b.user_id))];
+        if (clientIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name, email')
+            .in('id', clientIds);
+          const map: Record<string, string> = {};
+          (profiles || []).forEach(p => { map[p.id] = p.full_name || p.email; });
+          setUserProfiles(map);
+        }
+      }
     } catch (error: any) {
       toast({ title: 'Eroare', description: 'Nu am putut încărca datele', variant: 'destructive' });
     } finally {
@@ -240,8 +288,12 @@ export default function ProviderDashboard() {
             </Button>
           </div>
 
-          <Tabs defaultValue="experiences" className="space-y-6">
+          <Tabs defaultValue="sales" className="space-y-6">
             <TabsList>
+              <TabsTrigger value="sales">
+                <TrendingUp className="h-4 w-4 mr-1" />
+                Vânzări
+              </TabsTrigger>
               <TabsTrigger value="experiences">Experiențe</TabsTrigger>
               <TabsTrigger value="availability">Disponibilitate</TabsTrigger>
               <TabsTrigger value="recurring">Program Recurent</TabsTrigger>
@@ -251,6 +303,96 @@ export default function ProviderDashboard() {
                 Notificări
               </TabsTrigger>
             </TabsList>
+
+            {/* Sales Overview Tab */}
+            <TabsContent value="sales">
+              <div className="grid sm:grid-cols-3 gap-6 mb-6">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <BarChart3 className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Experiențe Vândute</p>
+                        <p className="text-2xl font-bold">{salesStats.totalSales}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <CalendarDays className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Rezervări</p>
+                        <p className="text-2xl font-bold">{salesStats.totalBookings}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <TrendingUp className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Venit Total</p>
+                        <p className="text-2xl font-bold">{salesStats.totalRevenue.toLocaleString()} Lei</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Istoric Rezervări</CardTitle>
+                  <CardDescription>Toate rezervările pentru experiențele tale</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {salesBookings.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">Nicio rezervare încă.</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Experiență</TableHead>
+                          <TableHead>Data Rezervării</TableHead>
+                          <TableHead>Client</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Valoare</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {salesBookings.map((b) => (
+                          <TableRow key={b.id}>
+                            <TableCell className="font-medium">{b.experiences?.title || 'N/A'}</TableCell>
+                            <TableCell>{format(new Date(b.booking_date), 'dd MMM yyyy', { locale: ro })}</TableCell>
+                            <TableCell>{userProfiles[b.user_id] || 'N/A'}</TableCell>
+                            <TableCell>
+                              <Badge variant={
+                                b.status === 'confirmed' ? 'default' :
+                                b.status === 'completed' ? 'secondary' :
+                                b.status === 'cancelled' ? 'destructive' : 'outline'
+                              }>
+                                {b.status === 'confirmed' ? 'Confirmată' :
+                                 b.status === 'completed' ? 'Finalizată' :
+                                 b.status === 'cancelled' ? 'Anulată' : 'În așteptare'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right font-medium">{b.total_price} Lei</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             {/* Experiences Tab */}
             <TabsContent value="experiences">

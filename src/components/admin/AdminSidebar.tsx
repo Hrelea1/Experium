@@ -31,7 +31,7 @@ const mainItems = [
   { title: "Blog", url: "/admin/blog", icon: BookOpen },
   { title: "Experiențe", url: "/admin/experiences", icon: Gift },
   { title: "Rezervări", url: "/admin/bookings", icon: Calendar },
-  { title: "Vouchere", url: "/admin/orders", icon: ShoppingBag },
+  { title: "Comenzi", url: "/admin/orders", icon: ShoppingBag },
   { title: "Aplicații Parteneri", url: "/admin/partner-applications", icon: Handshake },
   { title: "Roluri", url: "/admin/roles", icon: Users },
 ];
