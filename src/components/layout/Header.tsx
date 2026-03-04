@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Truck, Award } from "lucide-react";
+import { Menu, X, Search, Heart, ShoppingBag, User, LogOut, Shield, Gift, Handshake, Truck, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -69,6 +69,20 @@ export function Header() {
               className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
             >
               {t('nav.about')}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+            </Link>
+            <Link
+              to="/blog"
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
+            >
+              Blog
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+            </Link>
+            <Link
+              to="/partners"
+              className="text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 relative group"
+            >
+              {t('nav.partners')}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
             </Link>
 
@@ -232,6 +246,22 @@ export function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.about')}
+              </Link>
+              <Link
+                to="/blog"
+                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <BookOpen className="h-4 w-4" />
+                Blog
+              </Link>
+              <Link
+                to="/partners"
+                className="px-4 py-3 text-foreground font-medium hover:bg-muted rounded-lg transition-colors flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Handshake className="h-4 w-4" />
+                {t('nav.partners')}
               </Link>
 
               {isAdmin && (
