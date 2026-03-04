@@ -112,26 +112,13 @@ export default function Cart() {
       return;
     }
 
-    const result = await processCheckout(
+    // Redirects to Stripe Checkout
+    await processCheckout(
       items,
       deliveryType,
       personalDetails,
       deliveryType === 'physical' ? deliveryAddress : null
     );
-
-    if (result?.success) {
-      navigate("/order-confirmation", {
-        state: {
-          orderData: result,
-          cartItems: items,
-          deliveryType,
-          personalDetails,
-          deliveryAddress: deliveryType === 'physical' ? deliveryAddress : null,
-        },
-      });
-      
-      clearCart();
-    }
   };
 
   const getStepTitle = () => {

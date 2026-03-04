@@ -48,6 +48,7 @@ import ProviderDashboard from "./pages/provider/ProviderDashboard";
 import CreateExperience from "./pages/provider/CreateExperience";
 import AmbassadorDashboard from "./pages/ambassador/AmbassadorDashboard";
 import NotFound from "./pages/NotFound";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import { ScrollToTop } from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/voucher-confirmation" element={<VoucherConfirmation />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/gift-ideas" element={<GiftIdeas />} />
               <Route path="/partners" element={<Partners />} />
               <Route path="/about" element={<About />} />
