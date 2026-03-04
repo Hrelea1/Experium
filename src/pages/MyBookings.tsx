@@ -18,6 +18,7 @@ import { format } from 'date-fns';
 
 interface Booking {
   id: string;
+  experience_id: string;
   booking_date: string;
   participants: number;
   status: string;
@@ -161,9 +162,17 @@ const MyBookings = () => {
       }
 
       // Send cancellation notifications
+      const cancelledBooking = bookings.find(b => b.id === selectedBookingId);
       supabase.functions.invoke('send-notification', {
         body: { event_type: 'booking_cancelled', booking_id: selectedBookingId, refund_eligible: result.refund_eligible },
       }).catch((err) => console.error('Notification error:', err));
+
+      // Notify provider about cancellation
+      if (cancelledBooking) {
+        supabase.functions.invoke('push-notifications', {
+          body: { action: 'notify-cancellation', booking_id: selectedBookingId, experience_id: cancelledBooking.experience_id },
+        }).catch((err) => console.error('Provider cancellation notification error:', err));
+      }
 
       toast({
         title: 'Rezervare anulată',

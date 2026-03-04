@@ -178,6 +178,76 @@ serve(async (req) => {
       );
     }
 
+    // Notify providers about a cancellation
+    if (action === 'notify-cancellation') {
+      const supabaseAdmin = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
+
+      const { booking_id, experience_id } = body;
+
+      const { data: providers } = await supabaseAdmin
+        .from('experience_providers')
+        .select('provider_user_id')
+        .eq('experience_id', experience_id)
+        .eq('is_active', true);
+
+      if (!providers?.length) {
+        return new Response(
+          JSON.stringify({ notified: 0 }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const { data: booking } = await supabaseAdmin
+        .from('bookings')
+        .select('*, experiences(title)')
+        .eq('id', booking_id)
+        .single();
+
+      const experienceTitle = (booking?.experiences as any)?.title || 'Experiență';
+      const bookingDate = booking?.booking_date 
+        ? new Date(booking.booking_date).toLocaleDateString('ro-RO') 
+        : '';
+
+      let notified = 0;
+      for (const provider of providers) {
+        await supabaseAdmin.from('provider_notifications').insert({
+          provider_user_id: provider.provider_user_id,
+          title: 'Rezervare anulată',
+          message: `${experienceTitle} - ${booking?.participants || 1} participant(i) pe ${bookingDate} a fost anulată`,
+          type: 'cancellation',
+          reference_id: booking_id,
+        });
+
+        try {
+          await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/push-notifications`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+            },
+            body: JSON.stringify({
+              action: 'send-push',
+              provider_user_id: provider.provider_user_id,
+              title: 'Rezervare anulată',
+              message: `${experienceTitle} a fost anulată`,
+              url: '/#/provider',
+            }),
+          });
+        } catch (err) {
+          console.error('Push notification call failed:', err);
+        }
+        notified++;
+      }
+
+      return new Response(
+        JSON.stringify({ notified }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(
       JSON.stringify({ error: 'Unknown action' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
