@@ -95,13 +95,10 @@ serve(async (req) => {
             price: item.price,
             quantity: item.quantity,
             isGift: item.isGift,
-            services: item.services,
-            image: item.image,
-            location: item.location,
           })),
-        ),
-        personal_details_json: JSON.stringify(personalDetails || {}),
-        delivery_address_json: deliveryAddress ? JSON.stringify(deliveryAddress) : "",
+        ).slice(0, 500),
+        personal_details_json: JSON.stringify(personalDetails || {}).slice(0, 500),
+        delivery_address_json: deliveryAddress ? JSON.stringify(deliveryAddress).slice(0, 500) : "",
       },
     });
 
