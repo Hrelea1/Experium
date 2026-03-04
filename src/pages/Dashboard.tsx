@@ -204,16 +204,17 @@ const Dashboard = () => {
       return;
     }
 
-    // Send cancellation confirmation email
+    // Send cancellation notifications to client + provider
     try {
-      await supabase.functions.invoke('send-cancellation-confirmation', {
+      await supabase.functions.invoke('send-notification', {
         body: {
-          bookingId: selectedBookingId,
-          refundEligible: result.refund_eligible,
+          event_type: 'booking_cancelled',
+          booking_id: selectedBookingId,
+          refund_eligible: result.refund_eligible,
         },
       });
     } catch (emailError) {
-      console.error('Failed to send cancellation email:', emailError);
+      console.error('Failed to send cancellation notifications:', emailError);
     }
 
     setCancelling(false);
