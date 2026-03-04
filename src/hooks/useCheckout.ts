@@ -2,23 +2,25 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { CartItem, DeliveryType, PersonalDetails, DeliveryAddress } from '@/contexts/CartContext';
+
+interface BookingCheckoutParams {
+  experienceId: string;
+  slotId: string;
+  participants: number;
+  totalPrice: number;
+  title: string;
+}
 
 export function useCheckout() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const processCheckout = async (
-    items: CartItem[],
-    deliveryType: DeliveryType,
-    personalDetails: PersonalDetails,
-    deliveryAddress: DeliveryAddress | null
-  ): Promise<boolean> => {
+  const processCheckout = async (params: BookingCheckoutParams): Promise<boolean> => {
     if (!user) {
       toast({
         title: 'Eroare',
-        description: 'Trebuie să fii autentificat pentru a finaliza comanda',
+        description: 'Trebuie să fii autentificat pentru a finaliza plata',
         variant: 'destructive',
       });
       return false;
@@ -29,10 +31,7 @@ export function useCheckout() {
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          items,
-          deliveryType,
-          personalDetails,
-          deliveryAddress,
+          ...params,
           returnUrl: window.location.origin + window.location.pathname,
         },
       });
@@ -40,10 +39,8 @@ export function useCheckout() {
       if (error) throw error;
       if (!data?.url) throw new Error('No checkout URL received');
 
-      // Open Stripe Checkout in a new tab (iframe redirects are blocked)
       const stripeWindow = window.open(data.url, '_blank');
       if (!stripeWindow) {
-        // Fallback: try direct redirect if popup blocked
         window.location.href = data.url;
       }
       setIsProcessing(false);
@@ -51,7 +48,7 @@ export function useCheckout() {
     } catch (error: any) {
       console.error('Checkout error:', error);
       toast({
-        title: 'Eroare la procesarea comenzii',
+        title: 'Eroare la procesarea plății',
         description: error.message || 'Te rugăm să încerci din nou',
         variant: 'destructive',
       });

@@ -12,11 +12,7 @@ import CategorySearch from "./pages/CategorySearch";
 import MapView from "./pages/MapView";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
-import MyVouchers from "./pages/MyVouchers";
 import MyBookings from "./pages/MyBookings";
-import RedeemVoucher from "./pages/RedeemVoucher";
-import VoucherConfirmation from "./pages/VoucherConfirmation";
-import CreateTestVoucher from "./pages/CreateTestVoucher";
 import Cart from "./pages/Cart";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import GiftIdeas from "./pages/GiftIdeas";
@@ -30,7 +26,7 @@ import ManageBlog from "./pages/admin/ManageBlog";
 import BlogEditor from "./pages/admin/BlogEditor";
 import ManagePartnerApplications from "./pages/admin/ManagePartnerApplications";
 import ExperienceBuilder from "./pages/admin/ExperienceBuilder";
-import VoucherBuilder from "./pages/admin/VoucherBuilder";
+// VoucherBuilder removed - direct booking model
 import ContentEditor from "./pages/admin/ContentEditor";
 import ContentAudit from "./pages/admin/ContentAudit";
 import EditExperience from "./pages/admin/EditExperience";
@@ -69,10 +65,7 @@ const App = () => (
               <Route path="/experience/:id" element={<ExperienceDetail />} />
               <Route path="/category/:category" element={<CategorySearch />} />
               <Route path="/map" element={<MapView />} />
-              <Route path="/my-vouchers" element={<MyVouchers />} />
               <Route path="/my-bookings" element={<MyBookings />} />
-              <Route path="/redeem-voucher" element={<RedeemVoucher />} />
-              <Route path="/voucher-confirmation" element={<VoucherConfirmation />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
@@ -105,7 +98,7 @@ const App = () => (
               <Route path="/admin/experiences/:id/edit" element={<EditExperience />} />
               <Route path="/admin/bookings" element={<ManageBookings />} />
               <Route path="/admin/orders" element={<ManageOrders />} />
-              <Route path="/admin/orders/create" element={<VoucherBuilder />} />
+              
               <Route path="/admin/roles" element={<ManageRoles />} />
               <Route path="/admin/blog" element={<ManageBlog />} />
               <Route path="/admin/blog/create" element={<BlogEditor />} />
