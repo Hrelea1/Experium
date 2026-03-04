@@ -160,6 +160,11 @@ const MyBookings = () => {
         return;
       }
 
+      // Send cancellation notifications
+      supabase.functions.invoke('send-notification', {
+        body: { event_type: 'booking_cancelled', booking_id: selectedBookingId, refund_eligible: result.refund_eligible },
+      }).catch((err) => console.error('Notification error:', err));
+
       toast({
         title: 'Rezervare anulată',
         description: result.refund_eligible 

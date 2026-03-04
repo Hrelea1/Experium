@@ -76,6 +76,12 @@ export function BookingForm({ experience }: BookingFormProps) {
       return;
     }
 
+    // Send notifications to client + provider
+    const bookingId = data[0].booking_id;
+    supabase.functions.invoke("send-notification", {
+      body: { event_type: "booking_confirmed", booking_id: bookingId },
+    }).catch((err) => console.error("Notification error:", err));
+
     toast({ title: "Rezervare confirmată! 🎉", description: `${experience.title} - rezervarea ta a fost confirmată.` });
     navigate("/my-bookings");
   };

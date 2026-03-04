@@ -572,6 +572,171 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscribers: {
+        Row: {
+          email: string
+          full_name: string | null
+          gdpr_consent: boolean
+          gdpr_consent_date: string | null
+          id: string
+          is_active: boolean
+          segment: string
+          subscribed_at: string
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          email: string
+          full_name?: string | null
+          gdpr_consent?: boolean
+          gdpr_consent_date?: string | null
+          id?: string
+          is_active?: boolean
+          segment?: string
+          subscribed_at?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string
+          full_name?: string | null
+          gdpr_consent?: boolean
+          gdpr_consent_date?: string | null
+          id?: string
+          is_active?: boolean
+          segment?: string
+          subscribed_at?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      notification_logs: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          max_retries: number
+          metadata: Json | null
+          next_retry_at: string | null
+          notification_type: string
+          recipient_email: string | null
+          recipient_phone: string | null
+          recipient_role: string
+          retry_count: number
+          sent_at: string | null
+          status: string
+          subject: string | null
+          user_id: string
+          voucher_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          max_retries?: number
+          metadata?: Json | null
+          next_retry_at?: string | null
+          notification_type: string
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          recipient_role?: string
+          retry_count?: number
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          user_id: string
+          voucher_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          max_retries?: number
+          metadata?: Json | null
+          next_retry_at?: string | null
+          notification_type?: string
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          recipient_role?: string
+          retry_count?: number
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          user_id?: string
+          voucher_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_logs_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_booking_cancellation: boolean
+          email_booking_confirmation: boolean
+          email_booking_reminder: boolean
+          email_marketing: boolean
+          email_voucher_expiry: boolean
+          id: string
+          sms_booking_confirmation: boolean
+          sms_booking_reminder: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_booking_cancellation?: boolean
+          email_booking_confirmation?: boolean
+          email_booking_reminder?: boolean
+          email_marketing?: boolean
+          email_voucher_expiry?: boolean
+          id?: string
+          sms_booking_confirmation?: boolean
+          sms_booking_reminder?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_booking_cancellation?: boolean
+          email_booking_confirmation?: boolean
+          email_booking_reminder?: boolean
+          email_marketing?: boolean
+          email_voucher_expiry?: boolean
+          id?: string
+          sms_booking_confirmation?: boolean
+          sms_booking_reminder?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
