@@ -1,8 +1,90 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import { encode as base64Encode } from "https://deno.land/std@0.190.0/encoding/base64.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+// ---------- TWILIO SMS ----------
+
+async function sendSms(to: string, body: string): Promise<boolean> {
+  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+  if (!accountSid || !authToken || !fromNumber) {
+    console.warn("Twilio credentials not configured, skipping SMS");
+    return false;
+  }
+
+  // Normalize Romanian phone number
+  let normalizedTo = to.replace(/\s+/g, "");
+  if (normalizedTo.startsWith("0")) {
+    normalizedTo = "+40" + normalizedTo.substring(1);
+  }
+  if (!normalizedTo.startsWith("+")) {
+    normalizedTo = "+" + normalizedTo;
+  }
+
+  // Validate E.164 format
+  if (!/^\+[1-9]\d{6,14}$/.test(normalizedTo)) {
+    console.warn(`Invalid phone number format: ${normalizedTo}`);
+    return false;
+  }
+
+  try {
+    const credentials = base64Encode(`${accountSid}:${authToken}`);
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Basic ${credentials}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          To: normalizedTo,
+          From: fromNumber,
+          Body: body,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error(`Twilio SMS failed [${response.status}]: ${errorData}`);
+      return false;
+    }
+
+    console.log(`SMS sent successfully to ${normalizedTo}`);
+    return true;
+  } catch (err) {
+    console.error("Twilio SMS error:", err);
+    return false;
+  }
+}
+
+// ---------- SMS TEMPLATES ----------
+
+function smsBookingConfirmedClient(vars: Record<string, string>): string {
+  return `Experium: Rezervarea ta pentru ${vars.title} pe ${vars.date} este confirmată. ${vars.participants} participant(i). ID: ${vars.bookingId.substring(0, 8)}`;
+}
+
+function smsBookingCancelledClient(vars: Record<string, string>): string {
+  return `Experium: Rezervarea ta pentru ${vars.title} pe ${vars.date} a fost anulată.${vars.refundEligible === 'true' ? ' Ești eligibil pentru rambursare.' : ''}`;
+}
+
+function smsProviderNewBooking(vars: Record<string, string>): string {
+  return `Experium: Rezervare nouă pentru ${vars.title} pe ${vars.date}. Client: ${vars.clientName}. ${vars.participants} participant(i).`;
+}
+
+function smsProviderBookingCancelled(vars: Record<string, string>): string {
+  return `Experium: Rezervare anulată pentru ${vars.title} pe ${vars.date}. Client: ${vars.clientName}.`;
+}
+
+function smsBookingReminder(vars: Record<string, string>): string {
+  return `Experium: Reminder - experiența ${vars.title} la ${vars.location} este mâine, ${vars.date}. Ajunge cu 10-15 min înainte!`;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -354,7 +436,47 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Send provider emails
+    // Send client SMS
+    const clientPhone = clientProfile.phone;
+    if (clientPhone) {
+      const { data: clientSmsPrefs } = await supabaseAdmin
+        .from("notification_preferences")
+        .select("sms_booking_confirmation, sms_booking_reminder")
+        .eq("user_id", booking.user_id)
+        .single();
+
+      let smsText: string | null = null;
+      let shouldSendSms = true;
+
+      if (event_type === "booking_confirmed") {
+        if (clientSmsPrefs && !clientSmsPrefs.sms_booking_confirmation) shouldSendSms = false;
+        smsText = smsBookingConfirmedClient(vars);
+      } else if (event_type === "booking_cancelled") {
+        smsText = smsBookingCancelledClient(vars);
+      } else if (event_type === "booking_reminder") {
+        if (clientSmsPrefs && !clientSmsPrefs.sms_booking_reminder) shouldSendSms = false;
+        smsText = smsBookingReminder(vars);
+      }
+
+      if (smsText && shouldSendSms) {
+        const smsSent = await sendSms(clientPhone, smsText);
+        await supabaseAdmin.from("notification_logs").insert({
+          user_id: booking.user_id,
+          notification_type: "sms",
+          event_type,
+          recipient_phone: clientPhone,
+          recipient_role: "client",
+          subject: smsText.substring(0, 100),
+          status: smsSent ? "sent" : "failed",
+          booking_id,
+          sent_at: smsSent ? new Date().toISOString() : null,
+          metadata: { booking_id },
+        });
+        if (smsSent) emailsSent.push(`sms_client:${clientPhone}`);
+      }
+    }
+
+    // Send provider emails + SMS
     for (const provider of providerProfiles) {
       let providerTemplate: { subject: string; html: string } | null = null;
       const providerVars = { ...vars, providerName: escapeHtml(provider.full_name || "Furnizor") };
@@ -403,9 +525,41 @@ const handler = async (req: Request): Promise<Response> => {
           });
         }
       }
+
+      // Send provider SMS
+      const { data: providerProfile } = await supabaseAdmin
+        .from("profiles")
+        .select("phone")
+        .eq("id", provider.id)
+        .single();
+
+      if (providerProfile?.phone) {
+        let providerSmsText: string | null = null;
+        if (event_type === "booking_confirmed" || event_type === "provider_new_booking") {
+          providerSmsText = smsProviderNewBooking(providerVars);
+        } else if (event_type === "booking_cancelled" || event_type === "provider_booking_cancelled") {
+          providerSmsText = smsProviderBookingCancelled(providerVars);
+        }
+        if (providerSmsText) {
+          const smsSent = await sendSms(providerProfile.phone, providerSmsText);
+          await supabaseAdmin.from("notification_logs").insert({
+            user_id: provider.id,
+            notification_type: "sms",
+            event_type: `provider_${event_type}`,
+            recipient_phone: providerProfile.phone,
+            recipient_role: "provider",
+            subject: providerSmsText.substring(0, 100),
+            status: smsSent ? "sent" : "failed",
+            booking_id,
+            sent_at: smsSent ? new Date().toISOString() : null,
+            metadata: { booking_id },
+          });
+          if (smsSent) emailsSent.push(`sms_provider:${providerProfile.phone}`);
+        }
+      }
     }
 
-    console.log(`Notification [${event_type}] processed. Emails sent: ${emailsSent.length}`);
+    console.log(`Notification [${event_type}] processed. Emails+SMS sent: ${emailsSent.length}`);
 
     return new Response(
       JSON.stringify({ success: true, emails_sent: emailsSent.length }),
