@@ -26,7 +26,7 @@ serve(async (req) => {
     const user = authData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { items, deliveryType, personalDetails, deliveryAddress } = await req.json();
+    const { items, deliveryType, personalDetails, deliveryAddress, returnUrl } = await req.json();
 
     if (!items || items.length === 0) {
       throw new Error("No items in cart");
@@ -76,15 +76,15 @@ serve(async (req) => {
       }
     }
 
-    const origin = req.headers.get("origin") || "https://id-preview--822cb615-8c38-4524-bedf-f2603ff01820.lovable.app";
+    const baseUrl = returnUrl || req.headers.get("origin") || "https://id-preview--822cb615-8c38-4524-bedf-f2603ff01820.lovable.app";
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: lineItems,
       mode: "payment",
-      success_url: `${origin}/#/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/#/cart`,
+      success_url: `${baseUrl}#/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}#/cart`,
       metadata: {
         supabase_user_id: user.id,
         delivery_type: deliveryType || "digital",
