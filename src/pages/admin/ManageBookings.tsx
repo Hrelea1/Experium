@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Calendar, Users, Gift, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Users, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import {
   Table,
@@ -27,9 +27,6 @@ interface Booking {
   user_id: string;
   experiences?: {
     title: string;
-  };
-  vouchers?: {
-    code: string;
   };
 }
 
@@ -56,9 +53,6 @@ const ManageBookings = () => {
           *,
           experiences (
             title
-          ),
-          vouchers (
-            code
           )
         `)
         .order('booking_date', { ascending: false });
@@ -143,7 +137,7 @@ const ManageBookings = () => {
           <TableHead>Experiență</TableHead>
           <TableHead>Dată</TableHead>
           <TableHead>Participanți</TableHead>
-          <TableHead>Voucher</TableHead>
+          <TableHead>Valoare</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Acțiuni</TableHead>
         </TableRow>
@@ -172,16 +166,7 @@ const ManageBookings = () => {
                 {booking.participants}
               </div>
             </TableCell>
-            <TableCell>
-              {booking.vouchers ? (
-                <div className="flex items-center gap-1 text-sm">
-                  <Gift className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-mono">{booking.vouchers.code}</span>
-                </div>
-              ) : (
-                <span className="text-muted-foreground">-</span>
-              )}
-            </TableCell>
+            <TableCell className="font-medium">{booking.total_price} RON</TableCell>
             <TableCell>{getStatusBadge(booking.status)}</TableCell>
             <TableCell className="text-right">
               {booking.status === 'confirmed' && (

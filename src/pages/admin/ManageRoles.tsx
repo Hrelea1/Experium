@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, UserPlus, Trash2, Mail } from 'lucide-react';
+import { Shield, UserPlus, Trash2, Mail, TrendingUp } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -60,6 +60,7 @@ const ManageRoles = () => {
   const [granting, setGranting] = useState(false);
   const [isPrimaryAdmin, setIsPrimaryAdmin] = useState(false);
   const [ambassadorStats, setAmbassadorStats] = useState<Record<string, any>>({});
+  const [providerStats, setProviderStats] = useState<Record<string, { experienceCount: number; totalRevenue: number; totalSales: number }>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -122,6 +123,41 @@ const ManageRoles = () => {
         }
       }
       setAmbassadorStats(statsMap);
+
+      // Fetch provider stats
+      const providerRoles = rolesData?.filter(r => r.role === 'provider') || [];
+      const pStatsMap: Record<string, { experienceCount: number; totalRevenue: number; totalSales: number }> = {};
+      
+      for (const role of providerRoles) {
+        const { count: expCount } = await supabase
+          .from('experience_providers')
+          .select('*', { count: 'exact', head: true })
+          .eq('provider_user_id', role.user_id)
+          .eq('is_active', true);
+
+        // Get experience IDs for this provider
+        const { data: provExps } = await supabase
+          .from('experience_providers')
+          .select('experience_id')
+          .eq('provider_user_id', role.user_id)
+          .eq('is_active', true);
+
+        let totalRevenue = 0;
+        let totalSales = 0;
+        if (provExps && provExps.length > 0) {
+          const expIds = provExps.map(e => e.experience_id);
+          const { data: bookings } = await supabase
+            .from('bookings')
+            .select('total_price')
+            .in('experience_id', expIds)
+            .in('status', ['confirmed', 'completed']);
+          totalSales = bookings?.length || 0;
+          totalRevenue = bookings?.reduce((sum, b) => sum + (b.total_price || 0), 0) || 0;
+        }
+
+        pStatsMap[role.user_id] = { experienceCount: expCount || 0, totalRevenue, totalSales };
+      }
+      setProviderStats(pStatsMap);
     } catch (error: any) {
       toast({
         title: 'Eroare',
@@ -259,6 +295,11 @@ const ManageRoles = () => {
   };
 
   const ambassadorUsers = userRoles.filter(r => r.role === 'ambassador');
+  const providerUsers = userRoles.filter(r => r.role === 'provider');
+  const customerProfiles = allProfiles.filter(p => {
+    const roles = getUserRoles(p.id);
+    return roles.length === 0;
+  });
 
   if (!isPrimaryAdmin) {
     return (
@@ -523,6 +564,79 @@ const ManageRoles = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Providers Table */}
+        {providerUsers.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Furnizori ({providerUsers.length})
+              </CardTitle>
+              <CardDescription>Statistici per furnizor</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Furnizor</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Experiențe Listate</TableHead>
+                    <TableHead>Total Vânzări</TableHead>
+                    <TableHead>Venit Generat</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {providerUsers.map((role) => {
+                    const profile = getProfileById(role.user_id);
+                    const pStats = providerStats[role.user_id];
+                    return (
+                      <TableRow key={role.id}>
+                        <TableCell className="font-medium">{profile?.full_name || 'N/A'}</TableCell>
+                        <TableCell>{profile?.email || 'N/A'}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{pStats?.experienceCount || 0}</Badge>
+                        </TableCell>
+                        <TableCell>{pStats?.totalSales || 0}</TableCell>
+                        <TableCell className="font-semibold">{pStats?.totalRevenue?.toLocaleString() || 0} Lei</TableCell>
+                        <TableCell><Badge variant="default">Activ</Badge></TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Customers Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Clienți ({customerProfiles.length})</CardTitle>
+            <CardDescription>Utilizatori fără rol special</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nume</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Înregistrat</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {customerProfiles.slice(0, 50).map((profile) => (
+                  <TableRow key={profile.id}>
+                    <TableCell className="font-medium">{profile.full_name || 'N/A'}</TableCell>
+                    <TableCell>{profile.email}</TableCell>
+                    <TableCell>{new Date(profile.created_at).toLocaleDateString('ro-RO')}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );

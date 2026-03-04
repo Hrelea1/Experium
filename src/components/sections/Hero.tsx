@@ -49,7 +49,7 @@ export function Hero() {
     ctaPrimary: t('hero.discover'),
     ctaPrimaryLink: "/category/toate-categoriile",
     ctaSecondary: t('hero.hasVoucher'),
-    ctaSecondaryLink: "/redeem-voucher",
+    ctaSecondaryLink: "/my-bookings",
     backgroundImage: "",
   };
 
