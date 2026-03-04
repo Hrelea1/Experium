@@ -82,6 +82,11 @@ export function BookingForm({ experience }: BookingFormProps) {
       body: { event_type: "booking_confirmed", booking_id: bookingId },
     }).catch((err) => console.error("Notification error:", err));
 
+    // Notify provider (in-app + push)
+    supabase.functions.invoke("push-notifications", {
+      body: { action: "notify-booking", booking_id: bookingId, experience_id: experience.id },
+    }).catch((err) => console.error("Provider notification error:", err));
+
     toast({ title: "Rezervare confirmată! 🎉", description: `${experience.title} - rezervarea ta a fost confirmată.` });
     navigate("/my-bookings");
   };
