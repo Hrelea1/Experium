@@ -30,8 +30,14 @@ export function Header() {
   const { t } = useTranslation();
 
   const handleNavClick = (sectionId: string) => {
-    if (window.location.pathname !== '/') {
-      window.location.href = `/#${sectionId}`;
+    if (window.location.hash !== '#/') {
+      window.location.hash = `#/`;
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
     } else {
       const element = document.getElementById(sectionId);
       if (element) {

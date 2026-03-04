@@ -223,7 +223,7 @@ export default function OrderConfirmation() {
                           size="sm"
                           asChild
                         >
-                          <Link to="/redeem-voucher">
+                          <Link to="/my-bookings">
                             <Calendar className="w-4 h-4 mr-2" />
                             {t('orderConfirmation.scheduleNow')}
                           </Link>
@@ -295,7 +295,7 @@ export default function OrderConfirmation() {
             className="mt-8 flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Button asChild size="lg">
-              <Link to="/redeem-voucher">
+              <Link to="/my-bookings">
                 {t('orderConfirmation.useVoucherNow')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>

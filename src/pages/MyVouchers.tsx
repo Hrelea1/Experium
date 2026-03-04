@@ -363,7 +363,7 @@ const VoucherGrid = ({ vouchers, onDownload, getStatusBadge }: VoucherGridProps)
                     size="sm" 
                     className="flex-1"
                     onClick={() => {
-                      window.location.hash = `/redeem-voucher?code=${voucher.code}`;
+                      window.location.hash = `/my-bookings`;
                     }}
                   >
                     Rezervă
