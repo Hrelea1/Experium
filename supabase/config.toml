@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.send-notification]
 verify_jwt = false
+
+[functions.push-notifications]
+verify_jwt = false

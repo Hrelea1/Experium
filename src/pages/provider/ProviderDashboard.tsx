@@ -12,11 +12,17 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays, Clock, Users, Plus, Trash2, PlusCircle, Building2, Wrench } from 'lucide-react';
+import { CalendarDays, Clock, Users, Plus, Trash2, PlusCircle, Building2, Wrench, Bell } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { RecurringAvailability } from '@/components/provider/RecurringAvailability';
 import { ProviderBookings } from '@/components/provider/ProviderBookings';
+import { PushNotificationSettings } from '@/components/provider/PushNotificationSettings';
+import { useProviderNotifications } from '@/hooks/useProviderNotifications';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
+import { ro } from 'date-fns/locale';
 
 interface AssignedExperience {
   id: string;
@@ -41,6 +47,60 @@ interface AvailabilitySlot {
   max_participants: number;
   booked_participants: number;
   is_available: boolean;
+}
+
+function NotificationsHistory() {
+  const { notifications, markAsRead, markAllAsRead, unreadCount } = useProviderNotifications();
+  
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Istoric Notificări
+          </CardTitle>
+          <CardDescription>{unreadCount} necitite</CardDescription>
+        </div>
+        {unreadCount > 0 && (
+          <Button variant="outline" size="sm" onClick={markAllAsRead}>
+            Marchează toate ca citite
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        {notifications.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">Nicio notificare încă.</p>
+        ) : (
+          <div className="space-y-2">
+            {notifications.map((notif) => (
+              <div
+                key={notif.id}
+                className={cn(
+                  "p-3 rounded-lg border cursor-pointer transition-colors",
+                  !notif.is_read ? "bg-primary/5 border-primary/20" : "hover:bg-muted/50"
+                )}
+                onClick={() => !notif.is_read && markAsRead(notif.id)}
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-medium text-sm">{notif.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{notif.message}</p>
+                  </div>
+                  {!notif.is_read && (
+                    <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1.5" />
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true, locale: ro })}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function ProviderDashboard() {
@@ -186,6 +246,10 @@ export default function ProviderDashboard() {
               <TabsTrigger value="availability">Disponibilitate</TabsTrigger>
               <TabsTrigger value="recurring">Program Recurent</TabsTrigger>
               <TabsTrigger value="bookings">Rezervări</TabsTrigger>
+              <TabsTrigger value="notifications">
+                <Bell className="h-4 w-4 mr-1" />
+                Notificări
+              </TabsTrigger>
             </TabsList>
 
             {/* Experiences Tab */}
@@ -359,6 +423,14 @@ export default function ProviderDashboard() {
             {/* Bookings Tab */}
             <TabsContent value="bookings">
               <ProviderBookings />
+            </TabsContent>
+
+            {/* Notifications Tab */}
+            <TabsContent value="notifications">
+              <div className="space-y-6">
+                <PushNotificationSettings />
+                <NotificationsHistory />
+              </div>
             </TabsContent>
           </Tabs>
         </div>
