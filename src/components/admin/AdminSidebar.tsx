@@ -6,7 +6,9 @@ import {
   Users,
   Settings,
   Home,
-  FileEdit
+  FileEdit,
+  BookOpen,
+  Handshake
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -26,9 +28,11 @@ import {
 const mainItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Editor Conținut", url: "/admin/content", icon: FileEdit },
+  { title: "Blog", url: "/admin/blog", icon: BookOpen },
   { title: "Experiențe", url: "/admin/experiences", icon: Gift },
   { title: "Rezervări", url: "/admin/bookings", icon: Calendar },
   { title: "Vouchere", url: "/admin/orders", icon: ShoppingBag },
+  { title: "Aplicații Parteneri", url: "/admin/partner-applications", icon: Handshake },
   { title: "Roluri", url: "/admin/roles", icon: Users },
 ];
 
