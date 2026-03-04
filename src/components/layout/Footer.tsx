@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Youtube, Phone, Mail, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export function Footer() {
@@ -18,6 +17,7 @@ export function Footer() {
       { label: "Maramureș", href: "/category/toate-categoriile?region=maramures" },
       { label: "Dobrogea", href: "/category/toate-categoriile?region=dobrogea" },
       { label: "Banat", href: "/category/toate-categoriile?region=banat" },
+      { label: "Crișana", href: "/category/toate-categoriile?region=crisana" },
     ],
     suport: [
       { label: t('footer.faq'), href: "/faq" },
@@ -55,30 +55,27 @@ export function Footer() {
 
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
-              <a href="tel:+40721234567" className="flex items-center gap-2 text-secondary-foreground/70 hover:text-primary transition-colors">
-                <Phone className="w-4 h-4" />
+              <a href="tel:+40721234567" className="block text-secondary-foreground/70 hover:text-primary transition-colors">
                 +40 721 234 567
               </a>
-              <a href="mailto:contact@experium.ro" className="flex items-center gap-2 text-secondary-foreground/70 hover:text-primary transition-colors">
-                <Mail className="w-4 h-4" />
+              <a href="mailto:contact@experium.ro" className="block text-secondary-foreground/70 hover:text-primary transition-colors">
                 contact@experium.ro
               </a>
-              <div className="flex items-center gap-2 text-secondary-foreground/70">
-                <MapPin className="w-4 h-4" />
+              <div className="text-secondary-foreground/70">
                 Craiova, România
               </div>
             </div>
 
             {/* Social Links */}
             <div className="flex gap-3">
-              {[Facebook, Instagram, Youtube].map((Icon, i) => (
+              {["Facebook", "Instagram", "Youtube"].map((name) => (
                 <a
-                  key={i}
+                  key={name}
                   href="#"
-                  className="w-10 h-10 rounded-lg bg-secondary-foreground/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all"
-                  aria-label={`Social link ${i + 1}`}
+                  className="w-10 h-10 rounded-lg bg-secondary-foreground/10 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all text-sm font-semibold"
+                  aria-label={name}
                 >
-                  <Icon className="w-5 h-5" />
+                  {name[0]}
                 </a>
               ))}
             </div>

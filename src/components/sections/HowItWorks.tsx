@@ -1,30 +1,12 @@
 import { motion } from "framer-motion";
-import { Search, Gift, Calendar, PartyPopper } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
-const getSteps = (t: any) => [
-  {
-    icon: Search,
-    titleKey: "howItWorks.step1Title",
-    descKey: "howItWorks.step1Desc",
-  },
-  {
-    icon: Gift,
-    titleKey: "howItWorks.step2Title",
-    descKey: "howItWorks.step2Desc",
-  },
-  {
-    icon: Calendar,
-    titleKey: "howItWorks.step3Title",
-    descKey: "howItWorks.step3Desc",
-    extraInfo: "howItWorks.step3Extra",
-  },
-  {
-    icon: PartyPopper,
-    titleKey: "howItWorks.step4Title",
-    descKey: "howItWorks.step4Desc",
-  },
+const stepLabels = [
+  { titleKey: "howItWorks.step1Title", descKey: "howItWorks.step1Desc" },
+  { titleKey: "howItWorks.step2Title", descKey: "howItWorks.step2Desc" },
+  { titleKey: "howItWorks.step3Title", descKey: "howItWorks.step3Desc", extraInfo: "howItWorks.step3Extra" },
+  { titleKey: "howItWorks.step4Title", descKey: "howItWorks.step4Desc" },
 ];
 
 export function HowItWorks() {
@@ -62,7 +44,7 @@ export function HowItWorks() {
           {/* Connection Line */}
           <div className="hidden lg:block absolute top-16 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
 
-          {getSteps(t).map((step, index) => (
+          {stepLabels.map((step, index) => (
             <motion.div
               key={step.titleKey}
               initial={{ opacity: 0, y: 30 }}
@@ -73,10 +55,7 @@ export function HowItWorks() {
             >
               {/* Step Number */}
               <div className="relative z-10 w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary flex items-center justify-center shadow-lg">
-                <step.icon className="w-9 h-9 text-primary-foreground" />
-                <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-accent text-accent-foreground text-sm font-bold flex items-center justify-center">
-                  {index + 1}
-                </span>
+                <span className="text-2xl font-bold text-primary-foreground">{index + 1}</span>
               </div>
 
               <h3 className="text-xl font-bold mb-3">{t(step.titleKey)}</h3>

@@ -22,6 +22,13 @@ export const romanianLocations = {
       Maramureș: ["Baia Mare", "Sighetu Marmației", "Borșa", "Vișeu de Sus"],
     },
   },
+  Crișana: {
+    counties: {
+      Bihor: ["Oradea", "Băile Felix", "Salonta"],
+      Arad: ["Arad", "Lipova", "Ineu"],
+      Satu_Mare: ["Satu Mare", "Carei", "Negrești-Oaș"],
+    },
+  },
   Dobrogea: {
     counties: {
       Constanța: ["Constanța", "Mangalia", "Eforie Nord", "Mamaia"],

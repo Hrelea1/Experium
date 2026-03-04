@@ -1,21 +1,10 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { 
-  Mountain, 
-  Sparkles, 
-  UtensilsCrossed, 
-  Palette, 
-  Dumbbell, 
-  TreePine, 
-  Heart,
-  Plane
-} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const categories = [
   {
-    icon: Mountain,
     titleKey: "categories.adventure",
     slug: "aventura",
     descKey: "categories.adventureDesc",
@@ -23,7 +12,6 @@ const categories = [
     color: "from-orange-500 to-red-500",
   },
   {
-    icon: Sparkles,
     titleKey: "categories.spa",
     slug: "spa-relaxare",
     descKey: "categories.spaDesc",
@@ -31,7 +19,6 @@ const categories = [
     color: "from-cyan-500 to-blue-500",
   },
   {
-    icon: UtensilsCrossed,
     titleKey: "categories.gastronomy",
     slug: "gastronomie",
     descKey: "categories.gastronomyDesc",
@@ -39,7 +26,6 @@ const categories = [
     color: "from-amber-500 to-orange-500",
   },
   {
-    icon: Palette,
     titleKey: "categories.culture",
     slug: "arta-cultura",
     descKey: "categories.cultureDesc",
@@ -47,7 +33,6 @@ const categories = [
     color: "from-purple-500 to-pink-500",
   },
   {
-    icon: Dumbbell,
     titleKey: "categories.sports",
     slug: "sport",
     descKey: "categories.sportsDesc",
@@ -55,7 +40,6 @@ const categories = [
     color: "from-green-500 to-emerald-500",
   },
   {
-    icon: TreePine,
     titleKey: "categories.nature",
     slug: "natura",
     descKey: "categories.natureDesc",
@@ -63,7 +47,6 @@ const categories = [
     color: "from-teal-500 to-green-500",
   },
   {
-    icon: Heart,
     titleKey: "categories.romantic",
     slug: "romantic",
     descKey: "categories.romanticDesc",
@@ -71,7 +54,6 @@ const categories = [
     color: "from-rose-500 to-pink-500",
   },
   {
-    icon: Plane,
     titleKey: "categories.travel",
     slug: "calatorii",
     descKey: "categories.travelDesc",
@@ -151,11 +133,6 @@ export function Categories() {
             >
               {/* Gradient Background on Hover */}
               <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-              
-              {/* Icon */}
-              <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
-                <category.icon className="w-7 h-7 text-card" />
-              </div>
 
               {/* Content */}
               <h3 className="relative text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">

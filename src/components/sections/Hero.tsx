@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, MapPin, Sparkles, ChevronDown, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -117,7 +116,6 @@ export function Hero() {
             transition={{ delay: 0.2 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/20 backdrop-blur-sm text-card text-sm font-medium mb-6"
           >
-            <Sparkles className="w-4 h-4 text-accent" />
             {heroContent.badge}
           </motion.span>
 
@@ -139,13 +137,11 @@ export function Hero() {
           >
             <Button asChild size="lg" className="group">
               <Link to={heroContent.ctaPrimaryLink}>
-                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
                 {heroContent.ctaPrimary}
               </Link>
             </Button>
             <Button asChild size="lg" variant="secondary" className="group bg-card/20 backdrop-blur-sm border border-card/30 hover:bg-card/30 text-card hover:text-card">
               <Link to={heroContent.ctaSecondaryLink}>
-                <Gift className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
                 {heroContent.ctaSecondary}
               </Link>
             </Button>
@@ -167,10 +163,9 @@ export function Hero() {
                   className="w-full flex items-center justify-between gap-2 px-4 py-3 bg-muted rounded-xl text-left hover:bg-muted/80 transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
                     <span className="text-foreground font-medium">{t(selectedCategory)}</span>
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isCategoryOpen ? "rotate-180" : ""}`} />
+                  <span className={`text-muted-foreground transition-transform ${isCategoryOpen ? "rotate-180" : ""}`}>▾</span>
                 </button>
                 {isCategoryOpen && createPortal(
                   <>
@@ -206,7 +201,6 @@ export function Hero() {
 
               {/* Search Button */}
               <Button size="lg" className="md:w-auto" onClick={handleSearch}>
-                <Search className="w-5 h-5 mr-2" />
                 {t('hero.search')}
               </Button>
 
@@ -218,7 +212,6 @@ export function Hero() {
                 asChild
               >
                 <Link to="/map">
-                  <MapPin className="w-5 h-5 mr-2" />
                   {t('hero.showOnMap')}
                 </Link>
               </Button>

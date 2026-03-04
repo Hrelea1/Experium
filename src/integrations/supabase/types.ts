@@ -1038,6 +1038,35 @@ export type Database = {
         }
         Relationships: []
       }
+      region_notifications: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          region_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          region_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          region_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "region_notifications_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       regions: {
         Row: {
           created_at: string | null
