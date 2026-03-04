@@ -33,6 +33,7 @@ export function useCheckout() {
           deliveryType,
           personalDetails,
           deliveryAddress,
+          returnUrl: window.location.origin + window.location.pathname,
         },
       });
 
